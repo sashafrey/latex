@@ -3,6 +3,7 @@
 \usepackage[russian]{babel}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{hyperref}
 \usepackage[noend]{algorithmic}
 
 \textheight = 24.5cm
@@ -71,25 +72,28 @@
 \tableofcontents
 \newpage
 
-\section{Введение}
+\section{Введение}\label{introduction}
 \input{introduction_sub.tex}
 
-\section{Терминология}
+\section{Терминология}\label{defenitions}
 \input{defenitions_sub.tex}
 
-\section{Обучение тематических моделей}
+\section{Обучение тематических моделей}\label{learning}
 \input{learning_sub.tex}
 
-\section{Обзор библиотеки BigARTM}
+\section{Существующие реализации параллельных алгоритмов}\label{overview}
 \input{overview_sub.tex}
 
-\section{Регуляризаторы в BigARTM}
+\section{Библиотека BigARTM}\label{library}
+\input{library_sub.tex}
+
+\section{Регуляризаторы в BigARTM}\label{regularizers}
 \input{regularizers_sub.tex}
 
-\section{Эксперименты}
+\section{Эксперименты}\label{experiments}
 \input{experiments_sub.tex}
 
-\section{Заключение}
+\section{Заключение}\label{results}
 \input{results_sub.tex}
 
 
@@ -108,15 +112,26 @@ USA: ACM,~1999. — Pp. 50–57.
 \bibitem{protobuf} 
 https://developers.google.com/protocol-buffers/docs/tutorials
 
-\bibitem{smola}
-A.J.~Smola and S.~Narayanamurthy --- An architecture for parallel topic models,~2010.
-
 \bibitem{ad_lda}
-David Newman, Arthur Asuncion, Padhraic Smyth and Max Welling --- Distributed Algorithms for Topic Models,~2009.
+David Newman, Arthur Asuncion, Padhraic Smyth and Max Welling --- Distributed Algorithms for Topic Models, 2009.
+
+\bibitem{y_lda}
+A. J. Smola and S. Narayanamurthy --- An architecture for parallel topic models, 2010.
+
+\bibitem{as_lda}
+Arthur Asuncion, Padhraic Smyth, Max Welling --- Asynchronous Distributed Estimation of Topic Models for Document Analysis, 2010.
+
+\bibitem{plda}
+Yi Wang, Hongjie Bai, Matt Stanton, Wen-Yen Chen and Edward Y.Chang --- PLDA: Parallel Latent Dirichlet Allocation for Large-Scale Applications, 2009.
+
+\bibitem{mr_lda}
+Ke Zhai, Jordan Boyd-Graber, Nima Asadi, Mohamad Alkhouja --- Mr. LDA: A Flexible Large Scale Topic Modeling Package using Variational Inference in MapReduce, 2012.
+
+\bibitem{plda_plus}
+Liu, Z., Zhang, Y., Chang, E. Y., and Sun, M. --- PLDA+: Parallel Latent Dirichlet Allocation with Data Placement and Pipeline Processing, 2011.
 
 \bibitem{voron_potap_14} 
 Воронцов~К.В., Потапенко~А.А. --- Аддитивная регуляризация тематических моделей,~2014.
-
 
 \end{thebibliography}
 
