@@ -4,6 +4,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{cmap}  
+\usepackage{epstopdf}
 \usepackage[noend]{algorithmic}
 
 \textheight = 24.5cm
@@ -13,6 +16,23 @@
 \parskip = 5pt
 \tolerance = 2000
 \hyphenpenalty = 10
+
+
+\def\algorithmicrequire{\textbf{Вход:}}
+\def\algorithmicensure{\textbf{Выход:}}
+\def\algorithmicif{\textbf{если}}
+\def\algorithmicthen{\textbf{то}}
+\def\algorithmicelse{\textbf{иначе}}
+\def\algorithmicelsif{\textbf{иначе если}}
+\def\algorithmicfor{\textbf{для}}
+\def\algorithmicforall{\textbf{для всех}}
+\def\algorithmicdo{\textbf{выполнять}}
+\def\algorithmicwhile{\textbf{пока}}
+\def\algorithmicrepeat{\textbf{повторять}}
+\def\algorithmicuntil{\textbf{пока}}
+\def\algorithmicloop{\textbf{цикл}}
+\def\algorithmiccomment#1{\quad// {\sl #1}}
+
 
 \begin{document}
 
@@ -101,8 +121,8 @@
 \addcontentsline{toc}{section}{Список литературы}
 \begin{thebibliography}{00}
 
-\bibitem{voron2013ptm}
-Воронцов~К.В. Вероятностное тематическое моделирование,~2013.
+\bibitem{voron2014}
+Воронцов К. В. Аддитивная регуляризация тематических моделей коллекций текстовых документов // Доклады РАН. 2014. — Т. 455., №3. 268–271.
 
 \bibitem{hofmann_plsa}
 T.~Hofmann Probabilistic latent semantic indexing // Proceedings of the 22nd annual international
@@ -115,17 +135,11 @@ https://developers.google.com/protocol-buffers/docs/tutorials
 \bibitem{ad_lda}
 David Newman, Arthur Asuncion, Padhraic Smyth and Max Welling --- Distributed Algorithms for Topic Models, 2009.
 
-\bibitem{y_lda}
-A. J. Smola and S. Narayanamurthy --- An architecture for parallel topic models, 2010.
-
-\bibitem{as_lda}
-Arthur Asuncion, Padhraic Smyth, Max Welling --- Asynchronous Distributed Estimation of Topic Models for Document Analysis, 2010.
-
 \bibitem{plda}
 Yi Wang, Hongjie Bai, Matt Stanton, Wen-Yen Chen and Edward Y.Chang --- PLDA: Parallel Latent Dirichlet Allocation for Large-Scale Applications, 2009.
 
-\bibitem{mr_lda}
-Ke Zhai, Jordan Boyd-Graber, Nima Asadi, Mohamad Alkhouja --- Mr. LDA: A Flexible Large Scale Topic Modeling Package using Variational Inference in MapReduce, 2012.
+\bibitem{y_lda}
+A. J. Smola and S. Narayanamurthy --- An architecture for parallel topic models, 2010.
 
 \bibitem{plda_plus}
 Liu, Z., Zhang, Y., Chang, E. Y., and Sun, M. --- PLDA+: Parallel Latent Dirichlet Allocation with Data Placement and Pipeline Processing, 2011.
