@@ -1,0 +1,134 @@
+\documentclass{llncs}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[final]{graphicx}
+\usepackage{epstopdf}
+\usepackage[labelsep=period]{caption}
+\usepackage[hyphens]{url}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage[russian,english]{babel}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage[ruled,vlined,linesnumbered,algosection,algo2e]{algorithm2e}
+
+\tolerance=1000
+\hbadness=5000
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\tsum}{\mathop{\textstyle\sum}\limits}
+\newcommand{\tprod}{\mathop{\textstyle\prod}\limits}
+\newcommand{\cov}{\mathop{\rm cov}\limits}
+\newcommand{\Dir}{\mathop{\rm Dir}\nolimits}
+\newcommand{\KL}{\mathop{\rm KL}\nolimits}
+%\renewcommand{\geq}{\geqslant}
+%\renewcommand{\leq}{\leqslant}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\cond}{\mspace{3mu}{|}\mspace{3mu}}
+\newcommand{\Loss}{\mathscr{L}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\cL}{\mathscr{L}}
+\newcommand{\cP}{\mathscr{P}}
+\SetKwFor{ForAll}{\textbf{for all}}{}{}
+
+\begin{document}
+%%Analysis of Images, Social Networks, and Texts
+\title{
+    BigARTM: Open Source Library for 
+    Regularized %Multimodal Online Parallel Distributed 
+    Topic Modeling
+    of Large Text Collections
+}
+\author{
+    Konstantin Vorontsov\inst{1,3}
+    \and
+    Oleksandr Frei\inst{2}
+    \and
+    Murat Apishev\inst{3}
+    \and
+    Peter Romov\inst{4}
+}
+\institute{
+    Department of Intelligent Systems at Dorodnicyn Computing Centre of RAS,
+    Moscow Institute of Physics and Technology,
+    \email{voron@forecsys.ru}
+    \and
+    Schlumberger
+    \email{...}
+    \and
+    Moscow State University,
+    \email{...}
+    \and
+    Yandex
+    \email{...}
+}
+
+\maketitle
+
+\begin{abstract}
+    BigARTM
+
+\vspace{1em}
+\textbf{Keywords:}
+    probabilistic topic model,
+    Probabilistic Latent Sematic Analysis,
+    Latent Dirichlet Allocation,
+    stochastic matrix factorization,
+    regularization,
+    EM-algorithm,
+    BigARTM.
+\end{abstract}
+
+\section{Introduction}
+\cite{hofmann99plsi}
+\cite{blei03latent}
+\cite{asuncion09smoothing}
+
+\cite{voron14dan-eng}
+\cite{voron14aist}
+\cite{voron14mlj}
+
+\section{Multimodal regularized topic model}
+\label{sec:Multimodal}
+
+multimodal LDA (mmLDA) and correspondence LDA (Corr-LDA)
+\cite{blei03modeling}
+
+Matching Words and Pictures, MoM-LDA 
+\cite{barnard03matching}
+
+\cite{rubin12statistical}
+
+\cite{virtanen12factorized}
+
+\cite{roller13multimodal}
+
+
+\section{Online topic modeling}
+\label{sec:Online}
+
+\cite{hoffman10online}
+
+\cite{zhang13sparse}
+
+\section{BigARTM parallel distributed architecture}
+\label{sec:BigARTM}
+
+\section{Experiments}
+\label{sec:Experiments}
+
+\section{Conclusions}
+\label{sec:Conclusions}
+
+\bigskip
+\subsubsection*{Acknowledgements.}
+    The work was supported by~the Russian Foundation for Basic Research grants 14-07-00847, 14-07-00908,
+    and by~Skolkovo Institute of Science and Technology (project 081-R).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\def\BibUrl#1.{\relax}
+%\bibliographystyle{gost71sv}
+\bibliographystyle{splncs}
+\bibliography{MachLearn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
