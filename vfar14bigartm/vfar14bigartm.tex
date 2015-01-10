@@ -133,7 +133,7 @@ thus reducing barriers to entry into topic modeling research field.
 
 The rest of the paper is organized as follows.
 In~section~\ref{sec:Multimodal}
-we~introduce a~multimodal topic model generalized for documents with multiple accompanying discrete metadata.
+we~introduce a~multimodal topic model generalized for documents with multiple types of accompanying discrete metadata.
 In~section~\ref{sec:Online}
 we~describe a~fast online algorithm~\cite{hoffman10online} generalized for any additively regularized topic models.
 In~section~\ref{sec:BigARTM}
@@ -142,7 +142,6 @@ In~section~\ref{sec:Experiments}
 we~report some experiments on large datasets.
 In~section~\ref{sec:Conclusions}
 we~discuss advantages, limitations and open problems of BigARTM.
-
 
 \section{Multimodal regularized topic model}
 \label{sec:Multimodal}
@@ -156,23 +155,31 @@ $D$ denote a finite set (collection) of texts and
 $W^1$ denote a~finite set (vocabulary) of all terms from these texts.
 Each term can be a~single word or a~key phrase.
 %Each document ${d\in D}$ is a sequence of terms from the vocabulary~$W^1$.
-Denote $n_{dw}$ the number of times the term~$w$ appears in the document~$d$.
-A document can contain not only words, but also elements of other modalities, which we also call terms.
-Each $m$-th modality is defined by the finite set (vocabulary) of its terms $W^m$, ${m=1,\dots,M}$.
+A document can contain not only words, but also terms of other modalities.
+Each modality is defined by the finite set (vocabulary) of terms $W^m$, ${m=1,\dots,M}$.
 Examples of not-word modalities are:
 authors,
 class or category labels,
 date-time stamps,
-references to or from other documents,
+references to/from other documents,
 entities mentioned in texts,
 objects found in the images illustrating texts,
 users that read or downloaded documents,
 advertising banners,
 etc.
 
+Assume that
+each term occurrence in each document refers to some latent topic from a~finite set of topics~$T$.
+Text collection is considered to be a sample of triples
+$(w_i,d_i,t_i)$,\; ${i=1,\dots,n}$,
+drawn independently from a~discrete distribution $p(w,d,t)$ over a~finite space $W\times D \times T$,
+where ${W=W^1\sqcup\cdots\sqcup W^m}$ is disjoint union of all modality vocabularies.
+Terms~$w_i$ and documents~$d_i$ are observable variables,
+while topics~$t_i$ are latent variables.
+
 Following the idea of Correspondence LDA~\cite{blei03modeling}
 and Dependency LDA~\cite{rubin12statistical}
-we introduce the topic model of each $m$-th modality:
+we introduce the topic model for each modality:
 \[
     p(w\cond d)
     = \sum_{t\in T} p(w\cond t)\: p(t\cond d)
@@ -186,17 +193,13 @@ $\phi_{wt}=p(w\cond t)$ and $\theta_{td}=p(t\cond d)$
 form the matrices
 $\Phi^m = \bigl( \phi_{wt} \bigr)_{W^m\times T}$ of \emph{term probabilities for the topics}, and
 $\Theta = \bigl( \theta_{td} \bigr)_{T\times D}$ of \emph{topic probabilities for the documents}.
-Matrices $\Phi^m$, if stacked vertically,
-form ${W\!\!\times\!T}$-matrix~$\Phi$,
-where ${W=W^1\sqcup\cdots\sqcup W^m}$ is disjoint union of all modalities.
+Matrices $\Phi^m$, if stacked vertically, form ${W\!\!\times\!T}$-matrix~$\Phi$.
 Matrices $\Phi^m$ and~$\Theta$ are \emph{stochastic},
-that is, their columns $\phi^m_t$, $\theta_d$
-are non-negative and normalized representing discrete distributions.
-The number of topics~$|T|$ is usually assumed to be
-much smaller than~$|D|$ and some of~modalities~$|W^m|$.
+that is, their vector-columns represent discrete distributions.
+The number of topics~$|T|$ is usually assumed to be much smaller than~$|D|$ and~$|W|$.
 
 To learn parameters $\Phi^m$, $\Theta$ from the multimodal text collection
-we maximize the log-likelihood for $m$-th modality:
+we maximize the log-likelihood for each $m$-th modality:
 \[
     \cL_m (\Phi^m,\Theta) =
     \sum_{d\in D}\sum_{w\in W^m} n_{dw} \ln p(w\cond d)
@@ -221,51 +224,56 @@ and solve the constrained multicriteria optimization problem via scalarization:
     \theta_{td}\geq 0.
 \end{gather}
 
-\begin{theorem}
-\label{th:multimodal}
-    If the function $R(\Phi,\Theta)$ is continuously differentiable
-    then the local maximum $(\Phi,\Theta)$
-    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
-    satisfies the system of equations
-    with auxiliary variables $p_{tdw} = p(t\cond d,w)$:
-    \begin{align}
-        \label{eq:Estep}
-        p_{tdw} &= \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr);
-    \\
-        \label{eq:Mstep:phi}
-        \phi_{wt} &= \norm_{w\in W^m}
-            \biggl(
-                n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
-            \biggr);
-        \quad
-        n_{wt} = \sum_{d\in D} n_{dw} p_{tdw};
-    \\
-        \label{eq:Mstep:theta}
-        \theta_{td} &= \norm_{t\in T}
-            \biggl(
-                n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
-            \biggr);
-        \quad
-        n_{td} =
-            \sum_{w\in d} \tau_{m(w)} n_{dw} p_{tdw};
-            %\sum_{m=1}^M \tau_m \!\!\sum_{w\in W^m}\!\!\! n_{dw} p_{tdw};
-    \end{align}
-    where
-    $\norm_{t\in T} x_t = \frac{\max\{x_t,0\}}{\sum\limits_{s\in T} \max\{x_s,0\}}$
-    transforms a~vector $(x_t)_{t\in T}$ to a~discrete distribution;
-    $m(w)$~is the modality of the term~$w$, so that $w\in W^{m(w)}$.
-\end{theorem}
+The local maximum $(\Phi,\Theta)$
+of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
+satisfies the system of equations
+with auxiliary variables $p_{tdw} = p(t\cond d,w)$:
+\begin{align}
+    \label{eq:Estep}
+    p_{tdw} &= \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr);
+\\
+    \label{eq:Mstep:phi}
+    \phi_{wt} &= \norm_{w\in W^m}
+        \biggl(
+            n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+        \biggr);
+    \quad
+    n_{wt} = \sum_{d\in D} n_{dw} p_{tdw};
+\\
+    \label{eq:Mstep:theta}
+    \theta_{td} &= \norm_{t\in T}
+        \biggl(
+            n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+        \biggr);
+    \quad
+    n_{td} =
+        \sum_{w\in d} \tau_{m(w)} n_{dw} p_{tdw};
+        %\sum_{m=1}^M \tau_m \!\!\sum_{w\in W^m}\!\!\! n_{dw} p_{tdw};
+\end{align}
+where
+$\norm_{t\in T} x_t = \frac{\max\{x_t,0\}}{\sum\limits_{s\in T} \max\{x_s,0\}}$
+transforms a~vector $(x_t)_{t\in T}$ to a~discrete distribution;
+$m(w)$~is the modality of the term~$w$, so that $w\in W^{m(w)}$.
 
-This statement follows from Karush--Kuhn--Tucker conditions.
-The system of equations can be~solved by various numerical methods.
+The system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}
+follows from Karush--Kuhn--Tucker conditions (see Appendix for the proof).
+It~can be~solved by various numerical methods.
 Particularly,
 the simple-iteration method is equivalent to the EM algorithm,
 which is typically used in~practice.
-For single modality (${M=1}$) Theorem~1 gives the regularized EM algorithm~\cite{voron14aist,voron14mlj}.
-Many Bayesian topic models can be considered as its special cases with different regularizers~$R$.
+For single modality (${M=1}$) Theorem~1 gives the regularized EM algorithm
+proposed in~\cite{voron14dan-eng}.
+With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
+Many Bayesian topic models can be considered alternatively
+as special cases of ARTM with different regularizers~$R$,
+as shown in~\cite{voron14aist,voron14mlj}.
 For example,
 LDA~\cite{blei03latent} corresponds to the entropy smoothing regularizer.
-PLSA~\cite{hofmann99plsi} has no regularization at all, ${R=0}$.
+
+Due to models unification and additive regularization
+BigARTM enables to build topic models for various applications
+simply by choosing a~suitable combination of~regularizers
+from a constantly growing user-extensible library.
 
 \section{Online topic modeling}
 \label{sec:Online}
@@ -279,8 +287,8 @@ see Algorithm~\ref{alg:Online} and~\ref{alg:ProcessBatch}.
 Matrix~$\Phi$ is updated rarely, after all documents from the batch are processed.
 For a~large collection,
 matrix~$\Phi$ stabilizes after a~small initial part of the collection passed.
-Therefore a~single pass through the collection is usually sufficient to learn a~topic model
-(with possible second pass for only the initial part).
+Therefore a~single pass through the collection is usually sufficient to learn a~topic model.
+The second pass may be needed for the initial part of the collection.
 
 Algorithm~\ref{alg:Online} does not specify how often to synchronize $\Phi$ matrix at step \ref{alg:sync}.
 It can be done after every batch or less frequently
@@ -289,16 +297,16 @@ This flexibility is especially important for concurrent implementation of the al
 where multiple batches are processed in parallel.
 In this case synchronization can be triggered when a fixed number of documents had been processed since last synchronization.
 
-Such online reorganization of the EM iterative process
-is not necessarily associated with Bayesian inference presented in~\cite{hoffman10online}.
-Different topic models from PLSA to multimodal and regularized models
-can be learned by the above online implementation of the EM algorithm.
+The online reorganization of the EM iterations
+is not necessarily associated with Bayesian inference used in~\cite{hoffman10online}.
+Different topic models, from PLSA to multimodal and regularized models,
+can be learned by the above online EM algorithm.
 
 \begin{algorithm}[t]
 \caption{~Online EM-algorithm for multimodal ARTM}
 \label{alg:Online}
 \begin{algorithmic}[1]
-\REQUIRE collection $D_b$, discounting factor $\rho$;
+\REQUIRE collection $D_b$, discounting factor $\rho\in(0,1]$;
 \ENSURE matrix $\Phi$;
 \STATE initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$;
 \STATE $n_{wt} := 0$,~ $\tilde n_{wt} := 0$;
@@ -314,7 +322,8 @@ can be learned by the above online implementation of the EM algorithm.
                $\phi_{wt} := \norm_{w\in W^m}
                     \bigl(
                         n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
-                    \bigr)$ for all $w \in W$ and $t \in T$;
+                    \bigr)$
+               for all $w \in W^m$,\, $m=1,\dots,M$ and $t \in T$;
         \STATE $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$;
     \ENDIF
 \ENDFOR
@@ -474,7 +483,6 @@ Further improvement of single-node can be achieved by offloading batch processin
     and by~Skolkovo Institute of Science and Technology (project 081-R).
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\def\BibUrl#1.{\relax}
 %\bibliographystyle{gost71sv}
@@ -482,6 +490,148 @@ Further improvement of single-node can be achieved by offloading batch processin
 \bibliography{MachLearn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section*{Appendix}
+
+Topic~$t$ is called \emph{regular} for the modality~$m$
+if ${n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}} > 0}$
+for at least one term ${w\in W^m}$.
+If~the~reverse inequality holds for all ${w\in W^m}$ then
+topic~$t$ is called \emph{irregular}.
+
+Document~$d$ is called \emph{regular}
+if ${n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}} > 0}$
+for at least one topic ${t\in T}$.
+If~the reverse inequality holds for all ${t\in T}$ then
+document~$d$ is called \emph{irregular}.
+
+\begin{theorem}
+\label{th:multimodal}
+    If the function $R(\Phi,\Theta)$ is continuously differentiable
+    and $(\Phi,\Theta)$ is the local maximum
+    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
+    then for any regular topic-modality pair $(t,m)$ and any regular document~$d$
+    the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta} holds.
+\end{theorem}
+
+\begin{note}
+    If a~topic~$t$ is irregular 
+    then the $t$-th vector-column in matrix~$\Phi^m$ equals zero 
+    and can not represent a~discrete distribution.
+    This means that topic~$t$ for the modality~$m$ must be excluded from the model.
+    This mechanism is useful for irrelevant topics elimination and determining the number of topics.
+\end{note}
+\begin{note}
+    If a~documents~$d$ is irregular 
+    then the $d$-th vector-column in matrix~$\Theta$ equals zero 
+    and can not represent a~discrete distribution.
+    This means that document~$d$ must be excluded from the model.
+    For example, a~document may be too short, or have no relation to the themes of a~given collection.
+\end{note}
+
+\begin{proof}
+    For the local minimum $\Phi^m,\Theta$
+    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
+    the Karush--Kuhn--Tucker (KKT) conditions (see Appendix~A) can be written as follows:
+    %(conditions with respect to $\theta_{td}$ are analogous):
+    \begin{gather*}
+        \sum_{d} n_{dw} \frac{\theta_{td}}{p(w\cond d)} + \frac{\partial R}{\partial \phi_{wt}}
+        = \lambda_t - \lambda_{wt};
+        \quad
+        \lambda_{wt}\geq 0;
+        \quad
+        \lambda_{wt}\phi_{wt} = 0;
+    \\
+        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\! n_{dw} \frac{\phi_{wt}}{p(w\cond d)} + \frac{\partial R}{\partial \theta_{td}}
+        = \mu_d - \mu_{td};
+        \quad
+        \mu_{td}\geq 0;
+        \quad
+        \mu_{td}\theta_{td} = 0;
+    \end{gather*}
+    where $\lambda_t$, $\lambda_{wt}$, $\mu_d$, $\mu_{td}$
+    are KKT multipliers for normalization and nonnegativity constrains.
+
+    Let us multiply 
+    both sides of the first equation by~$\phi_{wt}$,
+    both sides of the second equation by~$\theta_{td}$,
+    and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep} 
+    in~the~left-hand side of both equations. 
+    Then we sum 
+    the right-hand side of the first equation over~$d$,
+    the right-hand side of the second equation over~$t$:
+    \begin{gather*}
+        \phi_{wt} \lambda_t
+        =
+        \sum_{d} 
+        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)} 
+        + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+        =
+        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}};
+    \\
+        \theta_{td} \mu_{d}
+        =
+        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\!
+        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)} 
+        + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+        =
+        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}.
+    \end{gather*}
+
+    An~assumption that $\lambda_t\leq 0$ contradicts the regularity condition for the $(t,m)$ pair.
+    Then ${\lambda_t>0}$.     
+    Either ${\phi_{wt}= 0}$ or both sides of the first equation are positive.
+    Combining these two cases in one formula, we write:
+    \begin{equation}
+    \label{eq:in-theorem-1:phi}
+        \phi_{wt} \lambda_t
+        =
+        \max\biggl\{
+        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
+        \biggr\}.
+    \end{equation}
+    Analogously,
+    an~assumption that $\mu_d\leq 0$ contradicts the regularity condition for the document~$d$.
+    Then ${\mu_d>0}$.
+    Either ${\theta_{td}= 0}$ or both sides of the second equation are positive,
+    consequently,
+    \begin{equation}
+    \label{eq:in-theorem-1:theta}
+        \theta_{td} \mu_d
+        =
+        \max\biggl\{
+        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
+        \biggr\}.
+    \end{equation}
+
+    Let us sum 
+    both sides of~the first equation over all~${w\in W^m}$,
+    then
+    both sides of~the second equation over all~${t\in T}$:
+    \begin{gather}
+    \label{eq:in-theorem-2:phi}
+        \lambda_t
+        =
+        \sum_{w\in W^m}
+        \max\biggl\{
+        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
+        \biggr\};
+    \\
+    \label{eq:in-theorem-2:theta}
+        \mu_d
+        =
+        \sum_{t\in T}
+        \max\biggl\{
+        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
+        \biggr\}.
+    \end{gather}
+
+    Finally, 
+    we obtain~\eqref{eq:Mstep:phi} by expressing $\phi_{wt}$ from~\eqref{eq:in-theorem-1:phi} and \eqref{eq:in-theorem-2:phi}.
+
+    Analogously, 
+    we obtain~\eqref{eq:Mstep:theta} by expressing $\theta_{td}$ from~\eqref{eq:in-theorem-1:theta} and \eqref{eq:in-theorem-2:theta}.
+    \qed    
+\end{proof}
 
 \end{document}
 
