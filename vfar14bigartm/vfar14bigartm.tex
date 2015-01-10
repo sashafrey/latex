@@ -119,6 +119,7 @@ to easily design, modify, select, and combine topic models.
 In this paper we announce \textbf{the BigARTM open source project} for
 parallel distributed online topic modeling of large collections,
 \texttt{http://bigartm.org}.
+BigARTM is released under New BSD License, which permits free commercial and non-commercial usage of the library.
 The theory of BigARTM is based on non-Bayesian multicriteria approach~---
 \emph{Additive Regularization of Topic Models}, ARTM~\cite{voron14dan-eng}.
 In~ARTM a~topic model is learned by maximizing the~weighted sum
@@ -297,7 +298,7 @@ can be learned by the above online implementation of the EM algorithm.
 \caption{~Online EM-algorithm for multimodal ARTM}
 \label{alg:Online}
 \begin{algorithmic}[1]
-\REQUIRE collection $D_b$, discounting factors $\rho$;
+\REQUIRE collection $D_b$, discounting factor $\rho$;
 \ENSURE matrix $\Phi$;
 \STATE initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$;
 \STATE $n_{wt} := 0$,~ $\tilde n_{wt} := 0$;
@@ -471,7 +472,7 @@ Further improvement of single-node can be achieved by offloading batch processin
 \subsubsection*{Acknowledgements.}
     The work was supported by~the Russian Foundation for Basic Research grants 14-07-00847, 14-07-00908,
     and by~Skolkovo Institute of Science and Technology (project 081-R).
-    
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
