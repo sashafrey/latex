@@ -470,6 +470,35 @@ We also use several free online services to host this project:
 \section{Experiments}
 \label{sec:Experiments}
 
+There are many efficient LDA implementations for single node processing. In this section we discuss Vowpal Wabbit LDA \cite{vwlda} and Gensim \cite{gensim} as most popular ones. At first we review their technical and algorithmic features and compare them with solutions applied to our library. In addition we explain the reasons why we refused to integrate ARTM into these implementations. Then we compare the results of experiments on these libraries and BigARTM.
+
+\paragraph{Vowpal Wabbit LDA.} LDA in Vowpal Wabbit is online, as other algorithms in this library. It bases on Online Variational Bayes LDA described by Matthew Hoffman in \cite{hoffman10online}. Online VB LDA in Vowpal Wabbit supports single-threaded documents processing, it's neither a multi-core nor distributed. Nevertheless, effective implementation in C++ without STL and good scalability of the algorithm made VW.LDA one of the fastest tools for topic modeling within single computing node. However, it's not very comfortable: Vowpal Wabbit LDA doesn't have user API and launches from CLI. This implies the limitations of possibilities to tune the parameters of topic model and to control its quality.
+
+Online algorithm and C++ usage are the common features of BigARTM and VW.LDA
+\footnote{But we also use STL ? Boost libraries}. Also both of libraries are cross-platform. But there are more differences than similarities. BigARTM accelerates processing by using multithreaded computing. Library capabilities and user API are much richer. API allows to tune almost all phases of algorithm. At the same time, it's also possible to use library from CLI as in VW.LDA, if necessary.
+
+\paragraph{Gensim.} Cross-platform and written on Python, library Gensim has two different LDA implementations. The first one is LdaModel, it's almost a clone of Online VB LDA. The high performance of data processing is achieved through the usage of NumPy library, built over low-level BLAS library
+\footnote{Intel MKL, ATLAS etc.}. The second implementation is LdaMulticore. It also bases on Online VB LDA, but supports multi-core processing. LdaMulticore creates a workflow per core, which processes it's own part of documents. In addition, it creates a general aggregating stream, that merges asynchronously the results, recieved from workflows. In this way, LdaModel uses several cores to process one batch of documents, and in LdaMulticore each core processes it's own batch. Gensim has a comfortable enough user interface. Moreover, it has a capability to find topic distributions for new documents using pre-built topic model.
+
+BigARTM and Gensim.LdaMulticore proceed multithreaded data processing in the same way. BigARTM also can find topic distributions for new documents. But our library supports multimodal models. And it's more productive. In the following experiments we show, that BigARTM's scalability is higher, than LdaMulticore's one.
+
+\paragraph{Motivation.} BigARTM's idea is to create a versatile tool for topic modeling that meets several criteria:
+
+\begin{itemize}
+	\item Online data processing.
+	\item ARTM support with possibility to add new regularizers and functionals of quality.
+	\item Permanent monitoring of topic model during learning.
+	\item A capability to be integrated in other programming languages.
+	\item Efficient parallel data processing.
+	\item Rich and flexible user API.
+	\item Cross-platform.
+\end{itemize}
+Some of this conditions exclude the possibility of using VW.LDA or Gensim as the base of ARTM. Vowpal Wabbit is a common library of online algorithms, which contain LDA as one of the working modes. It's impossible to control the state of the model or to influence it during the learning process. As we noted above, there's no user API in VW.LDA. In addtition, the source code of the library is difficult for modification and support.
+
+The key reason we refused to implement ARTM in Gensim is that it's written on Python. This language doesn't provide the possibility to be integrated into other languages easy. And C++ does. Moreover, we consider Gensim.LdaMulticore to be not very efficient. This question is discussed below.
+
+BigARTM satisfies all of the given criteria. It's effective, easily extensible due to the plug-ins, supports user interfaces for different languages. As we noted above, the library can learn several topic models simultaneously, apply different regularization strategies. Also it allows to correct parameters of the regularizers and models during the learning process and unload any intermediate and final information about the models.
+
 \section{Conclusions}
 \label{sec:Conclusions}
 
@@ -514,15 +543,15 @@ document~$d$ is called \emph{irregular}.
 \end{theorem}
 
 \begin{note}
-    If a~topic~$t$ is irregular 
-    then the $t$-th vector-column in matrix~$\Phi^m$ equals zero 
+    If a~topic~$t$ is irregular
+    then the $t$-th vector-column in matrix~$\Phi^m$ equals zero
     and can not represent a~discrete distribution.
     This means that topic~$t$ for the modality~$m$ must be excluded from the model.
     This mechanism is useful for irrelevant topics elimination and determining the number of topics.
 \end{note}
 \begin{note}
-    If a~documents~$d$ is irregular 
-    then the $d$-th vector-column in matrix~$\Theta$ equals zero 
+    If a~documents~$d$ is irregular
+    then the $d$-th vector-column in matrix~$\Theta$ equals zero
     and can not represent a~discrete distribution.
     This means that document~$d$ must be excluded from the model.
     For example, a~document may be too short, or have no relation to the themes of a~given collection.
@@ -551,19 +580,19 @@ document~$d$ is called \emph{irregular}.
     where $\lambda_t$, $\lambda_{wt}$, $\mu_d$, $\mu_{td}$
     are KKT multipliers for normalization and nonnegativity constrains.
 
-    Let us multiply 
+    Let us multiply
     both sides of the first equation by~$\phi_{wt}$,
     both sides of the second equation by~$\theta_{td}$,
-    and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep} 
-    in~the~left-hand side of both equations. 
-    Then we sum 
+    and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep}
+    in~the~left-hand side of both equations.
+    Then we sum
     the right-hand side of the first equation over~$d$,
     the right-hand side of the second equation over~$t$:
     \begin{gather*}
         \phi_{wt} \lambda_t
         =
-        \sum_{d} 
-        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)} 
+        \sum_{d}
+        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
         + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
         =
         n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}};
@@ -571,14 +600,14 @@ document~$d$ is called \emph{irregular}.
         \theta_{td} \mu_{d}
         =
         \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\!
-        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)} 
+        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
         + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         =
         n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}.
     \end{gather*}
 
     An~assumption that $\lambda_t\leq 0$ contradicts the regularity condition for the $(t,m)$ pair.
-    Then ${\lambda_t>0}$.     
+    Then ${\lambda_t>0}$.
     Either ${\phi_{wt}= 0}$ or both sides of the first equation are positive.
     Combining these two cases in one formula, we write:
     \begin{equation}
@@ -603,7 +632,7 @@ document~$d$ is called \emph{irregular}.
         \biggr\}.
     \end{equation}
 
-    Let us sum 
+    Let us sum
     both sides of~the first equation over all~${w\in W^m}$,
     then
     both sides of~the second equation over all~${t\in T}$:
@@ -625,12 +654,12 @@ document~$d$ is called \emph{irregular}.
         \biggr\}.
     \end{gather}
 
-    Finally, 
+    Finally,
     we obtain~\eqref{eq:Mstep:phi} by expressing $\phi_{wt}$ from~\eqref{eq:in-theorem-1:phi} and \eqref{eq:in-theorem-2:phi}.
 
-    Analogously, 
+    Analogously,
     we obtain~\eqref{eq:Mstep:theta} by expressing $\theta_{td}$ from~\eqref{eq:in-theorem-1:theta} and \eqref{eq:in-theorem-2:theta}.
-    \qed    
+    \qed
 \end{proof}
 
 \end{document}
