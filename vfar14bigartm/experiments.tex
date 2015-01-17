@@ -1,0 +1,95 @@
+\documentclass{article}
+
+% TEMP PACKAGES!
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{cmap}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage{standalone}
+\usepackage{array}
+
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}
+\pgfplotsset{compat = 1.3}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+
+Данный раздел посвящён сравнению моделей LDA и ARTM. В экспериментах, сравнивающих BigARTM с Gensim и VW.LDA мы показали, что алгоритм Online PLSA со сглаживающим регуляризатором и Online VB LDA работают схожим образом. Поэтому в этом эксперименте будут оцениваться характеристики PLSA со сглаживающим регуляризатором (который мы далее будем называть LDA) и ARTM (суть PLSA с набором регуляризаторов). Процесс обновления матрицы $\Phi$ в процессе прохода по коллекции будет производится аналогично экспериментам из раздела ???(раздел про сравнение библиотек). Ниже описываются используемые нами метрики качества потроения модели.
+
+\paragraph{Необходимые определения} \dots% here will be placed the text about regularizers and functionals.
+
+\paragraph{Текстовая коллекция} Все наши эксперименты проводились на корпусе английской Википедии
+\footnote{Коллекция была получена с помощью gensim.make\_wikicorpus.}
+, объём которой $|D| \approx 3.7 \times 10^6$ документов. Словарь имеет размер $|W| \approx 10^5$, общая длина коллекции в словах $n \approx ???$.
+
+\paragraph{Параметры эксперимента} 
+Обе модели будут иметь следующий общий набор параметров, с которыми будет запускаться BigARTM: 1 проход по коллекции
+\footnote{Подразумевается один полный проход по всей коллекции и повторный проход по первым $3 \times 10^5$ документам для уточнения их распределений.}
+, 20 проходов по каждому документу, общее количество тем --- 100, из них фоновых --- 5, матрица $\Theta$, построенная на прошлой итерации, используется в качестве начального приближения на текущей. Параметры обновления матрицы $\Phi$ $\kappa$ и $\tau_0$ равны 0.5 и 64 соответственно. Порог $p(t|w)$ для ядровых функционалов --- 0.25, размер батча равен 10000. Обновления модели производится каждые 1-3 батча
+\footnote{Такая недетрминированность возникает из-за того, что эксперименты проводились в proxy-режиме на удалённой машине.}. 
+
+Значения функционалов качества ядер тем и разреженностей матриц $\Phi$ и $\Theta$ будут оцениваться для LDA по всем темам, для ARTM --- только по предметным.
+
+Параметры LDA $\alpha = \beta = \cfrac{1}{|T|}$.
+
+\begin{figure}[h!]
+\begin{tabular}{cc}
+\input{plot_perplexity_sparsity}
+&
+\input{plot_kernel}
+\end{tabular}
+\caption{Comparison of LDA (thin) and ARTM (bold) models. X axis is a number of processed documents.} \label{fig:comparison_1}
+\end{figure}
+
+Регуляризатор для ARTM, представляющий собой смесь разреживания предметных тем, сглаживания фоновых и декорреляцию, описывается формулой
+
+\begin{align}
+    R(\Phi,\Theta)
+    =&
+    - \beta_0 \sum_{t\in S} \sum_{w\in W} \beta_w \ln \phi_{wt}
+    - \alpha_0 \sum_{d\in D} \sum_{t\in S} \alpha_t \ln \theta_{td}
+    \notag
+\\  {}&
+    + \beta_1 \sum_{t\in B} \sum_{w\in W} \beta_w \ln \phi_{wt}
+    + \alpha_1 \sum_{d\in D} \sum_{t\in B} \alpha_t \ln \theta_{td}
+    \notag
+\\  {}&
+    - \gamma
+        \sum_{t\in T}
+        \sum_{s\in T\backslash t}
+        \sum_{w\in W} \phi_{wt}\phi_{ws}
+    \to \max.
+\end{align}
+
+% description according to coefficients, don't forget about ones!
+% TEMPORARY
+Коэффициенты $\beta_w$ и $\alpha_t$ примем равными 1, $\forall w,t$. Коэффициенты регуляризации $\alpha_0, \alpha_1, \beta_0, \beta_1$ и $\gamma$ возьмём постоянными на протяжении всего прохода по коллекции. Их значения $\alpha_0 = a, \alpha_1 = b, \beta_0 = c, \beta_1 = d, \gamma = e$.
+
+\paragraph{Результаты} В таблице \ref{tab:model_comparison} приведены финальные значения функционалов качества после одного прохода по коллекции для моделей LDA и ARTM. Видно, что комбинация регуляризаторов сглаживания, разреживания и декорреляции сильно улучшает качество результирующей модели с небольшими потерями перплексии.
+
+\begin{table}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}[t]{P{8.4em}|P{2.9em} P{2.9em} P{2.9em} P{2.9em} P{2.9em} P{2.9em} }
+\hline
+Model/Functional & $\mathcal{P}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
+\hline
+LDA              & 6604 &  0.00  &   0.27 &   952 &  0.40 &  0.51 \\
+ARTM             & 6723 &  94.54 &  84.99 &  1014 &  0.55 &  0.70 \\
+\hline
+\end{tabular}
+\caption{Comparison of LDA and ARTM models. Quality functionals: $\mathcal{P}$ --- train perplexity, $\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of matrices $\Phi$ and $\Theta$ (in \%), $\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
+\label{tab:model_comparison}
+\end{center}
+\end{table}
+
+Более подробно процесс обучения представлен на \ref{fig:comparison_1}. На верхнем графике показано убывание перплексии и замеры разреженностей матриц $\Phi$ и $\Theta$. На нижнем --- усреднённые характеристики ядер тем. Видно, что LDA совершенно не способствует разреживанию и даёт гораздо менее чистые и контрастные ядра тем.
+
+Таким образом, мы показали, что реализованный в BigARTM алгоритм, с подходящей траекторией регуляризации, позволяет существенно улучшить характеристики тематической модели при небольшом ухудшении перплексии.
+
+\end{document}
