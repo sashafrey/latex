@@ -8,18 +8,21 @@ import pymystem3
 import multiprocessing 
 
 def stem_russian_batches(batch_filename):
-    stemmer = pymystem3.Mystem()
+    if not hasattr(stem_russian_batches, "stemmer"):
+       stem_russian_batches.stemmer = pymystem3.Mystem()
+
     batch_stem_path='./stem/'
 
-    print batch_filename
+    print batch_filename + " loading..."
     batch = artm.library.Library().LoadBatch(batch_filename)
+    print batch_filename + " loading done."
     batch_stem = artm.messages_pb2.Batch() 
     # stem tokens
     token_list = list()
     for token in batch.token:
         token_list.append(token)
     text = ' '.join(token_list)
-    text_stem = stemmer.lemmatize(text)
+    text_stem = stem_russian_batches.stemmer.lemmatize(text)
     token_stem_list = ''.join(text_stem).strip().split(' ')
 
     token_id_to_token_stem_id = dict()
@@ -53,8 +56,9 @@ def stem_russian_batches(batch_filename):
                 field_stem.token_id.append(token_stem_id)
                 field_stem.token_count.append(field_stem_dict[token_stem_id])
     # save batch
+    print batch_filename + " saving result..."
     artm.library.Library().SaveBatch(batch_stem, batch_stem_path)
-    print batch_filename + " done."
+    print batch_filename + " saving done."
     return 0
 
 if __name__ == '__main__':
@@ -70,5 +74,3 @@ if __name__ == '__main__':
     pool = multiprocessing.Pool()
     pool.map(stem_russian_batches, glob.glob(batch_path + "*.batch"))
     print 'Add batches done.'
-
-
