@@ -25,6 +25,7 @@ def cut_batch(batch_path, batch_cut_path, dictionary_path, no_below=5, no_above=
         lang_stat["@russian"] = 0
         for item in batch.item:
             item_cut = batch_cut.item.add()
+            item_cut.title = batch.item.title
             for field in item.field:
                 field_cut = item_cut.field.add()
                 field_cut.name = field.name

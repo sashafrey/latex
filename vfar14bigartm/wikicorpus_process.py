@@ -17,7 +17,7 @@ import glob
 #===============================================================================
 
 
-def load_doc_sets(csv_path='ru2en.csv'):
+def load_doc_sets(csv_path):
     doc_set_ru = set()
     doc_set_en = set()
     with open(csv_path, 'r') as csv_file:
@@ -35,28 +35,26 @@ def save_to_batches(input, doc_set=set(), batch_path='.', batch_size=1000, lang=
     wiki = WikiCorpus(input, lemmatize=False, dictionary='empty dictionary')
     wiki.metadata = True  # request to extract page_id and title
     
-    num_docs_total = len(doc_set)
-    num_docs_batch = 0
-    num_docs_curr  = 0
-    batch_dict     = defaultdict(int)
-    batch_token_id = 0
-    NNZ            = 0
+    num_docs_found = 0
+    batch_dict = {}
+    NNZ = 0
     batch = artm.messages_pb2.Batch()
     for (text, page_id_and_title) in wiki.get_texts():
         page_id = page_id_and_title[0]
         title = page_id_and_title[1]
-#         print page_id
-        
+
         if page_id in doc_set:
-            print num_docs_curr, page_id, title
+            num_docs_found += 1
+            print num_docs_found, page_id, title
+
             # get tokens tf in the text
             text_tf = Counter(text)
             for token in text:
                 # update batch dictionary
                 if token not in batch_dict:
-                    batch_dict[token] = batch_token_id
-                    batch_token_id += 1
-                    
+                    batch.token.append(unicode(token, 'utf-8'))
+                    batch_dict[token] = len(batch.token) - 1
+
             # add item to batch
             item = batch.item.add()
             item.id = int(page_id)
@@ -68,24 +66,18 @@ def save_to_batches(input, doc_set=set(), batch_path='.', batch_size=1000, lang=
                 field.token_count.append(text_tf[token])
                 NNZ += text_tf[token]
        
-            num_docs_batch += 1
-            num_docs_curr  += 1
-            if (num_docs_batch == batch_size) or\
-               (num_docs_curr == num_docs_total and num_docs_batch <> 0):
-                for token in batch_dict: 
-                    batch.token.append(unicode(token, 'utf-8'))
+            if len(batch.item) == batch_size:
                 artm.library.Library().SaveBatch(batch, batch_path)
-
                 print 'Batch done, |W| = ' + str(len(batch.token)) + ", NNZ = " + str(NNZ)
 
                 batch = artm.messages_pb2.Batch()
-                num_docs_batch = 0
-                batch_token_id = 0
-                batch_dict     = defaultdict(int)
-                NNZ            = 0
-            if num_docs_curr == num_docs_total: # all documents have been found
-                break 
-            
+                batch_dict = {}
+                NNZ = 0
+
+    if len(batch.item) > 0:
+        artm.library.Library().SaveBatch(batch, batch_path)
+        print 'Last batch done, |W| = ' + str(len(batch.token)) + ", NNZ = " + str(NNZ)
+
 if __name__ == '__main__':
     batch_path = 'batches_test_1/' 
     
