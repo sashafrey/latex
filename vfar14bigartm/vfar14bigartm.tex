@@ -470,26 +470,28 @@ We are also planning to implement a Java wrapper in the near future.
 In addition to the programming APIs the library also also has a simple CLI interface.
 
 \paragraph{Basic tools.}
-Most of BigARTM code is written in C++,
-and can be built on various operating systems (Windows, Linux, and Mac OS-X)
-in both 32 bit and 64 bit configurations.
-To build the the library you need a recent C++ compiler with C++11 support (GNU GCC 4.6.3, clang 3.4 or Visual Studio 2012 or newer),
-and Boost C++ Libraries (version 1.46.1 or newer).
-All other third-parties are included in BigARTM repository:
-\begin{itemize}
-\item Google Protocol Buffers,
-\item Google C++ Testing Framework (gtest),
-\item Google Logging library for C++ (glog),
-\item Google Commandline flags module for C++ (gflags),
-\item ZeroMQ (\url{http://zeromq.org/}),
-\item rpcz (\url{http://code.google.com/p/rpcz/}).
-\end{itemize}
-We also use several free online services to host this project:
-\begin{itemize}
-\item \url{https://github.com/bigartm/bigartm} --- to host source code,
-\item \url{https://readthedocs.org/} --- free documentation hosting,
-\item \url{http://travis-ci.org} --- free continuous integration service.
-\end{itemize}
+A careful selection of the programming tools is quite important for any software project.
+This is especially true for BigARTM as its code is written in C++,
+a language that on its own offers less functionality comparing to Python, .NET Framework or Java.
+To mitigate this we use
+various parts of the Boost C++ Libraries,
+Google Protocol Buffers for data serialization,
+Google C++ Testing Framework,
+Google Logging library for C++,
+Google Commandline flags module for C++,
+ZeroMQ library for network communication,
+RPCZ library as an RPC implementation for Google Protocol Buffers.
+This tools are not specific for topic modeling, and should be considered for any scientific library written in C++.
+
+BigARTM uses CMake as a cross-platform build system,
+and it successfully builds on Windows, Linux and OS X in 32 and 64 bit configurations.
+Building the library require a recent C++ compiler with C++11 support (GNU GCC 4.6.3, clang 3.4 or Visual Studio 2012 or newer),
+and Boost Libraries 1.46.1 or newer. All the other third-parties are included in the BigARTM repository.
+
+To organize the project we use several free online services,
+including \url{https://github.com/} --- to hose the source code,
+\url{https://readthedocs.org/} --- to host online documentation,
+\url{http://travis-ci.org} --- to run automated continuous integration builds.
 
 \section{Experiments}
 \label{sec:Experiments}
@@ -575,11 +577,12 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
 	\label{fig:bigartm_speedup}
 \end{figure}
 
-All runs perform one pass over the Wikipedia corpus and produce a model with $|T|=100$ topics.
-The runtime is reported for an Intel-based CPU with 32 cores, $1325 MHz$.
+Each run in our experiment performs one pass over the Wikipedia corpus and produce a model with $|T|=100$ topics.
+The runtime is reported for an Intel-based CPU with 16 physical cores with hyper-threading.
 The collection was split into batches with $10 000$ documents each
-(\texttt{chunksize} in Gensim, \texttt{--minibatch} in VW.LDA).
-The update rule in online algorithm used $\rho = (\tau_0 + t)^{-\kappa}$, $\tau_0 = 1$, $\kappa = 0.5$,
+(\texttt{chunksize} in Gensim, \texttt{minibatch} in VW.LDA).
+The update rule in online algorithm used $\rho = 1 \slash \sqrt{b + \tau_0}$, where $b$ is the number of batches processed so far,
+and $\tau_0$ is an a constant offset parameter, introduced in \cite{hoffman10online} (in our experiment $\tau_0 = 64$).
 Update performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ parallel threads.
 LDA priors were fixed as $\alpha = 0.1,\, \beta = 0.1$, so that $\vec{\theta}_d \sim \text{Dir}(\alpha),\, \vec{\phi}_t \sim \text{Dir}(\beta)$.
 
