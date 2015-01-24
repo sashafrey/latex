@@ -12,6 +12,13 @@
 \usepackage[ruled,vlined,linesnumbered,algosection,algo2e]{algorithm2e}
 \usepackage{algorithm}
 \usepackage[noend]{algorithmic}
+\usepackage{color}
+\usepackage{cmap}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage{standalone} 
 
 \tolerance=1000
 \hbadness=5000
@@ -32,6 +39,11 @@
 \newcommand{\cP}{\mathscr{P}}
 \newcommand{\kw}[1]{\textsf{#1}}
 \SetKwFor{ForAll}{\textbf{for all}}{}{}
+
+%... and these rows too.
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}
+\pgfplotsset{compat = 1.3}
 
 \begin{document}
 %%Analysis of Images, Social Networks, and Texts
@@ -67,7 +79,12 @@
 \maketitle
 
 \begin{abstract}
-    BigARTM...
+Probabilistic topic modeling of text collections is a powerful tool for statistical text analysis.
+In this paper we announce the BigARTM open source project for regularized multimodal topic modeling of large collections.
+Several experiments on Wikipedia corpus shows that BigARTM performs faster and gives better perplexity
+comparing to other popular packages,such as Vowpal Wabbit LDA and Gensim.
+We also demonstrate several unique BigARTM features, such as topics regularization and multi-language models,
+which are not available in other software packages for topic modeling.
 
 \vspace{1em}
 \textbf{Keywords:}
@@ -119,7 +136,6 @@ to easily design, modify, select, and combine topic models.
 In this paper we announce \textbf{the BigARTM open source project} for
 parallel distributed online topic modeling of large collections,
 \texttt{http://bigartm.org}.
-BigARTM is released under New BSD License, which permits free commercial and non-commercial usage of the library.
 The theory of BigARTM is based on non-Bayesian multicriteria approach~---
 \emph{Additive Regularization of Topic Models}, ARTM~\cite{voron14dan-eng}.
 In~ARTM a~topic model is learned by maximizing the~weighted sum
@@ -130,6 +146,14 @@ Many known Bayesian topic models were revisited in terms of ARTM in~\cite{voron1
 Compared to the Bayesian approach,
 ARTM makes topic models easier to design, infer, combine and explain,
 thus reducing barriers to entry into topic modeling research field.
+
+BigARTM is released under New BSD License, which permits free commercial and non-commercial usage.
+The core of the library is written C++ and exposed via two equally rich APIs for C++ and Python.
+The library is cross-platform and can be built for Linux, Windows and OS X in both 32 and 64 bit configuration.
+In our experiments on Wikipedia corpus BigARTM performs better than Vowpal Wabbit LDA and Gensim libraries
+in terms of perplexity and runtime.
+Comparing to other libraries BigARTM offers several additional features,
+such as regularization and multi-modal topic modeling.
 
 The rest of the paper is organized as follows.
 In~section~\ref{sec:Multimodal}
@@ -470,34 +494,205 @@ We also use several free online services to host this project:
 \section{Experiments}
 \label{sec:Experiments}
 
-There are many efficient LDA implementations for single node processing. In this section we discuss Vowpal Wabbit LDA \cite{vwlda} and Gensim \cite{gensim} as most popular ones. At first we review their technical and algorithmic features and compare them with solutions applied to our library. In addition we explain the reasons why we refused to integrate ARTM into these implementations. Then we compare the results of experiments on these libraries and BigARTM.
+In this section we evaluate the performance and the algorithmic quality of \mbox{BigARTM} against two popular software packages ---
+Gensim \cite{rehurek_lrec}  %\footnote{\url{http://radimrehurek.com/gensim/}}
+and Vowpal Wabbit\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}.
+We also demonstrate several unique BigARTM features, such as topics regularization and multi-language models,
+which are not available in other software packages.
 
-\paragraph{Vowpal Wabbit LDA.} LDA in Vowpal Wabbit is online, as other algorithms in this library. It bases on Online Variational Bayes LDA described by Matthew Hoffman in \cite{hoffman10online}. Online VB LDA in Vowpal Wabbit supports single-threaded documents processing, it's neither a multi-core nor distributed. Nevertheless, effective implementation in C++ without STL and good scalability of the algorithm made VW.LDA one of the fastest tools for topic modeling within single computing node. However, it's not very comfortable: Vowpal Wabbit LDA doesn't have user API and launches from CLI. This implies the limitations of possibilities to tune the parameters of topic model and to control its quality.
+All three libraries (LDA.VW, Gensim and BigARTM) work out-of-core,
+e.g. they are designed to process data that is too large to fit into a computer's main memory at one time.
+This allowed us to benchmark on a fairly large collection --- 3.7 million articles from the English Wikipedia
+\footnote{\url{http://dumps.wikimedia.org/enwiki/20141208/enwiki-20141208-pages-articles.xml.bz2}}.
+The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpuss}$ script
+\footnote{\url{https://github.com/piskvorky/gensim/blob/develop/gensim/scripts/make_wikicorpus.py}},
+which excludes all non-article pages (such as category, file, template, user pages, etc),
+and also pages that contain less than $50$ words.
+The dictionary is formed by all words that occur in at lest 20 documents,
+but no more than in $10\%$ documents in the collection.
+The resulting dictionary was caped at $|W| = 100\,000$ most frequent words.
 
-Online algorithm and C++ usage are the common features of BigARTM and VW.LDA
-\footnote{But we also use STL ? Boost libraries}. Also both of libraries are cross-platform. But there are more differences than similarities. BigARTM accelerates processing by using multithreaded computing. Library capabilities and user API are much richer. API allows to tune almost all phases of algorithm. At the same time, it's also possible to use library from CLI as in VW.LDA, if necessary.
+Both Gensim and VW.LDA represents the resulting topic model as Dirichlet distribution over $\Phi$ and $\Theta$ matrices:
+\[
+	\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d), \quad \vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t).
+\]
+On contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
+To compare the perplexity we will take the average of VW.LDA and Gensim distributions:
+\[
+	\vec{\theta}^\text{mean}_d = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)}\vec{\theta}_d, \quad \vec{\phi}^\text{mean}_t = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)} \vec{\phi}_t.
+\]
+The perplexity measure is defined as
+\begin{equation}
+    \label{eq:perplexity}
+    \mathscr{P}(D, p) = \exp\left(- \frac{1}{n} L(\Phi, \Theta) \right) = \exp \left( - \frac{1}{n} \sum_{d \in D} \sum_{w \in d} n_{dw} \ln p(w | d) \right).
+\end{equation}
 
-\paragraph{Gensim.} Cross-platform and written on Python, library Gensim has two different LDA implementations. The first one is LdaModel, it's almost a clone of Online VB LDA. The high performance of data processing is achieved through the usage of NumPy library, built over low-level BLAS library
-\footnote{Intel MKL, ATLAS etc.}. The second implementation is LdaMulticore. It also bases on Online VB LDA, but supports multi-core processing. LdaMulticore creates a workflow per core, which processes it's own part of documents. In addition, it creates a general aggregating stream, that merges asynchronously the results, recieved from workflows. In this way, LdaModel uses several cores to process one batch of documents, and in LdaMulticore each core processes it's own batch. Gensim has a comfortable enough user interface. Moreover, it has a capability to find topic distributions for new documents using pre-built topic model.
+\paragraph{Comparison to existing software packages.}
 
-BigARTM and Gensim.LdaMulticore proceed multithreaded data processing in the same way. BigARTM also can find topic distributions for new documents. But our library supports multimodal models. And it's more productive. In the following experiments we show, that BigARTM's scalability is higher, than LdaMulticore's one.
+%There is no article to quote for VW, check http://www.research.rutgers.edu/~lihong/pub/Qin13Efficient.pdf - they use a footnote to quote VW
+The \emph{Vowpal Wabbit (VW)} is a library
+of online algorithms that cover a wide range of machine learning problems. %, not specifically limited to topic modeling.
+For topic modeling VW has the VW.LDA algorithm, based on the Online Variational Bayes LDA \cite{hoffman10online}.
+VW.LDA implementation is neither multi-core nor distributed,
+but an effective single-threaded implementation in C++ made it one of the fastest tools for topic modeling.% within single computing node.
 
-\paragraph{Motivation.} BigARTM's idea is to create a versatile tool for topic modeling that meets several criteria:
+The \emph{Gensim} library specifically targets the area of topic modeling and matrix factorization.
+It has two LDA implementations --- LdaModel and LdaMulticore,
+both based on the same algorithm as VW.LDA (Online Variational Bayes LDA \cite{hoffman10online}).
+Gensim is entirely written in Python. Its high performance is achieved through the usage of NumPy library,
+built over a low-level BLAS libraries (such as Intel MKL, ATLAS, or OpenBLAS).
+In LdaModel all batches are processed sequentially, and all concurrency happens within NumPy. % (in numpy.dot, numpy.sum and other Level1 BLAS operations).
+In LdaMulticore the workflow is similar to BigARTM --- several batches are processed concurrently, and there is a single aggregation thread that asynchronously merges the results.
 
-\begin{itemize}
-	\item Online data processing.
-	\item ARTM support with possibility to add new regularizers and functionals of quality.
-	\item Permanent monitoring of topic model during learning.
-	\item A capability to be integrated in other programming languages.
-	\item Efficient parallel data processing.
-	\item Rich and flexible user API.
-	\item Cross-platform.
-\end{itemize}
-Some of this conditions exclude the possibility of using VW.LDA or Gensim as the base of ARTM. Vowpal Wabbit is a common library of online algorithms, which contain LDA as one of the working modes. It's impossible to control the state of the model or to influence it during the learning process. As we noted above, there's no user API in VW.LDA. In addtition, the source code of the library is difficult for modification and support.
+\begin{table}[t!]
+	\centering
+	\begin{tabular}[t]{||c||c|c|c|c||}
+	\hline
+	Library & Proc. & Train Time & Inference Time & Perplexity \\
+	\hline
+	BigARTM Smoothing & 1 & 62 min & 127 sec & 4000 \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 \\
+	\hline
+	BigARTM Smoothing & 8 & 8 min & 24 sec & 4304 \\
+	Gensim LDA-Multicore & 8 & 70 min & 338 sec & 4470 \\
+	\hline
+	\end{tabular}
+    \vskip 2ex
+	\caption{
+        BigARTM comparison with LDA.VW and Gensim.LdaMulticore.
+        Train Time is time for model training,
+        Inference Time -- time for calculation of $\theta_d$ of $100\,000$ held-out documents,
+        Perplexity is calculated according to \eqref{eq:perplexity} on held-out documents.
+    }
+	\label{tab:libraries_comparison}    
+\end{table}
+\begin{figure}[t!]
+	\centering
+    \vskip -4ex
+	\includegraphics[height=45mm]{bigartm_speedup.eps}
+	\caption{BigARTM speed up}
+	\label{fig:bigartm_speedup}
+\end{figure}
 
-The key reason we refused to implement ARTM in Gensim is that it's written on Python. This language doesn't provide the possibility to be integrated into other languages easy. And C++ does. Moreover, we consider Gensim.LdaMulticore to be not very efficient. This question is discussed below.
+All runs perform one pass over the Wikipedia corpus and produce a model with $|T|=100$ topics.
+The runtime is reported for an Intel-based CPU with 32 cores, $1325 MHz$.
+The collection was split into batches with $10 000$ documents each
+(\texttt{chunksize} in Gensim, \texttt{--minibatch} in VW.LDA).
+The update rule in online algorithm used $\rho = (\tau_0 + t)^{-\kappa}$, $\tau_0 = 1$, $\kappa = 0.5$,
+Update performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ parallel threads.
+LDA priors were fixed as $\alpha = 0.1,\, \beta = 0.1$, so that $\vec{\theta}_d \sim \text{Dir}(\alpha),\, \vec{\phi}_t \sim \text{Dir}(\beta)$.
 
-BigARTM satisfies all of the given criteria. It's effective, easily extensible due to the plug-ins, supports user interfaces for different languages. As we noted above, the library can learn several topic models simultaneously, apply different regularization strategies. Also it allows to correct parameters of the regularizers and models during the learning process and unload any intermediate and final information about the models.
+Table \ref{tab:libraries_comparison} gives the comparison of runtime and perplexity between LDA.VW, Gensim and BigARTM.
+Chart \ref{fig:bigartm_speedup} gives BigARTM speedup depending on the number CPU threads.
+
+{\color{red}ToDo: discussions.}
+
+\paragraph{Experiments with regularization}
+
+BigARTM has built-in library of regularizers that allows to improve several quality measures almost without any loss of perplexity.
+In the following experiment we follow the approach introduced in \cite{voron14aist} and configure $5\%$ of smooth background topics 
+and $95\%$ sparse topical topics. In addition we enable topics decorrelation to improve kernel quality measures
+(kernel size, kernel purity and kernel contrast).
+    
+\begin{table}[t]
+\centering
+\begin{tabular}[t]{||c||ccccccc||}
+\hline
+Model/Functional & $\mathcal{P}_{10k}$ & $\mathcal{P}_{100k}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
+\hline
+LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
+ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
+\hline
+\end{tabular}
+\caption{Comparison of LDA and ARTM models. 
+Quality functionals: $\mathcal{P}_{10k}$ $\mathcal{P}_{100k}$ --- hold-out perplexity on 10.000 and 100.000 documents sets,
+$\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%),
+$\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
+\label{tab:model_comparison}
+\end{table}
+
+\begin{figure}[h!]
+\begin{tabular}{cc}
+\input{plot_perplexity_sparsity}
+&
+\input{plot_kernel}
+\end{tabular}
+\caption{Comparison of LDA (thin) and ARTM (bold) models. X axis is a number of processed documents.}
+\label{fig:comparison_plot}
+\end{figure}
+
+Table \ref{tab:model_comparison} presents the comparisons results for regularized and non-regularized model.
+Figure \ref{fig:comparison_plot} presents all quality measures as a function of number processed documents.
+Upper chart shows perplexity and sparsity of $\Phi$, $\Theta$ matrices.
+Bottom chart shows average kernel measures.
+
+{\color{red}ToDo: discussions.}
+
+\paragraph{Experiments on multi-language Wikipedia}
+
+{\color{red}ToDo: discussions.}
+
+%There are many efficient LDA implementations for single node processing.
+%In this section we discuss Vowpal Wabbit LDA \cite{vwlda} and Gensim \cite{gensim} as most popular ones.
+%At first we review their technical and algorithmic features and compare them with solutions applied to our library.
+%In addition we explain the reasons why we refused to integrate ARTM into these implementations.
+%Then we compare the results of experiments on these libraries and BigARTM.
+%
+%\paragraph{Vowpal Wabbit LDA.} LDA in Vowpal Wabbit is online, as other algorithms in this library.
+%It bases on Online Variational Bayes LDA described by Matthew Hoffman in \cite{hoffman10online}.
+%Online VB LDA in Vowpal Wabbit supports single-threaded documents processing, it's neither a multi-core nor distributed.
+%Nevertheless, effective implementation in C++ without STL and good scalability of the algorithm
+%made VW.LDA one of the fastest tools for topic modeling within single computing node.
+%However, it's not very comfortable: Vowpal Wabbit LDA doesn't have user API and launches from CLI.
+%This implies the limitations of possibilities to tune the parameters of topic model and to control its quality.
+%
+%Online algorithm and C++ usage are the common features of BigARTM and VW.LDA
+%\footnote{But we also use STL ? Boost libraries}. Also both of libraries are cross-platform.
+%But there are more differences than similarities. BigARTM accelerates processing by using multithreaded computing.
+%Library capabilities and user API are much richer. API allows to tune almost all phases of algorithm.
+%At the same time, it's also possible to use library from CLI as in VW.LDA, if necessary.
+%
+%\paragraph{Gensim.} Cross-platform and written on Python, library Gensim has two different LDA implementations.
+%The first one is LdaModel, it's almost a clone of Online VB LDA.
+%The high performance of data processing is achieved through the usage of NumPy library, built over low-level BLAS library
+%\footnote{Intel MKL, ATLAS etc.}. The second implementation is LdaMulticore.
+%It also bases on Online VB LDA, but supports multi-core processing. LdaMulticore creates a workflow per core,
+%which processes it's own part of documents. In addition, it creates a general aggregating stream, that merges
+%asynchronously the results, recieved from workflows. In this way, LdaModel uses several cores to process one batch of documents,
+%and in LdaMulticore each core processes it's own batch. Gensim has a comfortable enough user interface.
+%Moreover, it has a capability to find topic distributions for new documents using pre-built topic model.
+%
+%BigARTM and Gensim.LdaMulticore proceed multithreaded data processing in the same way.
+%BigARTM also can find topic distributions for new documents. But our library supports multimodal models.
+%And it's more productive. In the following experiments we show,
+%that BigARTM's scalability is higher, than LdaMulticore's one.
+%
+%\paragraph{Motivation.} BigARTM's idea is to create a versatile tool for topic modeling that meets several criteria:
+%
+%\begin{itemize}
+%	\item Online data processing.
+%	\item ARTM support with possibility to add new regularizers and functionals of quality.
+%	\item Permanent monitoring of topic model during learning.
+%	\item A capability to be integrated in other programming languages.
+%	\item Efficient parallel data processing.
+%	\item Rich and flexible user API.
+%	\item Cross-platform.
+%\end{itemize}
+%Some of this conditions exclude the possibility of using VW.LDA or Gensim as the base of ARTM.
+%Vowpal Wabbit is a common library of online algorithms, which contain LDA as one of the working modes.
+%It's impossible to control the state of the model or to influence it during the learning process.
+%As we noted above, there's no user API in VW.LDA.
+%In addtition, the source code of the library is difficult for modification and support.
+%
+%The key reason we refused to implement ARTM in Gensim is that it's written on Python.
+%This language doesn't provide the possibility to be integrated into other languages easy.
+%And C++ does. Moreover, we consider Gensim.LdaMulticore to be not very efficient. This question is discussed below.
+%
+%BigARTM satisfies all of the given criteria. It's effective, easily extensible due to the plug-ins,
+%supports user interfaces for different languages. As we noted above, the library can learn several topic models simultaneously,
+%apply different regularization strategies. Also it allows to correct parameters
+%of the regularizers and models during the learning process and unload any intermediate and final information about the models.
 
 \section{Conclusions}
 \label{sec:Conclusions}
