@@ -73,7 +73,7 @@
 \begin{figure}
 	\centering
 	\label{fig:bigartm_speedup}
-	\includegraphics[height=6cm]{bigartm_speedup}
+%	\includegraphics[height=6cm]{bigartm_speedup}
 	\caption{BigARTM speed up }
 \end{figure}
 
@@ -165,5 +165,70 @@ ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
 \end{table}
 
 Более подробно процесс обучения представлен на \ref{fig:comparison_plot}. На верхнем графике показано убывание перплексии и замеры разреженностей матриц $\Phi$ и $\Theta$. На нижнем --- усреднённые характеристики ядер тем. Видно, что LDA совершенно не способствует разреживанию и даёт менее чистые и контрастные ядра тем, чем ARTM.
+
+
+\section{Multilanguage experiment}
+
+To~show how BigARTM works on~multimadal datasets we provide multilanguage dataset 
+based on russian--english Wikipedia articles. 
+
+We download all russian and english articles that have language links on each other
+and transfer them to bag-of-words format. 
+English words are used as is, while russian words are lemmatized with ``MyStem'' tool from Yandex.
+Then we reduce collection dictionary by using only those words 
+that appear in~20~documents at~least and in~10\% of~documents in the~collection at~most. 
+The same parameters are used in~Gensim Wikicorpus handlers.
+We obtain 216175~pairs of~russian--english documents with dictionary 
+containing 43\% russian words (84413 items) and 57\% english words (112336 items).
+
+To convert documents to BigARTM batches format we represent each pair of russian--english documents 
+as single multi-language document with~two modalities: one modality for each language.  
+That is our multi-language collection acts as multimodal collection. 
+
+We build multi-language modal with 400~topics. They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
+Most of them can be easily interpreted.
+We provide some examples of~the observed topics. 
+You can see that they are consistent between languages.
+
+
+\begin{table}
+	\centering\medskip\tabcolsep=2pt%\small
+	\footnotesize
+    \begin{tabular}{|l|l||l|l||l|l|}	
+    	\hline
+    	\multicolumn{2}{|c||}{\textbf{Topic~68}} & \multicolumn{2}{c||}{\textbf{Topic~79}} & \multicolumn{2}{c|}{\textbf{Topic~88}} \\
+    	\hline
+    	students(0.02) & университет(0.03) & club(0.04) & сборная(0.05) & opera(0.03) & певица(0.03) \\
+    	education(0.02) & институт(0.03) & league(0.03) & матч(0.05) & orchestra(0.02) & певец(0.03) \\
+    	institute(0.02) & школа(0.02) & goals(0.03) &  игрок(0.05) & concert(0.01) & музыка(0.02) \\
+    	research(0.01) & образование(0.02) & season(0.03) & карьера(0.03) & conductor(0.01) & опера(0.02) \\
+    	business(0.01) & программа(0.02) & cup(0.03) & футболист(0.03) & composer(0.01) & музыкальный(0.02) \\ 
+    	technology(0.01) & студент(0.01) & scored(0.02) & фк(0.03) & symphony(0.01) & дирижер(0.02) \\
+    	management(0.01) & учебный(0.01) & goal(0.02) & клуб(0.02) & musical(0.01) & оркестр(0.02) \\
+    	engineering(0.01) & обучение(0.01) & apps(0.02) & гол(0.02) & performed(0.01) & оперный(0.02) \\
+    	science(0.01) & развитие(0.01) & football(0.02) & против(0.02) & singer(0.01) & песня(0.01) \\
+    	schools(0.01) & проект(0.01) & match(0.01) & забивать(0.02) & performance(0.01) & композитор(0.01) \\ 
+    	student(0.01) & наука(0.01) & debut(0.01) & профиль(0.01) & recordings(0.01) & премия(0.01) \\
+    	program(0.01) & бизнес(0.01) & contract(0.01) & сезон(0.01) & recording(0.01) & исполнять(0.01) \\ 
+    	studies(0.01) & международный(0.01) & signed(0.01) & команда(0.01) & singing(0.01) & симфонический(0.01) \\
+    	universities(0.01) & организация(0.01) & loan(0.01) & чемпионат(0.01) & performances(0.01) & фестиваль(0.01) \\
+    	academic(0.01) & научный(0.01) & friendly(0.01) & дебютировать(0.01) & festival(0.01) & музыкант(0.01) \\
+    	learning(0.01) & факультет(0.01) & championship(0.01) &  лига(0.01) & sang(0.01) & конкурс(0.01) \\
+    	programs(0.01) & исследование(0.01) & premier(0.01) & футбол(0.01) & recorded(0.01) & запись(0.01) \\
+    	information(0.01) & технология(0.01) & playing(0.01) & сыграть(0.01) &  mozart(0.01) & сопрано(0.01) \\
+    	association(0.01) & технический(0.01) & squad(0.01) & молодежный(0.01) &  classical(0.01) & петь(0.01) \\
+    	sciences(0.01)& заведение(0.01) & profile(0.01) & контракт(0.01) & soprano(0.01) & моцарт(0.01) \\
+    	\hline
+	\end{tabular}
+\end{table}
+                                    
+
+Topic~110:  moon(0.10)  earth(0.04)  mars(0.04)  apollo(0.04)  impact(0.02)  mare(0.02)  luna(0.02)  space(0.01)  lunar(0.01)  spacecraft(0.01)  mission(0.01)  rover(0.01)  plate(0.01)  landing(0.01)  nasa(0.01)  martian(0.01)  exploration(0.00)  science(0.00)  program(0.00)  cordelia(0.00)
+Topic~110:  луна(0.12)  лунный(0.05)  аполлон(0.03)  море(0.02)  марс(0.02)  земля(0.02)  космический(0.02)  плита(0.01)  moon(0.01)  nasa(0.01)  зонд(0.01)  сторона(0.01)  wiki(0.01)  снимок(0.01)  посадка(0.01)  mare(0.01)  apollo(0.01)  аппарат(0.01)  поверхность(0.01)  марсианский(0.00)  
+
+
+Topic~251:  windows(0.07)  microsoft(0.05)  server(0.04)  web(0.02)  mitchell(0.02)  office(0.01)  sp(0.01)  services(0.01)  enterprise(0.01)  cox(0.01)  visual(0.01)  client(0.01)  mail(0.01)  software(0.01)  apache(0.01)  nt(0.01)  edition(0.01)  management(0.00)  net(0.00)  xp(0.00) 
+Topic~251:  windows(0.06)  microsoft(0.05)  веб(0.02)  server(0.02)  сервер(0.02)  office(0.02)  web(0.02)  митчелл(0.01)  sp(0.01)  visual(0.01)  приложение(0.01)  studio(0.01)  enterprise(0.01)  services(0.01)  управление(0.01)  пользователь(0.01)  сервис(0.01)  служба(0.01)  кокс(0.01)  клиент(0.01) 
+  
 
 \end{document}
