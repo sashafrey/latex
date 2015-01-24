@@ -605,6 +605,7 @@ LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
 ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
 \hline
 \end{tabular}
+\vskip 2ex
 \caption{Comparison of LDA and ARTM models. 
 Quality functionals: $\mathcal{P}_{10k}$ $\mathcal{P}_{100k}$ --- hold-out perplexity on 10.000 and 100.000 documents sets,
 $\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%),
@@ -631,29 +632,29 @@ Bottom chart shows average kernel measures.
 
 \paragraph{Experiments on multi-language Wikipedia.}
 
-To~show how BigARTM works on~multimadal datasets we provide multilanguage dataset
-based on russian--english Wikipedia articles.
+To~show how BigARTM works with~multimadal datasets we prepared a text corpus
+containing all English and Russian Wikipedia articles with mutual interlanguage links.
+We represent each linked pair of articles
+as a single multi-language document with~two modalities, one modality for each language.
+That is how our multi-language collection acts as a multimodal dataset.
 
-We download all russian and english articles that have language links on each other
-and transfer them to bag-of-words format.
-English words are used as is, while russian words are lemmatized with ``MyStem'' tool from Yandex.
-Then we reduce collection dictionary by using only those words
-that appear in~20~documents at~least and in~10\% of~documents in the~collection at~most.
-The same parameters are used in~Gensim Wikicorpus handlers.
-We obtain 216175~pairs of~russian--english documents with dictionary
-containing 43\% russian words (84413 items) and 57\% english words (112336 items).
+The dump of Russian articles \footnote{\url{http://dumps.wikimedia.org/ruwiki/20141203/ruwiki-20141203-pages-articles.xml.bz2}}
+had been processed following the same technique as we previously used in experiments on English Wikipedia.
+Russian words were lemmatized with ``Yandex MyStem 3.0'' \footnote{\url{https://tech.yandex.ru/mystem/}}.
+To further reduce the dictionary we only keep words
+that appear in no less than 20~documents, but no~more than in~10\% of~documents in the~collection.
+The resulting collection contains 216175~pairs of~russian--english articles, with combined dictionary
+of 196749 words (43\% russian, 57\% english words).
 
-To convert documents to BigARTM batches format we represent each pair of russian--english documents
-as single multi-language document with~two modalities: one modality for each language.
-That is our multi-language collection acts as multimodal collection.
-
-We build multi-language modal with 400~topics. They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
+We build multi-language modal with 400~topics.
+They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
 Most of them can be easily interpreted.
-We provide some examples of~the observed topics.
-You can see that they are consistent between languages.
+Table \ref{tab:top10words} shows top 10 words for some of the topics.
+For those who are familiar with both Russian and English languages it should be apparent that top words are consistent between the languages.
+The Russian part of last topic contains some English words such as
+``Windows'', ``Microsoft'' or ``Office'' because it is common to use them in Russian texts without translation.
 
-
-\begin{table}
+\begin{table}[t!]
 	\centering\medskip\tabcolsep=2pt%\small
 	\footnotesize
     \begin{tabular}{|l|l||l|l||l|l|}	
@@ -705,9 +706,12 @@ You can see that they are consistent between languages.
     	%soprano(0.01) & моцарт(0.01) & xp(0.00) клиент(0.01)& \\
       	\hline
 	\end{tabular}
+    \vskip 2ex
+	\caption{
+        Top10 words of two-language topic model,
+        based on all Russain and English Wikipedia articles with mutual interlanguage links.}
+	\label{tab:top10words}
 \end{table}
-
-{\color{red}ToDo: discussions.}
 
 %There are many efficient LDA implementations for single node processing.
 %In this section we discuss Vowpal Wabbit LDA \cite{vwlda} and Gensim \cite{gensim} as most popular ones.
