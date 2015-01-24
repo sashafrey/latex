@@ -6,15 +6,15 @@
 \usepackage{amsmath}
 \usepackage{cmap}
 
-
-
-
 % These ones should be added to the article's .tex file...
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{verbatim}
 \usepackage{standalone}
 \usepackage{array}
+\usepackage{amsmath,amssymb}
+
+\usepackage{url}
 
 %... and these rows too.
 \pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
@@ -22,7 +22,64 @@
 \pgfplotsset{compat = 1.3}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
+\renewcommand{\vec}[1]{{\boldsymbol #1}}
+
 \begin{document}
+
+\section{Сравнение BigARTM с другими библиотеками}
+
+Сравниваем BigARTM с реализацией алгоритма Online VB LDA в библиотеке для тематического моделирования Gensim\footnote{\url{http://radimrehurek.com/gensim/}} и Vowpal Wabbit\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}. Для сравнения будем строить тематическую модель для документов из английской Википедии (корпус описан далее). 
+
+\paragraph{Перплексия.} Алгоритм LDA представляет тематическую модель в виде распределений Дирихле на строчки $\Theta$ и столбцы $\Phi$:
+\begin{gather}
+	\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d), \quad \vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)
+\end{gather}
+Для того чтобы сравнить перплексию матриц $\Phi, \Theta$ для hold-out документов, мы будем брать средние распределения 
+\begin{gather}
+	\vec{\theta}^\text{mean}_d = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)}\vec{\theta}_d, \quad \vec{\phi}^\text{mean}_t = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)} \vec{\phi}_t.
+\end{gather}
+ 
+\paragraph{Параметры эксперимента}
+\begin{itemize}
+	\item Машина: x86\_64, 32 ядра, 1324.898MHz
+	\item Corpus: English Wikipedia shapshot \texttt{2014-12-08}, hold-out 100'000 documents
+	\item Topics: 100
+	\item One pass through train documents of the corpus
+	\item Batch size: 10'000 (\texttt{chunksize} in Gensim, \texttt{--minibatch} in VW)
+	\item Update rule: $\rho = (\tau_0 + t)^{-\kappa}$, $\tau_0 = 1$, $\kappa = 0.5$
+	\item Update after each batch in non-parallel implementation, update after $P$ batches when running in $P$ parallel threads (\texttt{update\_every = num\_processors})
+	\item LDA Priors: $\alpha = 0.1,\, \beta = 0.1$ ($\vec{\theta}_d \sim \text{Dir}(\alpha),\, \vec{\phi}_t \sim \text{Dir}(\beta)$)
+\end{itemize}
+
+
+\begin{table}
+	\centering
+	\label{tab:libraries_comparison}
+
+	\begin{tabular}[t]{c|c|ccc}
+	\hline
+	Library & Proc. & Train Time & Inference Time & Perplexity \\
+	\hline
+	BigARTM Smoothing & 1 & 62 min & 127 sec & 4000 \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 \\
+	\hline
+	BigARTM Smoothing & 8 & 8 min & 24 sec & 4304 \\
+	Gensim LDA-Multicore & 8 & 70 min & 338 sec & 4470 \\
+	\end{tabular}
+	\caption{Сравнение BigARTM с реализацией LDA в библиотеке Gensim и Vowpal Wabbit. Train Time — время на обучение модели, Inference Time — время вычисления $\theta_d$ для всех документов из hold-out. Perplexity — перплексия посчитанная по обученной модели $\{\vec{\phi}_t\}$ на hold-out документах $\{vec{\theta}_d\}$, в случае Gensim и VW в качестве распределений $\vec{\phi}_t$ и $\vec{\theta}_d$ брались средние из соответствующих распределений Дирихле.}
+\end{table}
+
+\begin{figure}
+	\centering
+	\label{fig:bigartm_speedup}
+	\includegraphics[height=6cm]{bigartm_speedup}
+	\caption{BigARTM speed up }
+\end{figure}
+
+
+
+\section{On LDA and ARTM}
 
 Данный раздел посвящён сравнению моделей LDA и ARTM. В экспериментах, сравнивающих BigARTM с Gensim и VW.LDA, мы показали, что алгоритм Online PLSA со сглаживающим регуляризатором и Online VB LDA работают схожим образом. Поэтому в этом эксперименте будут оцениваться характеристики PLSA со сглаживающим регуляризатором (который мы далее будем называть LDA) и ARTM (суть PLSA с набором регуляризаторов).
 
