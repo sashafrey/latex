@@ -18,7 +18,7 @@
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{verbatim}
-\usepackage{standalone} 
+\usepackage{standalone}
 
 \tolerance=1000
 \hbadness=5000
@@ -60,20 +60,26 @@
     Murat Apishev\inst{3}
     \and
     Peter Romov\inst{4}
+    \and
+    Marina Dudarenko\inst{5}
 }
 \institute{
     Department of Intelligent Systems at Dorodnicyn Computing Centre of RAS,
     Moscow Institute of Physics and Technology,
     \email{voron@forecsys.ru}
     \and
-    Schlumberger
-    \email{...}
+    Schlumberger Information Solutions,
+    \email{oleksandr.frei@gmail.com}
     \and
-    Moscow State University,
-    \email{...}
+    Lomonosov Moscow State University,
+    \email{great-mel@yandex.ru}
     \and
+    Moscow Institute of Physics and Technology,
     Yandex
-    \email{...}
+    \email{peter@romov.ru}
+    \and
+    Lomonosov Moscow State University
+    \email{m.dudarenko@gmail.com}
 }
 
 \maketitle
@@ -380,7 +386,7 @@ can be learned by the above online EM algorithm.
 \section{BigARTM architecture}
 \label{sec:BigARTM}
 
-The main goal for BigARTM architecture is to ensure constant memory usage regardless of the size of the collection.
+The main goal for BigARTM architecture is to ensure constant memory usage regardless of the collection size.
 For this reason each $D_b$ batch should be stored on disk in a separate file,
 and only a limited number of batches will be loaded into the main memory at any given time.
 The entire $\Theta$ matrix is also never stored in the memory.
@@ -390,6 +396,15 @@ As the result, the memory usage stays constant regardless of the size of the col
 An general rule of concurrency design is to express parallelism at the highest possible level.
 For this reason BigARTM goes for concurrent processing of the batches
 and keeps a single-threaded code for the $\kw{ProcessBatch}(D_b, \phi_{wt})$ routine.
+
+To split collection into batches and process them concurrently is a common approach,
+introduced in AD-LDA algorithm \cite{newman2009distributed}, and
+then further developed in PLDA \cite{wang2009plda} and PLDA{+} \cite{liu2011plda+} algorithms.
+These algorithms require all concurrent workers to become idle before an update of the $\Phi$ matrix.
+Such synchronization step adds a large overhead in the online algorithm where $\Phi$ matrix is updated multiple times on each iteration.
+An alternative architecture without the synchronization step is described in \cite{smola2010architecture},
+however it mostly targets a distributed cluster environment.
+In our work we develop an efficient single-node architecture where all workers benefit from the shared memory space.
 
 \begin{figure}[h!]
 \begin{centering}
@@ -470,28 +485,25 @@ We are also planning to implement a Java wrapper in the near future.
 In addition to the programming APIs the library also also has a simple CLI interface.
 
 \paragraph{Basic tools.}
-A careful selection of the programming tools is quite important for any software project.
+A careful selection of the programming tools is important for any software project.
 This is especially true for BigARTM as its code is written in C++,
-a language that on its own offers less functionality comparing to Python, .NET Framework or Java.
+a language that by itself offers less functionality comparing to Python, .NET Framework or Java.
 To mitigate this we use
 various parts of the Boost C++ Libraries,
 Google Protocol Buffers for data serialization,
-Google C++ Testing Framework,
-Google Logging library for C++,
-Google Commandline flags module for C++,
 ZeroMQ library for network communication,
-RPCZ library as an RPC implementation for Google Protocol Buffers.
-This tools are not specific for topic modeling, and should be considered for any scientific library written in C++.
+and several other libraries.
+%This tools are not specific for topic modeling, and should be considered for any scientific library written in C++.
 
 BigARTM uses CMake as a cross-platform build system,
 and it successfully builds on Windows, Linux and OS X in 32 and 64 bit configurations.
 Building the library require a recent C++ compiler with C++11 support (GNU GCC 4.6.3, clang 3.4 or Visual Studio 2012 or newer),
-and Boost Libraries 1.46.1 or newer. All the other third-parties are included in the BigARTM repository.
+and Boost Libraries 1.46.1 or newer. All the other third-parties are included in BigARTM repository.
 
-To organize the project we use several free online services,
-including \url{https://github.com/} --- to hose the source code,
-\url{https://readthedocs.org/} --- to host online documentation,
-\url{http://travis-ci.org} --- to run automated continuous integration builds.
+We also use free online services
+to store source code (\url{https://github.com}),
+to host online documentation (\url{https://readthedocs.org}) and
+to run automated continuous integration builds (\url{http://travis-ci.org}).
 
 \section{Experiments}
 \label{sec:Experiments}
@@ -567,7 +579,7 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
         Inference Time -- time for calculation of $\theta_d$ of $100\,000$ held-out documents,
         Perplexity is calculated according to \eqref{eq:perplexity} on held-out documents.
     }
-	\label{tab:libraries_comparison}    
+	\label{tab:libraries_comparison}
 \end{table}
 \begin{figure}[t!]
 	\centering
@@ -594,10 +606,10 @@ Chart \ref{fig:bigartm_speedup} gives BigARTM speedup depending on the number CP
 \paragraph{Experiments with regularization}
 
 BigARTM has built-in library of regularizers that allows to improve several quality measures almost without any loss of perplexity.
-In the following experiment we follow the approach introduced in \cite{voron14aist} and configure $5\%$ of smooth background topics 
+In the following experiment we follow the approach introduced in \cite{voron14aist} and configure $5\%$ of smooth background topics
 and $95\%$ sparse topical topics. In addition we enable topics decorrelation to improve kernel quality measures
 (kernel size, kernel purity and kernel contrast).
-    
+
 \begin{table}[t]
 \centering
 \begin{tabular}[t]{||c||ccccccc||}
@@ -609,7 +621,7 @@ ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
 \hline
 \end{tabular}
 \vskip 2ex
-\caption{Comparison of LDA and ARTM models. 
+\caption{Comparison of LDA and ARTM models.
 Quality functionals: $\mathcal{P}_{10k}$ $\mathcal{P}_{100k}$ --- hold-out perplexity on 10.000 and 100.000 documents sets,
 $\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%),
 $\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
@@ -651,8 +663,10 @@ of 196749 words (43\% russian, 57\% english words).
 
 We build multi-language modal with 400~topics.
 They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
-Most of them can be easily interpreted.
-Table \ref{tab:top10words} shows top 10 words for some of the topics.
+%Most of them can be easily interpreted.
+All $400$ topics were reviewed by an independent assessor, and he easily interpreted all except $4$ topics.
+
+Table \ref{tab:top10words} shows top 10 words for four randomly selected topics.
 For those who are familiar with both Russian and English languages it should be apparent that top words are consistent between the languages.
 The Russian part of last topic contains some English words such as
 ``Windows'', ``Microsoft'' or ``Office'' because it is common to use them in Russian texts without translation.
@@ -660,54 +674,34 @@ The Russian part of last topic contains some English words such as
 \begin{table}[t!]
 	\centering\medskip\tabcolsep=2pt%\small
 	\footnotesize
-    \begin{tabular}{|l|l||l|l||l|l|}	
+    \begin{tabular}{|lr|lr||lr|lr|}	
     	\hline
-    	\multicolumn{2}{|c||}{\textbf{Topic~68}} & \multicolumn{2}{c||}{\textbf{Topic~79}} \\
+    	\multicolumn{4}{|c||}{\textbf{Topic~68}} & \multicolumn{4}{c||}{\textbf{Topic~79}} \\
     	\hline
-    	students(0.02) & университет(0.03) & club(0.04) & сборная(0.05) \\
-    	education(0.02) & институт(0.03) & league(0.03) & матч(0.05) \\
-    	institute(0.02) & школа(0.02) & goals(0.03) &  игрок(0.05) \\
-    	research(0.01) & образование(0.02) & season(0.03) & карьера(0.03) \\
-    	business(0.01) & программа(0.02) & cup(0.03) & футболист(0.03) \\
-    	technology(0.01) & студент(0.01) & scored(0.02) & фк(0.03) \\
-    	management(0.01) & учебный(0.01) & goal(0.02) & клуб(0.02) \\
-    	engineering(0.01) & обучение(0.01) & apps(0.02) & гол(0.02) \\
-    	science(0.01) & развитие(0.01) & football(0.02) & против(0.02) \\
-    	schools(0.01) & проект(0.01) & match(0.01) & забивать(0.02) \\
-    	%student(0.01) & наука(0.01) & debut(0.01) & профиль(0.01) \\
-    	%program(0.01) & бизнес(0.01) & contract(0.01) & сезон(0.01) \\
-    	%studies(0.01) & международный(0.01) & signed(0.01) & команда(0.01) \\
-    	%universities(0.01) & организация(0.01) & loan(0.01) & чемпионат(0.01) \\
-    	%academic(0.01) & научный(0.01) & friendly(0.01) & дебютировать(0.01) \\
-    	%learning(0.01) & факультет(0.01) & championship(0.01) &  лига(0.01) \\
-    	%programs(0.01) & исследование(0.01) & premier(0.01) & футбол(0.01) \\
-    	%information(0.01) & технология(0.01) & playing(0.01) & сыграть(0.01) \\
-    	%association(0.01) & технический(0.01) & squad(0.01) & молодежный(0.01) \\
-    	%sciences(0.01)& заведение(0.01) & profile(0.01) & контракт(0.01) \\
+    	research & 4.56 & институт & 6.03 & goals & 4.48 & матч & 6.02 \\
+    	technology & 3.14 & университет & 3.35 & league & 3.99 & игрок & 5.56 \\
+    	engineering & 2.63 & программа & 3.17 & club & 3.76 &  сборная & 4.51 \\
+    	institute & 2.37 & учебный & 2.75 & season & 3.49 & фк & 3.25 \\
+    	science & 1.97 & технический & 2.70 & scored & 2.72 & против & 3.20 \\
+    	program & 1.60 & технология & 2.30 & cup & 2.57 & клуб & 3.14 \\
+    	education & 1.44 & научный & 1.76 & goal & 2.48 & футболист & 2.67 \\
+    	campus & 1.43 & исследование & 1.67 & apps & 1.74 & гол & 2.65 \\
+    	management & 1.38 & наука & 1.64 & debut & 1.69 & забивать & 2.53 \\
+    	programs & 1.36 & образование & 1.47 & match & 1.67 & команда & 2.14 \\
     	\hline
-    	\multicolumn{2}{|c||}{\textbf{Topic~88}} & \multicolumn{2}{c||}{\textbf{Topic~251}} \\
+    	\multicolumn{4}{|c||}{\textbf{Topic~88}} &     \multicolumn{4}{c||}{\textbf{Topic~251}} \\
     	\hline
-        opera(0.03) & певица(0.03) & windows(0.07) & windows(0.06) \\
-    	orchestra(0.02) & певец(0.03) & microsoft(0.05) & microsoft(0.05) \\
-    	concert(0.01) & музыка(0.02) & server(0.04) & веб(0.02) \\
-    	conductor(0.01) & опера(0.02) & web(0.02) & server(0.02) \\
-    	composer(0.01) & музыкальный(0.02) & mitchell(0.02) & сервер(0.02)\\
-    	symphony(0.01) & дирижер(0.02) & office(0.01) & office(0.02)\\
-    	musical(0.01) & оркестр(0.02) & sp(0.01) & web(0.02)\\
-    	performed(0.01) & оперный(0.02) & services(0.01) &  митчелл(0.01) \\
-    	singer(0.01) & песня(0.01) & enterprise(0.01) & sp(0.01) \\
-    	performance(0.01) & композитор(0.01) & cox(0.01) & visual(0.01) \\
-    	%recordings(0.01) & премия(0.01) & visual(0.01) & приложение(0.01) \\
-    	%recording(0.01) & исполнять(0.01) & client(0.01) & studio(0.01)\\
-    	%singing(0.01) & симфонический(0.01) & mail(0.01) & enterprise(0.01) \\
-    	%performances(0.01) & фестиваль(0.01) & software(0.01) & services(0.01) \\
-    	%festival(0.01) & музыкант(0.01) & apache(0.01) & управление(0.01) \\
-    	%sang(0.01) & конкурс(0.01) & nt(0.01) & пользователь(0.01) \\
-    	%recorded(0.01) & запись(0.01) & edition(0.01) & сервис(0.01) \\
-    	%mozart(0.01) & сопрано(0.01) & management(0.00) & служба(0.01) \\
-    	%classical(0.01) & петь(0.01) & net(0.00) & кокс(0.01)\\
-    	%soprano(0.01) & моцарт(0.01) & xp(0.00) клиент(0.01)& \\
-      	\hline
+        opera & 7.36 & опера & 7.82 & windows & 8.00 & windows & 6.05 \\
+    	conductor & 1.69 & оперный & 3.13 & microsoft & 4.03 & microsoft & 3.76 \\
+    	orchestra & 1.14 & дирижер & 2.82 & server & 2.93 & версия & 1.86 \\
+    	wagner & 0.97 & певец & 1.65 & software & 1.38 & приложение & 1.86 \\
+    	soprano & 0.78 & певица & 1.51 & user & 1.03 & сервер & 1.63 \\
+    	performance & 0.78 & театр & 1.14 & security & 0.92 & server & 1.54 \\
+    	mozart & 0.74 & партия & 1.05 & mitchell & 0.82 & программный & 1.08 \\
+    	sang & 0.70 & сопрано & 0.97 & oracle & 0.82 &  пользователь & 1.04 \\
+    	singing & 0.69 & вагнер & 0.90 & enterprise & 0.78 & обеспечение & 1.02 \\
+    	operas & 0.68 & оркестр & 0.82 & users & 0.78 & система & 0.96 \\
+    	\hline
 	\end{tabular}
     \vskip 2ex
 	\caption{
@@ -715,6 +709,7 @@ The Russian part of last topic contains some English words such as
         based on all Russain and English Wikipedia articles with mutual interlanguage links.}
 	\label{tab:top10words}
 \end{table}
+
 
 %There are many efficient LDA implementations for single node processing.
 %In this section we discuss Vowpal Wabbit LDA \cite{vwlda} and Gensim \cite{gensim} as most popular ones.
