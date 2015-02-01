@@ -9,9 +9,9 @@
 \usepackage[russian,english]{babel}
 \usepackage{graphicx}
 \usepackage{multicol}
-\usepackage[ruled,vlined,linesnumbered,algosection,algo2e]{algorithm2e}
-\usepackage{algorithm}
-\usepackage[noend]{algorithmic}
+\usepackage[ruled,vlined,linesnumbered,algo2e]{algorithm2e}
+%\usepackage{algorithm}
+%\usepackage[noend]{algorithmic}
 \usepackage{color}
 \usepackage{cmap}
 \usepackage{array}
@@ -53,7 +53,7 @@
     Topic Modeling of Large Collections
 }
 \author{
-    Konstantin Vorontsov\inst{1,3,4}
+    Konstantin Vorontsov\inst{1}
     \and
     Oleksandr Frei\inst{2}
     \and
@@ -63,38 +63,41 @@
     \and
     Marina Dudarenko\inst{5}
 }
-\institute{
-    Department of Intelligent Systems at Dorodnicyn Computing Centre of RAS,
-    Moscow Institute of Physics and Technology,
-    \email{voron@forecsys.ru}
+\institute{\noindent
+    Dorodnicyn Computing Centre of RAS, MIPT, HSE, Yandex,
+    \hfill\email{voron@forecsys.ru}
     \and
     Schlumberger Information Solutions,
-    \email{oleksandr.frei@gmail.com}
+    \hfill\email{oleksandr.frei@gmail.com}
     \and
     Lomonosov Moscow State University,
-    \email{great-mel@yandex.ru}
+    \hfill\email{great-mel@yandex.ru}
     \and
     Moscow Institute of Physics and Technology,
-    Yandex
-    \email{peter@romov.ru}
+    Yandex,
+    \hfill\email{peter@romov.ru}
     \and
-    Lomonosov Moscow State University
-    \email{m.dudarenko@gmail.com}
+    Lomonosov Moscow State University,
+    \hfill\email{m.dudarenko@gmail.com}
 }
 
 \maketitle
 
 \begin{abstract}
 Probabilistic topic modeling of text collections is a powerful tool for statistical text analysis.
-In this paper we announce the BigARTM open source project for regularized multimodal topic modeling of large collections.
+In this paper we announce the \mbox{BigARTM} open source project 
+for regularized multimodal topic modeling of large collections.
 Several experiments on Wikipedia corpus shows that BigARTM performs faster and gives better perplexity
-comparing to other popular packages,such as Vowpal Wabbit LDA and Gensim.
-We also demonstrate several unique BigARTM features, such as topics regularization and multi-language models,
+comparing to other popular packages, such as Vowpal Wabbit and Gensim.
+We~also demonstrate several unique BigARTM features, such as 
+additive combination of regularizers, 
+topic sparsing and decorrelation, 
+multimodal and multilanguage modeling,
 which are not available in other software packages for topic modeling.
 
 \vspace{1em}
 \textbf{Keywords:}
-    probabilistic topic model,
+    probabilistic topic modeling,
     Probabilistic Latent Sematic Analysis,
     Latent Dirichlet Allocation,
     Additive Regularization of Topic Models,
@@ -110,7 +113,7 @@ Topic model reveals a~hidden thematic structure of the text collection
 and finds a~compressed representation of each document by~a~set of its topics.
 Such models appear to be highly useful for many applications including
 information retrieval for long-text queries,
-revealing research trends and research fronts,
+%revealing research trends and research fronts,
 classification, categorization, summarization and segmentation of texts.
 More ideas, models and applications are outlined in the survey~\cite{daud10knowledge}.
 
@@ -119,22 +122,22 @@ defines each topic by a~multinomial distribution over words,
 and then describes each document with a~multinomial distribution over topics.
 From the optimizational point of view,
 topic modeling can be considered as a~special case
-of constrained approximate stochastic matrix factorization.
+of approximate stochastic matrix factorization.
 Learning a~factorized representation of a~text collection
 is an ill-posed problem, which has an infinite set of solutions.
 Then a~regularization must be used
-to~impose problem-oriented restrictions
+to~impose problem-oriented constrains
 and thus to choose a~more reasonable solution.
 
 Hundreds of models adapted to different situations are described in the literature.
 For practitioners, most of them are too difficult to quickly
 understand, compare, combine and embed into applications.
-Then there was a~common practice to use only the simplest models such as
+Then there was a~common practice to use only the basic models such as
 \emph{Probabilistic Latent Semantic Analysis}, PLSA~\cite{hofmann99plsi} and
 \emph{Latent Dirichlet Allocation}, LDA~\cite{blei03latent}.
 Some of the difficulties are rooted in Bayesian learning framework,
 which is dominating approach in topic modeling.
-Bayesian inference of each kind of model is a~unique and laborious mathematical work,
+Bayesian inference of each kind of model requires a~laborious mathematical work,
 which prevents the unification and the flexible manipulation of various topic models.
 Until now, there was no freely available development tools
 to easily design, modify, select, and combine topic models.
@@ -154,7 +157,7 @@ ARTM makes topic models easier to design, infer, combine and explain,
 thus reducing barriers to entry into topic modeling research field.
 
 BigARTM is released under New BSD License, which permits free commercial and non-commercial usage.
-The core of the library is written C++ and exposed via two equally rich APIs for C++ and Python.
+The core of the library is written in C++ and exposed via two equally rich APIs for C++ and Python.
 The library is cross-platform and can be built for Linux, Windows and OS X in both 32 and 64 bit configuration.
 In our experiments on Wikipedia corpus BigARTM performs better than Vowpal Wabbit LDA and Gensim libraries
 in terms of perplexity and runtime.
@@ -165,7 +168,7 @@ The rest of the paper is organized as follows.
 In~section~\ref{sec:Multimodal}
 we~introduce a~multimodal topic model generalized for documents with multiple types of accompanying discrete metadata.
 In~section~\ref{sec:Online}
-we~describe a~fast online algorithm~\cite{hoffman10online} generalized for any additively regularized topic models.
+we~describe a~fast online algorithm~\cite{hoffman10online} generalized for additively regularized multimodal topic modeling.
 In~section~\ref{sec:BigARTM}
 we~consider the parallel architecture and implementation details of BigARTM library.
 In~section~\ref{sec:Experiments}
@@ -286,24 +289,25 @@ transforms a~vector $(x_t)_{t\in T}$ to a~discrete distribution;
 $m(w)$~is the modality of the term~$w$, so that $w\in W^{m(w)}$.
 
 The system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}
-follows from Karush--Kuhn--Tucker conditions (see Appendix for the proof).
+follows from Karush--Kuhn--Tucker conditions (see Appendix~A for the proof).
 It~can be~solved by various numerical methods.
 Particularly,
 the simple-iteration method is equivalent to the EM algorithm,
 which is typically used in~practice.
-For single modality (${M=1}$) Theorem~1 gives the regularized EM algorithm
+For single modality (${M=1}$) it gives the regularized EM algorithm
 proposed in~\cite{voron14dan-eng}.
-With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
+With no regularization (${R=0}$) it~corresponds to PLSA~\cite{hofmann99plsi}.
+
 Many Bayesian topic models can be considered alternatively
 as special cases of ARTM with different regularizers~$R$,
 as shown in~\cite{voron14aist,voron14mlj}.
-For example,
+For~example,
 LDA~\cite{blei03latent} corresponds to the entropy smoothing regularizer.
 
-Due to models unification and additive regularization
+Due to additive regularization and modeling unification 
 BigARTM enables to build topic models for various applications
 simply by choosing a~suitable combination of~regularizers
-from a constantly growing user-extensible library.
+from the build-in user extendable library.
 
 \section{Online topic modeling}
 \label{sec:Online}
@@ -316,72 +320,22 @@ each document vector $\theta_d$ is~iterated until convergence at a~constant matr
 see Algorithm~\ref{alg:Online} and~\ref{alg:ProcessBatch}.
 Matrix~$\Phi$ is updated rarely, after all documents from the batch are processed.
 For a~large collection,
-matrix~$\Phi$ stabilizes after a~small initial part of the collection passed.
-Therefore a~single pass through the collection is usually sufficient to learn a~topic model.
+matrix~$\Phi$ usually stabilizes after a~small initial part of the collection passed.
+Therefore a~single pass through the collection is sufficient to learn a~topic model.
 The second pass may be needed for the initial part of the collection.
 
-Algorithm~\ref{alg:Online} does not specify how often to synchronize $\Phi$ matrix at step \ref{alg:sync}.
-It can be done after every batch or less frequently
+Algorithm~\ref{alg:Online} does not specify how often to synchronize $\Phi$ matrix 
+at steps~\ref{alg:sync-begin}--\ref{alg:sync-end}.
+It~can be done after every batch or less frequently
 (for instance if $\frac{\partial R}{\partial \phi_{wt}}$ takes long time to evaluate).
 This flexibility is especially important for concurrent implementation of the algorithm,
 where multiple batches are processed in parallel.
-In this case synchronization can be triggered when a fixed number of documents had been processed since last synchronization.
+In~this case synchronization can be triggered when a fixed number of documents had been processed since last synchronization.
 
 The online reorganization of the EM iterations
 is not necessarily associated with Bayesian inference used in~\cite{hoffman10online}.
 Different topic models, from PLSA to multimodal and regularized models,
 can be learned by the above online EM algorithm.
-
-\begin{algorithm}[t]
-\caption{~Online EM-algorithm for multimodal ARTM}
-\label{alg:Online}
-\begin{algorithmic}[1]
-\REQUIRE collection $D_b$, discounting factor $\rho\in(0,1]$;
-\ENSURE matrix $\Phi$;
-\STATE initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$;
-\STATE $n_{wt} := 0$,~ $\tilde n_{wt} := 0$;
-\FORALL{batches $D_b$, $b = 1,\dots,B$}
-    \STATE $\tilde n_{wt} := \tilde n_{wt} + \kw{ProcessBatch}(D_b, \phi_{wt})$;
-    \IF{(synchronize)} \label{alg:sync}
-        %\STATE $n_{wt} := \kw{Merge} (n_{wt}, \tilde n_{dw})$;
-        %\STATE $r_{wt} := \kw{Regularize} (n_{wt})$;
-        %\STATE $n_t := \sum_{w \in W} max(0, n_{wt} + r_{wt})$;
-        \STATE \label{alg:merging}
-               $n_{wt} := \rho n_{wt} + \tilde n_{dw}$ for all $w \in W$ and $t \in T$;
-        \STATE \label{alg:phi}
-               $\phi_{wt} := \norm_{w\in W^m}
-                    \bigl(
-                        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
-                    \bigr)$
-               for all $w \in W^m$,\, $m=1,\dots,M$ and $t \in T$;
-        \STATE $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$;
-    \ENDIF
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[t]
-\caption{~$\kw{ProcessBatch} (D_b, \phi_{wt})$}
-\label{alg:ProcessBatch}
-\begin{algorithmic}[1]
-\REQUIRE batch $D_b$, matrix $\phi_{wt}$;
-\ENSURE matrix $\tilde n_{wt}$;
-\STATE $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$;
-\FORALL{ $d \in D_b$}
-	\STATE initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$;
-	\REPEAT
-        \STATE $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $t \in T$;
-        \STATE $n_{td} := \sum_{w\in d} \tau_{m(w)} n_{dw} p_{tdw}$ for all $t \in T$;
-        \STATE $\theta_{td} := \norm_{t\in T}
-                    \bigl(
-                        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
-                    \bigr)$ for all $t \in T$;
-	\UNTIL{$\theta_d$ converges};
-	\STATE increment $\tilde n_{wt}$ by $n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$;
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
 
 \section{BigARTM architecture}
 \label{sec:BigARTM}
@@ -391,6 +345,53 @@ For this reason each $D_b$ batch should be stored on disk in a separate file,
 and only a limited number of batches will be loaded into the main memory at any given time.
 The entire $\Theta$ matrix is also never stored in the memory.
 As the result, the memory usage stays constant regardless of the size of the collection.
+
+\SetAlgoSkip{}
+\begin{algorithm2e}[t]
+\caption{Online EM-algorithm for multimodal ARTM}
+\label{alg:Online}
+\BlankLine
+\KwIn{collection $D_b$, discounting factor $\rho\in(0,1]$;}
+\KwOut{matrix $\Phi$;}
+\BlankLine
+initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$\;
+$n_{wt} := 0$,~ $\tilde n_{wt} := 0$\;
+\ForAll{batches $D_b$, $b = 1,\dots,B$}{
+    $\tilde n_{wt} := \tilde n_{wt} + \kw{ProcessBatch}(D_b, \phi_{wt})$\;
+    \If{(synchronize)\label{alg:sync-begin}}{
+        $n_{wt} := \rho n_{wt} + \tilde n_{dw}$ for all $w \in W$ and $t \in T$\; \label{alg:merging}
+        $\phi_{wt} := \norm_{w\in W^m}
+            \bigl(
+                n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+            \bigr)$
+        for all $w \in W^m$,\, $m=1,\dots,M$ and $t \in T$\; \label{alg:phi}
+
+        $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\; \label{alg:sync-end}
+    }
+}
+\end{algorithm2e}
+
+\begin{algorithm2e}[t]
+\caption{\kw{ProcessBatch}($D_b, \phi_{wt}$)}
+\label{alg:ProcessBatch}
+\BlankLine
+\KwIn{batch $D_b$, matrix $\phi_{wt}$;}
+\KwOut{matrix $\tilde n_{wt}$;}
+\BlankLine
+$\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
+\ForAll{$d \in D_b$}{
+	initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
+	\Repeat{$\theta_d$ converges}{
+        $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $t \in T$\;
+        $n_{td} := \sum_{w\in d} \tau_{m(w)} n_{dw} p_{tdw}$ for all $t \in T$\;
+        $\theta_{td} := \norm_{t\in T}
+            \bigl(
+                n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+            \bigr)$ for all $t \in T$\;
+	}
+	increment $\tilde n_{wt}$ by $n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
+}
+\end{algorithm2e}
 
 \paragraph{Concurrency.}
 An general rule of concurrency design is to express parallelism at the highest possible level.
@@ -406,9 +407,9 @@ An alternative architecture without the synchronization step is described in \ci
 however it mostly targets a distributed cluster environment.
 In our work we develop an efficient single-node architecture where all workers benefit from the shared memory space.
 
-\begin{figure}[h!]
+\begin{figure}[t]
 \begin{centering}
-\includegraphics[height=40mm]{diagramm_artm_core.eps}
+\includegraphics[height=36mm]{diagramm_artm_core.eps}
 \caption{Diagram of key BigARTM components}
 \label{fig:diagramm_artm_core}
 \end{centering}
@@ -455,34 +456,38 @@ and $I$ is $10 \dots 20$, so the ratio safely exceeds the expected number of cor
 (up to 32 physical CPU cores in modern workstations, and even 60 cores if we are talking about Intel Xeon Phi co-processors).
 
 \paragraph{Data layout.}
-BigARTM uses dense single-precision matrices to represent $\Phi$ and $\Theta$.
-Together with the $\Phi$ matrix we store a global dictionary for all words $w \in W$.
-This dictionary is implemented as $\kw{std::unordered\_map}$ that maps a string representation of $w \in W$
+BigARTM uses dense single-precision matrices to represent $\Phi$ and~$\Theta$.
+Together with the $\Phi$ matrix we store a global dictionary for all terms ${w \in W}$.
+This dictionary is implemented as $\kw{std::unordered\_map}$ that maps a string representation of ${w \in W}$
 into its integer index in the $\Phi$ matrix.
 This dictionary can be extended automatically as more and more batches came through the system.
-To achieve this each batch $D_b$ always has a local dictionary $W_b$, listing all words that occur in the batch.
-The $n_{dw}$ elements of the batch are stored as a sparse CSR matrix (Compressed Sparse Raw format),
-where each row correspond to a document $d \in D_b$, and words $w$ run over a local batch dictionary $W_b$.
+To achieve this each batch $D_b$ always has a local dictionary $W_b$, listing all terms that occur in the batch.
+The $n_{dw}$ elements of the batch are stored as a~sparse CSR matrix (Compressed Sparse Raw format),
+where each row correspond to a~document ${d \in D_b}$, 
+and terms~$w$ run over a~local batch dictionary~$W_b$.
 
 For performance reasons $\Phi$ matrix is stored in column-major order, and $\Theta$ in row-major order.
 This layout ensures that $\sum_t \phi_{wt} \theta_{td}$ sum runs on sequential memory elements.
-In both matrices all values smaller than $10^{-16}$ are always replaced with zero to avoid performance issues with denormalized numbers
+In both matrices all values smaller than $10^{-16}$ are always replaced with zero to avoid performance issues with denormalized numbers%
 \footnote{\url{http://en.wikipedia.org/wiki/Denormal_number#Performance_issues}}.
 %http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
 
 \paragraph{Programming interface.}
 All functionality of BigARTM is expressed in a set of $\kw{extern C}$ methods,
-To input and output complex data structures this API uses Google Protocol Buffers
+To input and output complex data structures this API uses Google Protocol Buffers%
 \footnote{\url{http://code.google.com/p/protobuf/}}.
 This approach makes it easy to integrate BigARTM into almost any research or production environment,
 because almost every modern language has an implementation of Google Protocol Buffers
 and a way of calling $\kw{extern C}$ code
-(``ctypes'' module for Python, ``loadlibrary'' for Matlab, ``PInvoke'' for C\#, etc).
+($\kw{ctypes}$ module for Python, $\kw{loadlibrary}$ for Matlab, $\kw{PInvoke}$ for C\#, etc).
 
 On top of the $\kw{extern C}$ API BigARTM already has convenient wrappers in C++ and Python.
 We are also planning to implement a Java wrapper in the near future.
 
-In addition to the programming APIs the library also also has a simple CLI interface.
+In addition to the APIs the library also has a simple CLI interface.
+
+BigARTM has build-in libraries of regularizers and quality measures
+that can be extended in current implementation only through project recompilation. 
 
 \paragraph{Basic tools.}
 A careful selection of the programming tools is important for any software project.
@@ -508,37 +513,47 @@ to run automated continuous integration builds (\url{http://travis-ci.org}).
 \section{Experiments}
 \label{sec:Experiments}
 
-In this section we evaluate the performance and the algorithmic quality of \mbox{BigARTM} against two popular software packages ---
-Gensim \cite{rehurek_lrec}  %\footnote{\url{http://radimrehurek.com/gensim/}}
-and Vowpal Wabbit\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}.
-We also demonstrate several unique BigARTM features, such as topics regularization and multi-language models,
+In this section we evaluate the runtime performance and the algorithmic quality of \mbox{BigARTM} 
+against two popular software packages~--- 
+Gensim~\cite{rehurek_lrec}  
+%\footnote{\url{http://radimrehurek.com/gensim/}}
+and Vowpal Wabbit%
+\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}.
+We also demonstrate some of unique BigARTM features, such as 
+combining regularizers and multi-language topic modeling via multimodality,
 which are not available in other software packages.
 
-All three libraries (LDA.VW, Gensim and BigARTM) work out-of-core,
-e.g. they are designed to process data that is too large to fit into a computer's main memory at one time.
-This allowed us to benchmark on a fairly large collection --- 3.7 million articles from the English Wikipedia
+All three libraries (VW.LDA, Gensim and BigARTM) work out-of-core,
+e.\,g. they are designed to process data that is too large to fit into a computer's main memory at one time.
+This allowed us to benchmark on a fairly large collection --- 3.7 million articles from the English Wikipedia%
 \footnote{\url{http://dumps.wikimedia.org/enwiki/20141208/enwiki-20141208-pages-articles.xml.bz2}}.
-The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpuss}$ script
+The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpuss}$ script%
 \footnote{\url{https://github.com/piskvorky/gensim/blob/develop/gensim/scripts/make_wikicorpus.py}},
 which excludes all non-article pages (such as category, file, template, user pages, etc),
-and also pages that contain less than $50$ words.
-The dictionary is formed by all words that occur in at lest 20 documents,
+and also pages that contain less than $50$~words.
+The dictionary is formed by all words that occur in at lest 20~documents,
 but no more than in $10\%$ documents in the collection.
 The resulting dictionary was caped at $|W| = 100\,000$ most frequent words.
 
 Both Gensim and VW.LDA represents the resulting topic model as Dirichlet distribution over $\Phi$ and $\Theta$ matrices:
-\[
-	\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d), \quad \vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t).
-\]
-On contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
-To compare the perplexity we will take the average of VW.LDA and Gensim distributions:
-\[
-	\vec{\theta}^\text{mean}_d = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)}\vec{\theta}_d, \quad \vec{\phi}^\text{mean}_t = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)} \vec{\phi}_t.
-\]
+$\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d)$ and 
+$\vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)$.
+On~contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
+To~compare the perplexity we take the maximum likelihood (ML) and maximum a~posteriori (MAP) estimates 
+from $\vec{\gamma}_d$ and $\vec{\lambda}_t$ distributions:
+\begin{align*}
+	\theta^{\mathrm{ML}}_{td} &\propto \gamma_{td}+\alpha, &
+    \phi^{\mathrm{ML}}_{wt} &\propto \lambda_{wt}+\beta;
+\\
+	\theta^{\mathrm{MAP}}_{td} &\propto \max\{\gamma_{td}+\alpha-1,0\}, &
+    \phi^{\mathrm{MAP}}_{wt} &\propto \max\{\lambda_{wt}+\beta-1,0\}.
+\end{align*}
 The perplexity measure is defined as
 \begin{equation}
     \label{eq:perplexity}
-    \mathscr{P}(D, p) = \exp\left(- \frac{1}{n} L(\Phi, \Theta) \right) = \exp \left( - \frac{1}{n} \sum_{d \in D} \sum_{w \in d} n_{dw} \ln p(w | d) \right).
+    \mathscr{P}(D, p) = 
+        %\exp\left(- \frac{1}{n} L(\Phi, \Theta) \right) = 
+        \exp \biggl( - \frac{1}{n} \sum_{d \in D} \sum_{w \in d} n_{dw} \ln p(w \cond d) \biggr).
 \end{equation}
 
 \paragraph{Comparison to existing software packages.}
@@ -546,125 +561,148 @@ The perplexity measure is defined as
 %There is no article to quote for VW, check http://www.research.rutgers.edu/~lihong/pub/Qin13Efficient.pdf - they use a footnote to quote VW
 The \emph{Vowpal Wabbit (VW)} is a library
 of online algorithms that cover a wide range of machine learning problems. %, not specifically limited to topic modeling.
-For topic modeling VW has the VW.LDA algorithm, based on the Online Variational Bayes LDA \cite{hoffman10online}.
-VW.LDA implementation is neither multi-core nor distributed,
+For~topic modeling VW has the VW.LDA algorithm, based on the Online Variational Bayes LDA \cite{hoffman10online}.
+VW.LDA is neither multi-core nor distributed,
 but an effective single-threaded implementation in C++ made it one of the fastest tools for topic modeling.% within single computing node.
 
 The \emph{Gensim} library specifically targets the area of topic modeling and matrix factorization.
 It has two LDA implementations --- LdaModel and LdaMulticore,
-both based on the same algorithm as VW.LDA (Online Variational Bayes LDA \cite{hoffman10online}).
+both based on the same algorithm as VW.LDA (Online Variational Bayes LDA~\cite{hoffman10online}).
 Gensim is entirely written in Python. Its high performance is achieved through the usage of NumPy library,
 built over a low-level BLAS libraries (such as Intel MKL, ATLAS, or OpenBLAS).
 In LdaModel all batches are processed sequentially, and all concurrency happens within NumPy. % (in numpy.dot, numpy.sum and other Level1 BLAS operations).
 In LdaMulticore the workflow is similar to BigARTM --- several batches are processed concurrently, and there is a single aggregation thread that asynchronously merges the results.
 
-\begin{table}[t!]
-	\centering
-	\begin{tabular}[t]{||c||c|c|c|c||}
+\begin{table}[t]
+	\caption{
+        The comparison of BigARTM with VW.LDA and Gensim.
+        \emph{Train time} is time for model training,
+        \emph{inference time} is time for calculation of $\theta_d$ of $100\,000$ held-out documents,
+        \emph{perplexity} is calculated according to \eqref{eq:perplexity} on held-out documents.
+    }
+	\label{tab:libraries_comparison}
+    \vskip-2ex\centering\tabcolsep=8pt
+	\begin{tabular}[t]{l|c|rrr}
 	\hline
-	Library & Proc. & Train Time & Inference Time & Perplexity \\
+	library & procs & train time & inference time & perplexity \\
 	\hline
-	BigARTM Smoothing & 1 & 62 min & 127 sec & 4000 \\
+	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 \\
 	Gensim LDA & 1 & 369 min & 395 sec & 4161 \\
 	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 \\
 	\hline
-	BigARTM Smoothing & 8 & 8 min & 24 sec & 4304 \\
+	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 \\
 	Gensim LDA-Multicore & 8 & 70 min & 338 sec & 4470 \\
 	\hline
 	\end{tabular}
-    \vskip 2ex
-	\caption{
-        BigARTM comparison with LDA.VW and Gensim.LdaMulticore.
-        Train Time is time for model training,
-        Inference Time -- time for calculation of $\theta_d$ of $100\,000$ held-out documents,
-        Perplexity is calculated according to \eqref{eq:perplexity} on held-out documents.
-    }
-	\label{tab:libraries_comparison}
 \end{table}
-\begin{figure}[t!]
+
+\begin{figure}[t]
 	\centering
-    \vskip -4ex
-	\includegraphics[height=45mm]{bigartm_speedup.eps}
-	\caption{BigARTM speed up}
+	\includegraphics[height=35mm]{speedup_bigartm.eps}
+	\includegraphics[height=35mm]{speedup_gensim.eps}
+	\caption{Speed up for BigARTM (left chart) and Gensim (right chart)}
 	\label{fig:bigartm_speedup}
 \end{figure}
 
-Each run in our experiment performs one pass over the Wikipedia corpus and produce a model with $|T|=100$ topics.
+Each run in our experiment performs one pass over the Wikipedia corpus and produces a~model with $|T|=100$ topics.
 The runtime is reported for an Intel-based CPU with 16 physical cores with hyper-threading.
 The collection was split into batches with $10 000$ documents each
 (\texttt{chunksize} in Gensim, \texttt{minibatch} in VW.LDA).
-The update rule in online algorithm used $\rho = 1 \slash \sqrt{b + \tau_0}$, where $b$ is the number of batches processed so far,
-and $\tau_0$ is an a constant offset parameter, introduced in \cite{hoffman10online} (in our experiment $\tau_0 = 64$).
+The update rule in online algorithm used 
+${\rho = (b + \tau_0)^{-0.5}}$, 
+where $b$ is the number of batches processed so far,
+and $\tau_0$ is an a constant offset parameter introduced in \cite{hoffman10online}, 
+in~our experiment ${\tau_0 = 64}$.
 Update performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ parallel threads.
-LDA priors were fixed as $\alpha = 0.1,\, \beta = 0.1$, so that $\vec{\theta}_d \sim \text{Dir}(\alpha),\, \vec{\phi}_t \sim \text{Dir}(\beta)$.
+LDA priors were fixed as 
+${\alpha = 0.1}$,\, ${\beta = 0.1}$, 
+so that 
+$\vec{\theta}_d \sim \text{Dir}(\alpha)$,\, 
+$\vec{\phi}_t \sim \text{Dir}(\beta)$.
 
-Table \ref{tab:libraries_comparison} gives the comparison of runtime and perplexity between LDA.VW, Gensim and BigARTM.
-Chart \ref{fig:bigartm_speedup} gives BigARTM speedup depending on the number CPU threads.
+Table\;\ref{tab:libraries_comparison} compares the performance of VW.LDA, Gensim, and BigARTM.
 
-{\color{red}ToDo: discussions.}
+Fig.\;\ref{fig:bigartm_speedup} compares BigARTM and Gensim speedup depending on the number of CPU threads
+for Amazon AWS~c3.8xlarge with 32~cores, 
+Gensim~\mbox{0.10.3} under Python~\mbox{2.7}, 
+and the parameter of LDA-Multicore $\kw{workers}=\kw{nProcessors}-1$.
 
-\paragraph{Experiments with regularization}
+%{\color{red}ToDo: discussions.}
 
-BigARTM has built-in library of regularizers that allows to improve several quality measures almost without any loss of perplexity.
-In the following experiment we follow the approach introduced in \cite{voron14aist} and configure $5\%$ of smooth background topics
-and $95\%$ sparse topical topics. In addition we enable topics decorrelation to improve kernel quality measures
-(kernel size, kernel purity and kernel contrast).
+\paragraph{Experiments with combination of regularizers.}
+
+BigARTM has a~built-in library of regularizers, which can be used in any combination.  
+In~the following experiment we combine three regularizers:
+sparsing of~$\phi_{t}$~distributions, 
+sparsing of~$\theta_{d}$~distributions, and
+pairwise decorrelation of~$\phi_{t}$ distributions.
+This combination helps to improve several quality measures without significant loss of perplexity,
+according to~experiments on the off-line implementation of ARTM~\cite{voron14aist}.
+The goal of our experiment is to show that this remains true 
+for the on-line implementation in BigARTM.
+We~use the following built-in quality measures:
+the hold-out perplexity, 
+the sparsity of $\Phi$ and $\Theta$ matrices, and 
+the characteristics of topic lexical kernels (size, purity, and contrast) averaged across all topics.
 
 \begin{table}[t]
-\centering
-\begin{tabular}[t]{||c||ccccccc||}
-\hline
-Model/Functional & $\mathcal{P}_{10k}$ & $\mathcal{P}_{100k}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
-\hline
-LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
-ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
-\hline
-\end{tabular}
-\vskip 2ex
-\caption{Comparison of LDA and ARTM models.
-Quality functionals: $\mathcal{P}_{10k}$ $\mathcal{P}_{100k}$ --- hold-out perplexity on 10.000 and 100.000 documents sets,
-$\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%),
-$\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
-\label{tab:model_comparison}
+    \caption{Comparison of LDA and ARTM models.
+        Quality measures: 
+        $\mathcal{P}_{10k}$, $\mathcal{P}_{100k}$ --- hold-out perplexity on 10K and 100K documents sets,
+        $\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%),
+        $\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
+    \label{tab:model_comparison}
+    \centering\vskip-2ex\tabcolsep=8pt
+    \begin{tabular}[t]{l|rrrrrrr}
+    \hline
+    Model & $\mathcal{P}_{10k}$ & $\mathcal{P}_{100k}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
+    \hline
+    LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
+    ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
+    \hline
+    \end{tabular}
 \end{table}
 
-\begin{figure}[h!]
+\begin{figure}[t]
 \begin{tabular}{cc}
 \input{plot_perplexity_sparsity}
 &
 \input{plot_kernel}
 \end{tabular}
-\caption{Comparison of LDA (thin) and ARTM (bold) models. X axis is a number of processed documents.}
+\caption{Comparison of LDA (thin) and ARTM (bold) models. The number of processed documents is along X~axis.}
 \label{fig:comparison_plot}
 \end{figure}
 
-Table \ref{tab:model_comparison} presents the comparisons results for regularized and non-regularized model.
-Figure \ref{fig:comparison_plot} presents all quality measures as a function of number processed documents.
-Upper chart shows perplexity and sparsity of $\Phi$, $\Theta$ matrices.
-Bottom chart shows average kernel measures.
+Table \ref{tab:model_comparison} compares the results of additive combination of regularizers (ARTM) and usual LDA model.
+Figure \ref{fig:comparison_plot} presents quality measures as functions of the number of processed documents.
+The left chart shows perplexity and sparsity of $\Phi$, $\Theta$ matrices, and
+the right chart shows average lexical kernel measures.
 
-{\color{red}ToDo: discussions.}
+%{\color{red}ToDo: discussions.}
 
 \paragraph{Experiments on multi-language Wikipedia.}
 
-To~show how BigARTM works with~multimadal datasets we prepared a text corpus
+To~show how BigARTM works with multimodal datasets we prepared a text corpus
 containing all English and Russian Wikipedia articles with mutual interlanguage links.
 We represent each linked pair of articles
 as a single multi-language document with~two modalities, one modality for each language.
-That is how our multi-language collection acts as a multimodal dataset.
+That is how our multi-language collection acts as a multimodal document collection.
 
-The dump of Russian articles \footnote{\url{http://dumps.wikimedia.org/ruwiki/20141203/ruwiki-20141203-pages-articles.xml.bz2}}
+The dump of Russian articles% 
+\footnote{\url{http://dumps.wikimedia.org/ruwiki/20141203/ruwiki-20141203-pages-articles.xml.bz2}}
 had been processed following the same technique as we previously used in experiments on English Wikipedia.
-Russian words were lemmatized with ``Yandex MyStem 3.0'' \footnote{\url{https://tech.yandex.ru/mystem/}}.
+Russian words were lemmatized with Yandex MyStem~3.0% 
+\footnote{\url{https://tech.yandex.ru/mystem/}}.
 To further reduce the dictionary we only keep words
-that appear in no less than 20~documents, but no~more than in~10\% of~documents in the~collection.
-The resulting collection contains 216175~pairs of~russian--english articles, with combined dictionary
-of 196749 words (43\% russian, 57\% english words).
+that appear in no less than 20~documents, but no~more than in~10\% of~documents in the collection.
+The resulting collection contains 216175~pairs of Russian--English articles, with combined dictionary
+of 196749 words (43\% Russian, 57\% English words).
 
-We build multi-language modal with 400~topics.
+We build multi-language model with 400~topics.
 They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
 %Most of them can be easily interpreted.
-All $400$ topics were reviewed by an independent assessor, and he easily interpreted all except $4$ topics.
+All $400$ topics were reviewed by an independent assessor, 
+and he successfully interpreted all except four topics.
 
 Table \ref{tab:top10words} shows top 10 words for four randomly selected topics.
 For those who are familiar with both Russian and English languages it should be apparent that top words are consistent between the languages.
@@ -672,11 +710,15 @@ The Russian part of last topic contains some English words such as
 ``Windows'', ``Microsoft'' or ``Office'' because it is common to use them in Russian texts without translation.
 
 \begin{table}[t!]
-	\centering\medskip\tabcolsep=2pt%\small
+	\caption{
+        Top 10 words with $p(w\cond t)$ probabilities (in~\%) from two-language topic model,
+        based on Russian and English Wikipedia articles with mutual interlanguage links.}
+	\label{tab:top10words}
+	\centering\tabcolsep=3pt%\small
 	\footnotesize
     \begin{tabular}{|lr|lr||lr|lr|}	
     	\hline
-    	\multicolumn{4}{|c||}{\textbf{Topic~68}} & \multicolumn{4}{c||}{\textbf{Topic~79}} \\
+    	\multicolumn{4}{|c||}{\textbf{Topic~68}} & \multicolumn{4}{c|}{\textbf{Topic~79}\rule{0pt}{3ex}} \\
     	\hline
     	research & 4.56 & институт & 6.03 & goals & 4.48 & матч & 6.02 \\
     	technology & 3.14 & университет & 3.35 & league & 3.99 & игрок & 5.56 \\
@@ -689,7 +731,7 @@ The Russian part of last topic contains some English words such as
     	management & 1.38 & наука & 1.64 & debut & 1.69 & забивать & 2.53 \\
     	programs & 1.36 & образование & 1.47 & match & 1.67 & команда & 2.14 \\
     	\hline
-    	\multicolumn{4}{|c||}{\textbf{Topic~88}} &     \multicolumn{4}{c||}{\textbf{Topic~251}} \\
+    	\multicolumn{4}{|c||}{\textbf{Topic~88}} &     \multicolumn{4}{c|}{\textbf{Topic~251}\rule{0pt}{3ex}}  \\
     	\hline
         opera & 7.36 & опера & 7.82 & windows & 8.00 & windows & 6.05 \\
     	conductor & 1.69 & оперный & 3.13 & microsoft & 4.03 & microsoft & 3.76 \\
@@ -703,11 +745,6 @@ The Russian part of last topic contains some English words such as
     	operas & 0.68 & оркестр & 0.82 & users & 0.78 & система & 0.96 \\
     	\hline
 	\end{tabular}
-    \vskip 2ex
-	\caption{
-        Top10 words of two-language topic model,
-        based on all Russain and English Wikipedia articles with mutual interlanguage links.}
-	\label{tab:top10words}
 \end{table}
 
 
@@ -775,24 +812,107 @@ The Russian part of last topic contains some English words such as
 \section{Conclusions}
 \label{sec:Conclusions}
 
-BigARTM architecture has a rich potential.
-Current components can be reused in a distributed solution that runs on cluster.
+\mbox{BigARTM} in an open source project for parallel online topic modeling of large text collections.
+It~provides a~high flexibility for various applications due to 
+multimodality and additive combinations of regularizers.
+\mbox{BigARTM} architecture has a~rich potential.
+Current components can be reused in a~distributed solution that runs on cluster.
 Further improvement of single-node can be achieved by offloading batch processing into GPU.
 
 \bigskip
 \subsubsection*{Acknowledgements.}
-    The work was supported by~the Russian Foundation for Basic Research grants 14-07-00847, 14-07-00908,
+    The work was supported by~the Russian Foundation for Basic Research grants 14-07-00847, 14-07-00908, 14-07-31176
     and by~Skolkovo Institute of Science and Technology (project 081-R).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\def\BibUrl#1.{\relax}
-%\bibliographystyle{gost71sv}
-\bibliographystyle{splncs03}
-\bibliography{MachLearn}
+%\bibliographystyle{splncs03}
+%\bibliography{MachLearn}
+
+\begin{thebibliography}{10}
+%\providecommand{\url}[1]{\texttt{#1}}
+%\providecommand{\urlprefix}{URL }
+
+\bibitem{blei12ptm}
+Blei, D.M.: Probabilistic topic models. Communications of the ACM  55(4),
+  77--84 (2012)
+
+\bibitem{blei03modeling}
+Blei, D.M., Jordan, M.I.: Modeling annotated data. In: Proceedings of the 26th
+  Annual International ACM SIGIR Conference on Research and Development in
+  Informaion Retrieval. pp. 127--134. ACM, New York, NY, USA (2003)
+
+\bibitem{blei03latent}
+Blei, D.M., Ng, A.Y., Jordan, M.I.: Latent {Dirichlet} allocation. Journal of
+  Machine Learning Research  3,  993--1022 (2003)
+
+\bibitem{daud10knowledge}
+Daud, A., Li, J., Zhou, L., Muhammad, F.: Knowledge discovery through directed
+  probabilistic topic models: a survey. Frontiers of Computer Science in China
+  4(2),  280--301 (2010)
+
+\bibitem{hoffman10online}
+Hoffman, M.D., Blei, D.M., Bach, F.R.: Online learning for latent dirichlet
+  allocation. In: NIPS. pp. 856--864. Curran Associates, Inc. (2010)
+
+\bibitem{hofmann99plsi}
+Hofmann, T.: Probabilistic latent semantic indexing. In: Proceedings of the
+  22nd annual international ACM SIGIR conference on Research and development in
+  information retrieval. pp. 50--57. ACM, New York, NY, USA (1999)
+
+\bibitem{liu2011plda+}
+Liu, Z., Zhang, Y., Chang, E.Y., Sun, M.: PLDA+: Parallel latent dirichlet
+  allocation with data placement and pipeline processing. ACM Transactions on
+  Intelligent Systems and Technology (TIST)  2(3), ~26 (2011)
+
+\bibitem{newman2009distributed}
+Newman, D., Asuncion, A., Smyth, P., Welling, M.: Distributed algorithms for
+  topic models. The Journal of Machine Learning Research  10,  1801--1828
+  (2009)
+
+\bibitem{rehurek_lrec}
+{\v R}eh{\r u}{\v r}ek, R., Sojka, P.: {Software Framework for Topic Modelling
+  with Large Corpora}. In: {Proceedings of the LREC 2010 Workshop on New
+  Challenges for NLP Frameworks}. pp. 45--50. ELRA, Valletta, Malta (May 2010).
+  %\url{http://is.muni.cz/publication/884893/en}
+
+\bibitem{rubin12statistical}
+Rubin, T.N., Chambers, A., Smyth, P., Steyvers, M.: Statistical topic models
+  for multi-label document classification. Machine Learning  88(1-2),  157--208
+  (2012)
+
+\bibitem{smola2010architecture}
+Smola, A., Narayanamurthy, S.: An architecture for parallel topic models.
+  Proceedings of the VLDB Endowment  3(1-2),  703--710 (2010)
+
+\bibitem{voron14dan-eng}
+Vorontsov, K.V.: Additive regularization for topic models of text collections.
+  Doklady Mathematics  89(3),  301--304 (2014)
+
+\bibitem{voron14mlj}
+Vorontsov, K.V., Potapenko, A.A.: Additive regularization of topic models.
+  Machine Learning, Special Issue on Data Analysis and Intelligent Optimization
+   (2014)
+
+\bibitem{voron14aist}
+Vorontsov, K.V., Potapenko, A.A.: Tutorial on probabilistic topic modeling:
+  Additive regularization for stochastic matrix factorization. In: AIST'2014,
+  Analysis of Images, Social networks and Texts. vol. 436, pp. 29--46. Springer
+  International Publishing Switzerland, Communications in Computer and
+  Information Science (CCIS) (2014)
+
+\bibitem{wang2009plda}
+Wang, Y., Bai, H., Stanton, M., Chen, W.Y., Chang, E.Y.: PLDA: Parallel latent
+  dirichlet allocation for large-scale applications. In: Algorithmic Aspects in
+  Information and Management, pp. 301--314. Springer (2009)
+
+\end{thebibliography}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Appendix}
+\newpage
+\section*{Appendix A}
+
+Consider the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}.
 
 Topic~$t$ is called \emph{regular} for the modality~$m$
 if ${n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}} > 0}$
@@ -827,13 +947,13 @@ document~$d$ is called \emph{irregular}.
     then the $d$-th vector-column in matrix~$\Theta$ equals zero
     and can not represent a~discrete distribution.
     This means that document~$d$ must be excluded from the model.
-    For example, a~document may be too short, or have no relation to the themes of a~given collection.
+    For example, a~document may be too short or irrelevant to the given collection.
 \end{note}
 
 \begin{proof}
     For the local minimum $\Phi^m,\Theta$
     of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
-    the Karush--Kuhn--Tucker (KKT) conditions (see Appendix~A) can be written as follows:
+    the Karush--Kuhn--Tucker (KKT) conditions can be written as follows:
     %(conditions with respect to $\theta_{td}$ are analogous):
     \begin{gather*}
         \sum_{d} n_{dw} \frac{\theta_{td}}{p(w\cond d)} + \frac{\partial R}{\partial \phi_{wt}}
