@@ -540,11 +540,11 @@ $\vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)$.
 On~contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
 To~compare the perplexity we take the mean or the mode of the posterior distributions:
 \begin{align*}
-	\theta^{\mathrm{mean}}_{td} &\propto \gamma_{td}, &
-    \phi^{\mathrm{mean}}_{wt} &\propto \lambda_{wt};
+    \phi^{\mathrm{mean}}_{wt} &= \norm_{w\in W} \lambda_{wt}, &
+	\theta^{\mathrm{mean}}_{td} &= \norm_{t\in T} \gamma_{td};
 \\
-	\theta^{\mathrm{mode}}_{td} &\propto \max\{\gamma_{td}-1,0\}, &
-    \phi^{\mathrm{mode}}_{wt} &\propto \max\{\lambda_{wt}-1,0\}.
+    \phi^{\mathrm{mode}}_{wt} &= \norm_{w\in W} (\lambda_{wt}-1), &
+	\theta^{\mathrm{mode}}_{td} &= \norm_{t\in T} (\gamma_{td}-1).
 \end{align*}
 The perplexity measure is defined as
 \begin{equation}
