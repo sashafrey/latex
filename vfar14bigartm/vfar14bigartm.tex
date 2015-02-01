@@ -518,7 +518,7 @@ against two popular software packages~---
 Gensim~\cite{rehurek_lrec}
 %\footnote{\url{http://radimrehurek.com/gensim/}}
 and Vowpal Wabbit%
-\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}.
+\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/}}.
 We also demonstrate some of the unique BigARTM features, such as
 combining regularizers and multi-language topic modeling via multimodality,
 which are not available in the other software packages.
@@ -526,9 +526,9 @@ which are not available in the other software packages.
 All three libraries (VW.LDA, Gensim and BigARTM) work out-of-core,
 e.\,g. they are designed to process data that is too large to fit into a computer's main memory at one time.
 This allowed us to benchmark on a fairly large collection --- 3.7 million articles from the English Wikipedia%
-\footnote{\url{http://dumps.wikimedia.org/enwiki/20141208/enwiki-20141208-pages-articles.xml.bz2}}.
+\footnote{\url{http://dumps.wikimedia.org/enwiki/20141208/}}.
 The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpuss}$ script%
-\footnote{\url{https://github.com/piskvorky/gensim/blob/develop/gensim/scripts/make_wikicorpus.py}},
+\footnote{\url{https://github.com/piskvorky/gensim/tree/develop/gensim/scripts/}},
 which excludes all non-article pages (such as category, file, template, user pages, etc),
 and also pages that contain less than $50$~words.
 The dictionary is formed by all words that occur in at least 20~documents,
@@ -576,25 +576,26 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
 \begin{table}[t]
 	\caption{
         The comparison of BigARTM with VW.LDA and Gensim.
-        \emph{Train time} is time for model training,
-        \emph{inference time} is time for calculation of $\theta_d$ of $100\,000$ held-out documents,
+        \emph{Train time} is the time for model training,
+        \emph{inference} is the time for calculation of $\theta_d$ of $100\,000$ held-out documents,
         \emph{perplexity} is calculated according to \eqref{eq:perplexity} on held-out documents.
     }
 	\label{tab:libraries_comparison}
     \vskip-2ex\centering\tabcolsep=8pt
-	\begin{tabular}[t]{l|c|rrr}
+	\begin{tabular}[t]{|l|c|r|r|rr|}
 	\hline
-	library & procs & train time & inference time & perplexity \\
+	library & procs & train time & inference & \multicolumn{2}{c|}{perplexity} \\
+	        &       &            &           & mean & map \\
 	\hline
-	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 \\
-	Gensim LDA & 1 & 369 min & 395 sec & 4161 (mean) / 4213 (map) \\
-	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 (mean) / 4061 (map) \\
+	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 &\\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 & 4213 \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 & 4061 \\
 	\hline
-	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 \\
-	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 (mean) / 4055 (map) \\	
+	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 & \\
+	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 & 4055  \\	
 	\hline
-	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 \\
-	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 (mean) / 4379 (map) \\
+	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 & \\
+	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 & 4379 \\
 	\hline
 	\end{tabular}
 \end{table}
@@ -616,7 +617,7 @@ ${\rho = (b + \tau_0)^{-0.5}}$,
 where $b$ is the number of batches processed so far,
 and $\tau_0$ is an a constant offset parameter introduced in \cite{hoffman10online},
 in~our experiment ${\tau_0 = 64}$.
-Updates were performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ parallel threads.
+Updates were performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ threads.
 LDA priors were fixed as
 ${\alpha = 0.1}$,\, ${\beta = 0.1}$,
 so that
@@ -692,7 +693,7 @@ as a single multi-language document with~two modalities, one modality for each l
 That is how our multi-language collection acts as a multimodal document collection.
 
 The dump of Russian articles%
-\footnote{\url{http://dumps.wikimedia.org/ruwiki/20141203/ruwiki-20141203-pages-articles.xml.bz2}}
+\footnote{\url{http://dumps.wikimedia.org/ruwiki/20141203/}}
 had been processed following the same technique as we previously used in experiments on English Wikipedia.
 Russian words were lemmatized with Yandex MyStem~3.0%
 \footnote{\url{https://tech.yandex.ru/mystem/}}.
@@ -708,9 +709,9 @@ All $400$ topics were reviewed by an independent assessor,
 and he successfully interpreted all except four topics.
 
 Table \ref{tab:top10words} shows top 10 words for four randomly selected topics.
-For those who are familiar with both Russian and English languages it should be apparent that top words are consistent between the languages.
+Top words in these topics are clearly consistent between Russian and English languages.
 The Russian part of last topic contains some English words such as
-``Windows'', ``Microsoft'' or ``Office'' because it is common to use them in Russian texts without translation.
+``Windows'' or ``Server'' because it is common to use them in Russian texts without translation.
 
 \begin{table}[t!]
 	\caption{
