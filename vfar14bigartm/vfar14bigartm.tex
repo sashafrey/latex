@@ -7,8 +7,7 @@
 \usepackage[hyphens]{url}
 \usepackage{amssymb,amsmath,mathrsfs}
 \usepackage[russian,english]{babel}
-\usepackage{graphicx}
-\usepackage{multicol}
+%\usepackage{multicol}
 \usepackage[ruled,vlined,linesnumbered,algo2e]{algorithm2e}
 %\usepackage{algorithm}
 %\usepackage[noend]{algorithmic}
@@ -17,7 +16,7 @@
 \usepackage{array}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\usepackage{verbatim}
+%\usepackage{verbatim}
 \usepackage{standalone}
 
 \tolerance=1000
@@ -109,8 +108,8 @@ which are not available in the other software packages for topic modeling.
 \section{Introduction}
 
 Topic modeling is a~rapidly developing branch of statistical text analysis~\cite{blei12ptm}.
-Topic models reveal a hidden thematic structure of text collections
-and produce a~compressed representation of documents in terms of their topics.
+Topic model reveals a~hidden thematic structure of a~text collection
+and finds a~compressed representation of each document in terms of its topics.
 Practical applications of topic models include many areas, such as
 information retrieval for long-text queries,
 %revealing research trends and research fronts,
@@ -127,7 +126,7 @@ To learn a~factorized representation of a~text collection
 is an ill-posed problem, which has an infinite set of solutions.
 A typical approach in this case is to apply regularization techniques,
 which impose problem-specific constrains
-and ultimately lead to a better solution.
+and ultimately lead to a~better solution.
 
 Existing works on topic modeling describe hundreds of models, adapted to different situations.
 For practitioners, most of the models are too difficult to quickly
@@ -151,7 +150,7 @@ In~ARTM a~topic model is learned by maximizing a~weighted sum
 of the log-likelihood and additional regularization criteria.
 The optimization problem is solved by a~general regularized expectation-maximization (EM) algorithm,
 which can be applied to an arbitrary combination of regularization criteria.
-Many known Bayesian topic models were revisited in terms of ARTM in~\cite{voron14aist,voron14mlj}.
+Many known Bayesian topic models were revisited in terms of ARTM in~\cite{voron14mlj,voron14aist}.
 Compared to the Bayesian approach,
 ARTM makes it easier to design, infer and combine topic models,
 thus reducing the barrier for entering into topic modeling research field.
@@ -205,8 +204,8 @@ Assume that
 each term occurrence in each document refers to some latent topic from a~finite set of topics~$T$.
 Text collection is considered to be a sample of triples
 $(w_i,d_i,t_i)$,\; ${i=1,\dots,n}$,
-drawn independently from a~discrete distribution $p(w,d,t)$ over the~finite space $W\times D \times T$,
-where ${W=W^1\sqcup\cdots\sqcup W^m}$ is disjoint a union of the vocabularies across all modalities.
+drawn independently from a~discrete distribution $p(w,d,t)$ over the finite space $W\times D \times T$,
+where ${W=W^1\sqcup\cdots\sqcup W^m}$ is a~disjoint union of the vocabularies across all modalities.
 Terms~$w_i$ and documents~$d_i$ are observable variables,
 while topics~$t_i$ are latent variables.
 
@@ -222,10 +221,10 @@ we introduce a topic model for each modality:
 \]
 
 The parameters
-$\phi_{wt}=p(w\cond t)$ and $\theta_{td}=p(t\cond d)$
+${\theta_{td}=p(t\cond d)}$ and ${\phi_{wt}=p(w\cond t)}$
 form matrices
-$\Phi^m = \bigl( \phi_{wt} \bigr)_{W^m\times T}$ of \emph{term probabilities for the topics}, and
-$\Theta = \bigl( \theta_{td} \bigr)_{T\times D}$ of \emph{topic probabilities for the documents}.
+${\Theta = \bigl( \theta_{td} \bigr)_{T\times D}}$ of \emph{topic probabilities for the documents}, and
+${\Phi^m = \bigl( \phi_{wt} \bigr)_{W^m\times T}}$ of \emph{term probabilities for the topics}.
 The matrices $\Phi^m$, if stacked vertically, form a ${W\!\!\times\!T}$-matrix~$\Phi$.
 Matrices $\Phi^m$ and~$\Theta$ are \emph{stochastic},
 that is, their vector-columns represent discrete distributions.
@@ -445,7 +444,7 @@ The design with two copies of the $\Phi$ matrix gives much more control over thi
 and in certain cases allows BigARTM to behave in a fully deterministic way.
 
 The design with two $\Phi$ matrices only supports a~single merger thread,
-and we believe it should handle all $\hat n_{wt}$ updates coming from many threads.
+and we believe it should handle all $\tilde n_{wt}$ updates coming from many threads.
 This is a reasonable assumption because
 merging at step~\ref{alg:merging} takes only about $O(|W|\cdot|T|)$ operations to execute, while
 $\kw{ProcessBatch}$ takes $O(n |T| I)$ operations,
@@ -539,14 +538,13 @@ Both Gensim and VW.LDA represents the resulting topic model as Dirichlet distrib
 $\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d)$ and
 $\vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)$.
 On~contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
-To~compare the perplexity we take the expected value (MEAN) and maximum a~posteriori (MAP) estimates
-from $\vec{\gamma}_d$ and $\vec{\lambda}_t$ distributions:
+To~compare the perplexity we take the mean or the mode of the posterior distributions:
 \begin{align*}
-	& \theta^{\mathrm{MEAN}}_{td} \propto \gamma_{td}+\alpha, &
-    & \phi^{\mathrm{MEAN}}_{wt} \propto \lambda_{wt}+\beta;
+	\theta^{\mathrm{mean}}_{td} &\propto \gamma_{td}, &
+    \phi^{\mathrm{mean}}_{wt} &\propto \lambda_{wt};
 \\
-	& \theta^{\mathrm{MAP}}_{td} \;\; \propto \max\{\gamma_{td}+\alpha-1,0\}, &
-    & \phi^{\mathrm{MAP}}_{wt} \;\; \propto \max\{\lambda_{wt}+\beta-1,0\}.
+	\theta^{\mathrm{mode}}_{td} &\propto \max\{\gamma_{td}-1,0\}, &
+    \phi^{\mathrm{mode}}_{wt} &\propto \max\{\lambda_{wt}-1,0\}.
 \end{align*}
 The perplexity measure is defined as
 \begin{equation}
@@ -582,20 +580,20 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
     }
 	\label{tab:libraries_comparison}
     \vskip-2ex\centering\tabcolsep=8pt
-	\begin{tabular}[t]{|l|c|r|r|c|}
+	\begin{tabular}[t]{l|c|rrrr}
 	\hline
-	library & procs & train time & inference & perplexity \\
-	        &       &            &           & mean / map \\
+	& & & & \multicolumn{2}{c}{perplexity} \\
+	library & procs & train time & inference & mode & mean \\
 	\hline
-	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 \\
-	Gensim LDA & 1 & 369 min & 395 sec & 4161 / 4213 \\
-	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 / 4061 \\
+	BigARTM +smoothing & 1 & 62 min & 127 sec & \multicolumn{2}{c}{4000} \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4213 & 4161  \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4061 & 4108 \\
 	\hline
-	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 \\
-	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 / 4055  \\
+	BigARTM +smoothing & 4 & 13 min & 33 sec & \multicolumn{2}{c}{4061}  \\
+	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4055 & 4111  \\	
 	\hline
-	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 \\
-	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 / 4379 \\
+	BigARTM +smoothing & 8 & 8 min & 24 sec & \multicolumn{2}{c}{4304}  \\
+	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4379 & 4455 \\
 	\hline
 	\end{tabular}
 \end{table}
