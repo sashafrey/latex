@@ -587,11 +587,14 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
 	library & procs & train time & inference time & perplexity \\
 	\hline
 	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 \\
-	Gensim LDA & 1 & 369 min & 395 sec & 4161 \\
-	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 (mean) / 4213 (map) \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 (mean) / 4061 (map) \\
+	\hline
+	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 \\
+	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 (mean) / 4055 (map) \\	
 	\hline
 	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 \\
-	Gensim LDA-Multicore & 8 & 70 min & 338 sec & 4470 \\
+	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 (mean) / 4379 (map) \\
 	\hline
 	\end{tabular}
 \end{table}

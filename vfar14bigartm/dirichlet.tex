@@ -1,0 +1,68 @@
+\documentclass[]{article}
+
+% TEMP PACKAGES!
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{cmap}
+
+% These ones should be added to the article's .tex file...
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage{standalone}
+\usepackage{array}
+\usepackage{amsmath,amssymb}
+\usepackage{fullpage}
+
+\usepackage{url}
+\renewcommand{\vec}[1]{{\boldsymbol #1}}
+
+\begin{document}
+
+\section{Распределение Дирихле.}
+Смотрим на Википедии: \url{http://en.wikipedia.org/wiki/Dirichlet_distribution}.
+
+Если случайная величина имеет распределение Дирихле с вектором параметров $\vec{\alpha}$, то вот ее мода и среднее:
+
+\begin{gather}
+\vec{x} \sim \text{Dir}(\vec{\alpha}), \quad \vec{\alpha} \in \mathbb{R}^K \\
+x^\text{mode}_i = \frac{\alpha_i - 1}{\sum_{j} \alpha_j - K}, \, \alpha_i > 1 \\
+x^\text{mean}_i = \frac{\alpha_i}{\sum_{j} \alpha_j}
+\end{gather}
+
+В случае, если $\alpha_i \leq 1$, то с модой распределения Дирихле получается хитрая вещь. Пояснение можно почитать вот здесь: \url{http://www.quora.com/Why-can-hyper-parameters-in-beta-and-dirichlet-distribution-be-less-than-1}.
+
+Посмотрим на плотнсть распределения Дирихле:
+\begin{gather}
+	p(\vec{x}) = \frac{1}{B(\vec{\alpha})} \prod_{i=1}^K x_i^{\alpha_i-1} \\
+	B(\vec{\alpha}) = \frac{\prod_{i=1}^K \Gamma(\alpha_i)}{\Gamma(\sum_{i=1}^K \alpha_i)}
+\end{gather}
+
+Если $\alpha_i = 1$, то в плотность $p(\vec{x})$ вероятность $i$-того события $x_i$ не входит: $x_i^{\alpha_i-1} = 1$. Распределению равномерно, какое значение будет принимать $x_i$, поэтому мода по этой координате не определена.
+
+Если $0 < \alpha_i < 1$, то при фиксированных всех вероятностях событий, кроме $x_i$, плотность зависит следующим образом:
+\begin{gather}
+	p(\vec{x}) \propto \frac{1}{x_i^{1 - \alpha_i}}
+\end{gather}
+Это значит, что чем ближе вероятность $i$-того события к 0 — тем вероятнее такое распределение с точки зрения Дирихле. Но формально моды не существует, поскольку в $x_i = 0$ эта функция плотности не определена.
+
+Если представить, что функция плотности в точке $x_i = 0$ равна $+\infty$ и это не мешает плотности интегрироваться в 1, то мода вполне себе существует и легко показать, что в таком случае:
+\begin{gather}
+x^\text{mode}_i \propto \max\left(0, \alpha_i - 1 \right).
+\end{gather}
+
+
+\section{Формулы для перевода модели LDA в $\Phi, \Theta$}
+
+$$\phi_t \sim \text{Dir}(\lambda_t) \quad \Rightarrow \quad \begin{cases}
+  \phi_{w,t}^\text{map} \propto (\lambda_{w,t} - 1)_{+} \\
+  \phi_{w,t}^\text{mean} \propto \lambda_{w,t}
+\end{cases}$$
+
+$$\theta_d \sim \text{Dir}(\gamma_d) \quad \Rightarrow \quad \begin{cases}
+  \theta_{d,t}^\text{map} \propto (\gamma_{d,t} - 1)_{+} \\
+  \theta_{d,t}^\text{mean} \propto \gamma_{d,t}
+\end{cases}$$
+
+\end{document}
