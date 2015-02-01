@@ -539,14 +539,14 @@ Both Gensim and VW.LDA represents the resulting topic model as Dirichlet distrib
 $\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d)$ and
 $\vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)$.
 On~contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
-To~compare the perplexity we take the maximum likelihood (ML) and maximum a~posteriori (MAP) estimates
+To~compare the perplexity we take the expected value (MEAN) and maximum a~posteriori (MAP) estimates
 from $\vec{\gamma}_d$ and $\vec{\lambda}_t$ distributions:
 \begin{align*}
-	\theta^{\mathrm{ML}}_{td} &\propto \gamma_{td}+\alpha, &
-    \phi^{\mathrm{ML}}_{wt} &\propto \lambda_{wt}+\beta;
+	& \theta^{\mathrm{MEAN}}_{td} \propto \gamma_{td}+\alpha, &
+    & \phi^{\mathrm{MEAN}}_{wt} \propto \lambda_{wt}+\beta;
 \\
-	\theta^{\mathrm{MAP}}_{td} &\propto \max\{\gamma_{td}+\alpha-1,0\}, &
-    \phi^{\mathrm{MAP}}_{wt} &\propto \max\{\lambda_{wt}+\beta-1,0\}.
+	& \theta^{\mathrm{MAP}}_{td} \;\; \propto \max\{\gamma_{td}+\alpha-1,0\}, &
+    & \phi^{\mathrm{MAP}}_{wt} \;\; \propto \max\{\lambda_{wt}+\beta-1,0\}.
 \end{align*}
 The perplexity measure is defined as
 \begin{equation}
@@ -582,20 +582,20 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
     }
 	\label{tab:libraries_comparison}
     \vskip-2ex\centering\tabcolsep=8pt
-	\begin{tabular}[t]{|l|c|r|r|rr|}
+	\begin{tabular}[t]{|l|c|r|r|c|}
 	\hline
-	library & procs & train time & inference & \multicolumn{2}{c|}{perplexity} \\
-	        &       &            &           & mean & map \\
+	library & procs & train time & inference & perplexity \\
+	        &       &            &           & mean / map \\
 	\hline
-	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 &\\
-	Gensim LDA & 1 & 369 min & 395 sec & 4161 & 4213 \\
-	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 & 4061 \\
+	BigARTM +smoothing & 1 & 62 min & 127 sec & 4000 \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 / 4213 \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 / 4061 \\
 	\hline
-	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 & \\
-	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 & 4055  \\	
+	BigARTM +smoothing & 4 & 13 min & 33 sec & 4061 \\
+	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4111 / 4055  \\
 	\hline
-	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 & \\
-	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 & 4379 \\
+	BigARTM +smoothing & 8 & 8 min & 24 sec & 4304 \\
+	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4455 / 4379 \\
 	\hline
 	\end{tabular}
 \end{table}
