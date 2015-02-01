@@ -527,7 +527,7 @@ All three libraries (VW.LDA, Gensim and BigARTM) work out-of-core,
 e.\,g. they are designed to process data that is too large to fit into a computer's main memory at one time.
 This allowed us to benchmark on a fairly large collection --- 3.7 million articles from the English Wikipedia%
 \footnote{\url{http://dumps.wikimedia.org/enwiki/20141208/}}.
-The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpuss}$ script%
+The conversion to bag-of-words was done with $\kw{gensim.make\_wikicorpus}$ script%
 \footnote{\url{https://github.com/piskvorky/gensim/tree/develop/gensim/scripts/}},
 which excludes all non-article pages (such as category, file, template, user pages, etc),
 and also pages that contain less than $50$~words.
