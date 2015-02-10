@@ -1,0 +1,234 @@
+\documentclass{article}
+
+% TEMP PACKAGES!
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{cmap}
+
+% These ones should be added to the article's .tex file...
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage{standalone}
+\usepackage{array}
+\usepackage{amsmath,amssymb}
+
+\usepackage{url}
+
+%... and these rows too.
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}
+\pgfplotsset{compat = 1.3}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\renewcommand{\vec}[1]{{\boldsymbol #1}}
+
+\begin{document}
+
+\section{Сравнение BigARTM с другими библиотеками}
+
+Сравниваем BigARTM с реализацией алгоритма Online VB LDA в библиотеке для тематического моделирования Gensim\footnote{\url{http://radimrehurek.com/gensim/}} и Vowpal Wabbit\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/wiki/Latent-Dirichlet-Allocation}}. Для сравнения будем строить тематическую модель для документов из английской Википедии (корпус описан далее). 
+
+\paragraph{Перплексия.} Алгоритм LDA представляет тематическую модель в виде распределений Дирихле на строчки $\Theta$ и столбцы $\Phi$:
+\begin{gather}
+	\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d), \quad \vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)
+\end{gather}
+Для того чтобы сравнить перплексию матриц $\Phi, \Theta$ для hold-out документов, мы будем брать средние распределения 
+\begin{gather}
+	\vec{\theta}^\text{mean}_d = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)}\vec{\theta}_d, \quad \vec{\phi}^\text{mean}_t = \mathbb{E}_{\text{Dir}(\vec{\gamma}_d)} \vec{\phi}_t.
+\end{gather}
+ 
+\paragraph{Параметры эксперимента}
+\begin{itemize}
+	\item Машина: x86\_64, 32 ядра, 1324.898MHz
+	\item Corpus: English Wikipedia shapshot \texttt{2014-12-08}, hold-out 100'000 documents
+	\item Topics: 100
+	\item One pass through train documents of the corpus
+	\item Batch size: 10'000 (\texttt{chunksize} in Gensim, \texttt{--minibatch} in VW)
+	\item Update rule: $\rho = (\tau_0 + t)^{-\kappa}$, $\tau_0 = 1$, $\kappa = 0.5$
+	\item Update after each batch in non-parallel implementation, update after $P$ batches when running in $P$ parallel threads (\texttt{update\_every = num\_processors})
+	\item LDA Priors: $\alpha = 0.1,\, \beta = 0.1$ ($\vec{\theta}_d \sim \text{Dir}(\alpha),\, \vec{\phi}_t \sim \text{Dir}(\beta)$)
+\end{itemize}
+
+
+\begin{table}
+	\centering
+	\label{tab:libraries_comparison}
+
+	\begin{tabular}[t]{c|c|ccc}
+	\hline
+	Library & Proc. & Train Time & Inference Time & Perplexity \\
+	\hline
+	BigARTM Smoothing & 1 & 62 min & 127 sec & 4000 \\
+	Gensim LDA & 1 & 369 min & 395 sec & 4161 \\
+	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4108 \\
+	\hline
+	BigARTM Smoothing & 8 & 8 min & 24 sec & 4304 \\
+	Gensim LDA-Multicore & 8 & 70 min & 338 sec & 4470 \\
+	\end{tabular}
+	\caption{Сравнение BigARTM с реализацией LDA в библиотеке Gensim и Vowpal Wabbit. Train Time — время на обучение модели, Inference Time — время вычисления $\theta_d$ для всех документов из hold-out. Perplexity — перплексия посчитанная по обученной модели $\{\vec{\phi}_t\}$ на hold-out документах $\{vec{\theta}_d\}$, в случае Gensim и VW в качестве распределений $\vec{\phi}_t$ и $\vec{\theta}_d$ брались средние из соответствующих распределений Дирихле.}
+\end{table}
+
+\begin{figure}
+	\centering
+	\label{fig:bigartm_speedup}
+%	\includegraphics[height=6cm]{bigartm_speedup}
+	\caption{BigARTM speed up }
+\end{figure}
+
+
+
+\section{On LDA and ARTM}
+
+Данный раздел посвящён сравнению моделей LDA и ARTM. В экспериментах, сравнивающих BigARTM с Gensim и VW.LDA, мы показали, что алгоритм Online PLSA со сглаживающим регуляризатором и Online VB LDA работают схожим образом. Поэтому в этом эксперименте будут оцениваться характеристики PLSA со сглаживающим регуляризатором (который мы далее будем называть LDA) и ARTM (суть PLSA с набором регуляризаторов).
+
+\paragraph{Текстовая коллекция} Все наши эксперименты проводились на корпусе английской Википедии
+\footnote{Коллекция была получена с помощью gensim.make\_wikicorpus.}
+, объём которой $|D| \approx 3.7 \times 10^6$ документов. Словарь имеет размер $|W| \approx 10^5$, общая длина коллекции в словах $n \approx 577 \times 10^6$.
+
+\paragraph{Параметры эксперимента}
+В этом эксперименте мы будем пользоваться следующими функционалами качества моделирования:
+\begin{itemize}
+	\item Перплексия на контрольной выборке\
+	\footnote{Объём контрольной выборки, на которой перплексия измерялась в ходе прохода по коллекции --- 10 тыс. документов. Кроме того, была измерена результирующая перплексия на выборке из 100 тыс. документов.}.
+	\item Разреженность матрицы $\Phi$.
+	\item Разреженность матрицы $\Theta$ документов обучающей выборки.
+	\item Характеристики ядер тем (размер, чистота, контрастность) (\cite{LABEL} ССЫЛКА НА НУЖНУЮ ПУБЛИКАЦИЮ КВ!!!).
+\end{itemize}
+Обе модели будут иметь следующий общий набор параметров, с которыми будет запускаться BigARTM: 1 проход по коллекции
+\footnote{Подразумевается один полный проход по всей коллекции и повторный проход по первым $1.5 \times 10^5$ документам для уточнения их распределений.}
+, 10 проходов по каждому документу, 100 выделяемых тем. Матрица $\Theta$, построенная на предыдущем проходе по документу, используется в качестве начального приближения на текущем. Параметры обновления матрицы $\Phi$, $\kappa$ и $\tau_0$, равны 0.5 и 64 соответственно
+\footnote{Как это было в экспериментах в \ref{LABEL} РАЗДЕЛ ПРО СРАВНЕНИЕ БИБЛИОТЕК!!!}
+. Порог $p(t|w)$ для ядровых функционалов --- 0.25,. Размер батча равен 10000, обновления модели производится каждые батч.
+
+Параметры LDA $\alpha = \beta = \cfrac{1}{|T|}$.
+
+\begin{figure}[h!]
+\begin{tabular}{cc}
+\input{plot_perplexity_sparsity}
+&
+\input{plot_kernel}
+\end{tabular}
+\caption{Comparison of LDA (thin) and ARTM (bold) models. X axis is a number of processed documents.} \label{fig:comparison_plot}
+\end{figure}
+
+Регуляризатор для ARTM, представляющий собой смесь разреживания и декорреляции тем, описывается формулой
+
+\begin{align}
+    R(\Phi,\Theta)
+    =&
+    - \beta \sum_{t\in T} \sum_{w\in W} \beta_w \ln \phi_{wt}
+    - \alpha \sum_{d\in D} \sum_{t\in T} \alpha_t \ln \theta_{td}
+    \notag
+\\  {}&
+    - \gamma
+        \sum_{t\in T}
+        \sum_{s\in T\backslash t}
+        \sum_{w\in W} \phi_{wt}\phi_{ws}
+    \to \max.
+\end{align}
+
+Отсюда получаются формулы M-шага
+
+\begin{align}
+    \phi_{wt} &\propto
+        \Bigl(n_{wt}
+            - \beta \underbrace{\beta_{w} [t\!\in\! T]}_{\substack{\text{sparsing}\\\text{topic}}} {}
+            - \gamma \underbrace{[t\!\in\! T]\: \phi_{wt} \!\sum_{s\in T\backslash t}\! \phi_{ws}}_{\text{decorrelation}} {}
+        \Bigr)_{+};
+\\
+    \theta_{td} &\propto
+        \Bigl(n_{td}
+            - \alpha \underbrace{\alpha_{t} [t\!\in\! T]}_{\substack{\text{sparsing}\\\text{topic}}} {}
+        \Bigr)_{+}.
+\end{align}
+
+Коэффициенты $\beta_w$ и $\alpha_t$ примем равными 1, $\forall w,t$. Коэффициенты регуляризации $\alpha,  \beta$ и $\gamma$ возьмём постоянными на протяжении всего прохода по коллекции. Их значения: $\alpha = 0.15, \beta = 0.009, \gamma = 7.8 \times 10^5$.
+
+\paragraph{Результаты} В таблице \ref{tab:model_comparison} приведены финальные значения функционалов качества после одного прохода по коллекции для моделей LDA и ARTM. Видно, что комбинация регуляризаторов разреживания и декорреляции улучшает качество результирующей модели с небольшими потерями перплексии.
+
+\begin{table}[t]
+\caption{Comparison of LDA and ARTM models. Quality functionals: $\mathcal{P}_{10k}$ $\mathcal{P}_{100k}$ --- hold-out perplexity on 10.000 and 100.000 documents sets, $\mathcal{S}_{\Phi}$, $\mathcal{S}_{\Theta}$ --- sparsity of $\Phi$ and $\Theta$ matrices (in \%), $\mathcal{K}_{s}$, $\mathcal{K}_{p}$, $\mathcal{K}_{c}$ --- average topic kernel size, purity and contrast respectively.}
+\label{tab:model_comparison}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}[t]{P{10.5em}|P{3.5em} P{3.5em} P{3.5em} P{3.5em} P{3.5em} P{3.5em} P{3.5em} }
+\hline
+Model/Functional & $\mathcal{P}_{10k}$ & $\mathcal{P}_{100k}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
+\hline
+LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
+ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Более подробно процесс обучения представлен на \ref{fig:comparison_plot}. На верхнем графике показано убывание перплексии и замеры разреженностей матриц $\Phi$ и $\Theta$. На нижнем --- усреднённые характеристики ядер тем. Видно, что LDA совершенно не способствует разреживанию и даёт менее чистые и контрастные ядра тем, чем ARTM.
+
+
+\section{Multilanguage experiment}
+
+To~show how BigARTM works on~multimadal datasets we provide multilanguage dataset 
+based on russian--english Wikipedia articles. 
+
+We download all russian and english articles that have language links on each other
+and transfer them to bag-of-words format. 
+English words are used as is, while russian words are lemmatized with ``MyStem'' tool from Yandex.
+Then we reduce collection dictionary by using only those words 
+that appear in~20~documents at~least and in~10\% of~documents in the~collection at~most. 
+The same parameters are used in~Gensim Wikicorpus handlers.
+We obtain 216175~pairs of~russian--english documents with dictionary 
+containing 43\% russian words (84413 items) and 57\% english words (112336 items).
+
+To convert documents to BigARTM batches format we represent each pair of russian--english documents 
+as single multi-language document with~two modalities: one modality for each language.  
+That is our multi-language collection acts as multimodal collection. 
+
+We build multi-language modal with 400~topics. They cover a wide range of themes such as science, architecture, history, culture, technologies, army, different countries.
+Most of them can be easily interpreted.
+We provide some examples of~the observed topics. 
+You can see that they are consistent between languages.
+
+
+\begin{table}
+	\centering\medskip\tabcolsep=2pt%\small
+	\footnotesize
+    \begin{tabular}{|l|l||l|l||l|l|}	
+    	\hline
+    	\multicolumn{2}{|c||}{\textbf{Topic~68}} & \multicolumn{2}{c||}{\textbf{Topic~79}} & \multicolumn{2}{c|}{\textbf{Topic~88}} \\
+    	\hline
+    	students(0.02) & университет(0.03) & club(0.04) & сборная(0.05) & opera(0.03) & певица(0.03) \\
+    	education(0.02) & институт(0.03) & league(0.03) & матч(0.05) & orchestra(0.02) & певец(0.03) \\
+    	institute(0.02) & школа(0.02) & goals(0.03) &  игрок(0.05) & concert(0.01) & музыка(0.02) \\
+    	research(0.01) & образование(0.02) & season(0.03) & карьера(0.03) & conductor(0.01) & опера(0.02) \\
+    	business(0.01) & программа(0.02) & cup(0.03) & футболист(0.03) & composer(0.01) & музыкальный(0.02) \\ 
+    	technology(0.01) & студент(0.01) & scored(0.02) & фк(0.03) & symphony(0.01) & дирижер(0.02) \\
+    	management(0.01) & учебный(0.01) & goal(0.02) & клуб(0.02) & musical(0.01) & оркестр(0.02) \\
+    	engineering(0.01) & обучение(0.01) & apps(0.02) & гол(0.02) & performed(0.01) & оперный(0.02) \\
+    	science(0.01) & развитие(0.01) & football(0.02) & против(0.02) & singer(0.01) & песня(0.01) \\
+    	schools(0.01) & проект(0.01) & match(0.01) & забивать(0.02) & performance(0.01) & композитор(0.01) \\ 
+    	student(0.01) & наука(0.01) & debut(0.01) & профиль(0.01) & recordings(0.01) & премия(0.01) \\
+    	program(0.01) & бизнес(0.01) & contract(0.01) & сезон(0.01) & recording(0.01) & исполнять(0.01) \\ 
+    	studies(0.01) & международный(0.01) & signed(0.01) & команда(0.01) & singing(0.01) & симфонический(0.01) \\
+    	universities(0.01) & организация(0.01) & loan(0.01) & чемпионат(0.01) & performances(0.01) & фестиваль(0.01) \\
+    	academic(0.01) & научный(0.01) & friendly(0.01) & дебютировать(0.01) & festival(0.01) & музыкант(0.01) \\
+    	learning(0.01) & факультет(0.01) & championship(0.01) &  лига(0.01) & sang(0.01) & конкурс(0.01) \\
+    	programs(0.01) & исследование(0.01) & premier(0.01) & футбол(0.01) & recorded(0.01) & запись(0.01) \\
+    	information(0.01) & технология(0.01) & playing(0.01) & сыграть(0.01) &  mozart(0.01) & сопрано(0.01) \\
+    	association(0.01) & технический(0.01) & squad(0.01) & молодежный(0.01) &  classical(0.01) & петь(0.01) \\
+    	sciences(0.01)& заведение(0.01) & profile(0.01) & контракт(0.01) & soprano(0.01) & моцарт(0.01) \\
+    	\hline
+	\end{tabular}
+\end{table}
+                                    
+
+Topic~110:  moon(0.10)  earth(0.04)  mars(0.04)  apollo(0.04)  impact(0.02)  mare(0.02)  luna(0.02)  space(0.01)  lunar(0.01)  spacecraft(0.01)  mission(0.01)  rover(0.01)  plate(0.01)  landing(0.01)  nasa(0.01)  martian(0.01)  exploration(0.00)  science(0.00)  program(0.00)  cordelia(0.00)
+Topic~110:  луна(0.12)  лунный(0.05)  аполлон(0.03)  море(0.02)  марс(0.02)  земля(0.02)  космический(0.02)  плита(0.01)  moon(0.01)  nasa(0.01)  зонд(0.01)  сторона(0.01)  wiki(0.01)  снимок(0.01)  посадка(0.01)  mare(0.01)  apollo(0.01)  аппарат(0.01)  поверхность(0.01)  марсианский(0.00)  
+
+
+Topic~251:  windows(0.07)  microsoft(0.05)  server(0.04)  web(0.02)  mitchell(0.02)  office(0.01)  sp(0.01)  services(0.01)  enterprise(0.01)  cox(0.01)  visual(0.01)  client(0.01)  mail(0.01)  software(0.01)  apache(0.01)  nt(0.01)  edition(0.01)  management(0.00)  net(0.00)  xp(0.00) 
+Topic~251:  windows(0.06)  microsoft(0.05)  веб(0.02)  server(0.02)  сервер(0.02)  office(0.02)  web(0.02)  митчелл(0.01)  sp(0.01)  visual(0.01)  приложение(0.01)  studio(0.01)  enterprise(0.01)  services(0.01)  управление(0.01)  пользователь(0.01)  сервис(0.01)  служба(0.01)  кокс(0.01)  клиент(0.01) 
+  
+
+\end{document}

@@ -1,0 +1,201 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}     
+\pgfplotsset{compat = 1.3}
+
+\begin{document}
+\scriptsize
+
+\begin{tikzpicture}[remember picture, baseline=0pt, scale = 0.8]
+    \begin{axis}[
+        %ylabel shift = 50 pt,
+        width=7cm,
+        height=5cm,
+        axis lines=left,
+        ytick = {0, 250, 500, 750, 1000, 1250},
+        ymajorgrids=true,
+        xmajorgrids=true,        
+		scaled y ticks = true,
+		scaled y ticks=base 10:-3,
+        ymin = 0, ymax = 1250,
+        major grid style={draw=lightgray},
+        ylabel near ticks,
+        ylabel={\scriptsize $\mathrm{\bf Kernel~size}$},
+        scaled x ticks = false,                   
+        ]
+    \addplot[smooth,line width=0.4mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 971.0)
+		(440000, 1090.0)
+		(650000, 1113.0)
+		(860000, 1119.0)
+		(1060000, 1126.0)
+		(1260000, 1126.0)
+		(1470000, 1131.0)
+		(1680000, 1129.0)
+		(1880000, 1128.0)
+		(2090000, 1128.0)
+		(2300000, 1129.0)
+		(2510000, 1129.0)
+		(2720000, 1128.0)
+		(2930000, 1129.0)
+		(3140000, 1128.0)
+		(3350000, 1128.0)
+		(3568494, 1128.0)
+		(3628494, 1127.0)
+		(3778494, 1135.0)
+    }; \label{kernelSizePlsa}
+    
+    \addplot[smooth,line width=0.2mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 448.0)
+		(440000, 709.0)
+		(650000, 788.0)
+		(860000, 837.0)
+		(1060000, 863.0)
+		(1260000, 878.0)
+		(1470000, 915.0)
+		(1680000, 901.0)
+		(1880000, 898.0)
+		(2090000, 909.0)
+		(2300000, 913.0)
+		(2510000, 925.0)
+		(2720000, 927.0)
+		(2930000, 926.0)
+		(3140000, 917.0)
+		(3350000, 920.0)
+		(3568494, 916.0)
+		(3628494, 907.0)
+		(3778494, 931.0)   
+    }; \label{kernelSizeLda}
+    \end{axis}
+    
+    \begin{axis}[
+    	ylabel shift = -4 pt,
+        width=7cm,
+        height=5cm,
+        axis lines=left,
+        axis x line*=top,
+        xtick=\empty,
+        axis y line*=right,
+        ymin = 0, ymax = 1,
+        ylabel near ticks,             
+        ylabel={\scriptsize $\mathrm{\bf Purity~and~contrast}$},
+        legend columns=3, 
+        legend style={
+            text width=4.5em,
+            text height=1.5ex,
+            text depth=.5ex,
+        	draw=none,
+            /tikz/column 3/.style={
+                column sep=0pt,
+            },
+            at={(axis description cs:0.98,-0.14)}
+        },        
+        ]
+    \addlegendimage{smooth, black}        
+    \addlegendimage{dashed, black} 
+    \addlegendimage{dotted, black}
+    \addlegendimage{/pgfplots/refstyle=perplexityPlsa}\addlegendentry{\scriptsize $\mathrm{Size}$} 
+    \addplot[dashed,line width=0.4mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 0.402)
+		(440000, 0.644)
+		(650000, 0.717)
+		(860000, 0.748)
+		(1060000, 0.763)
+		(1260000, 0.774)
+		(1470000, 0.774)
+		(1680000, 0.783)
+		(1880000, 0.79)
+		(2090000, 0.793)
+		(2300000, 0.797)
+		(2510000, 0.797)
+		(2720000, 0.799)
+		(2930000, 0.801)
+		(3140000, 0.805)
+		(3350000, 0.806)
+		(3568494, 0.81)
+		(3628494, 0.812)
+		(3778494, 0.81)
+    };           
+    \addlegendentry{\scriptsize $\mathrm{Purity}$}
+
+    \addplot[dashed,line width=0.2mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 0.155)
+		(440000, 0.312)
+		(650000, 0.392)
+		(860000, 0.436)
+		(1060000, 0.46)
+		(1260000, 0.476)
+		(1470000, 0.486)
+		(1680000, 0.494)
+		(1880000, 0.502)
+		(2090000, 0.505)
+		(2300000, 0.511)
+		(2510000, 0.514)
+		(2720000, 0.516)
+		(2930000, 0.519)
+		(3140000, 0.521)
+		(3350000, 0.524)
+		(3568494, 0.527)
+		(3628494, 0.527)
+		(3778494, 0.535)
+    };
+    
+    \addplot[dotted,line width=0.4mm] plot coordinates {
+		(10000, 0.031)
+		(220000, 0.542)
+		(440000, 0.628)
+		(650000, 0.668)
+		(860000, 0.689)
+		(1060000, 0.698)
+		(1260000, 0.705)
+		(1470000, 0.706)
+		(1680000, 0.713)
+		(1880000, 0.719)
+		(2090000, 0.721)
+		(2300000, 0.724)
+		(2510000, 0.724)
+		(2720000, 0.726)
+		(2930000, 0.728)
+		(3140000, 0.73)
+		(3350000, 0.732)
+		(3568494, 0.734)
+		(3628494, 0.735)
+		(3778494, 0.732)
+    };         
+    \addlegendentry{\scriptsize $\mathrm{Contrast}$}  
+    
+    \addplot[dotted,line width=0.2mm] plot coordinates {
+		(10000, 0.031)
+		(220000, 0.408)
+		(440000, 0.46)
+		(650000, 0.478)
+		(860000, 0.489)
+		(1060000, 0.495)
+		(1260000, 0.499)
+		(1470000, 0.506)
+		(1680000, 0.504)
+		(1880000, 0.504)
+		(2090000, 0.507)
+		(2300000, 0.508)
+		(2510000, 0.509)
+		(2720000, 0.511)
+		(2930000, 0.509)
+		(3140000, 0.508)
+		(3350000, 0.51)
+		(3568494, 0.509)
+		(3628494, 0.508)
+		(3778494, 0.516)	
+    };
+    \end{axis}
+\end{tikzpicture}
+\normalsize
+\end{document}

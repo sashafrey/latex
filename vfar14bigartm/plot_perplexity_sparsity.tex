@@ -1,0 +1,204 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}     
+\pgfplotsset{compat = 1.9}
+
+\begin{document}
+\scriptsize
+
+\begin{tikzpicture}[remember picture, baseline=0pt, scale = 0.8]
+    \begin{axis}[
+        %ylabel shift = -10 pt,
+        width=7cm,
+        height=5cm,
+        axis lines=left,
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ytick = {3500, 5250, 7000, 8750, 10500, 12250},
+        ymin = 3500, ymax = 12250,
+        major grid style={draw=lightgray},
+        ylabel near ticks,
+        ylabel={\scriptsize $\mathrm{\bf Perplexity}$},
+        scaled x ticks = false,                    
+        ]
+    \addplot[smooth,line width=0.4mm] plot coordinates {
+		(10000, 11693.0)
+		(220000, 5262.0)
+		(440000, 4253.0)
+		(650000, 3988.0)
+		(860000, 3832.0)
+		(1060000, 3763.0)
+		(1260000, 3740.0)
+		(1470000, 3705.0)
+		(1680000, 3639.0)
+		(1880000, 3612.0)
+		(2090000, 3621.0)
+		(2300000, 3619.0)
+		(2510000, 3625.0)
+		(2720000, 3604.0)
+		(2930000, 3608.0)
+		(3140000, 3575.0)
+		(3350000, 3575.0)
+		(3568494, 3559.0)
+		(3628494, 3538.0)
+		(3778494, 3592.0)
+    }; \label{perplexityPlsa}
+    
+    \addplot[smooth,line width=0.2mm] plot coordinates {
+		(10000, 11693.0)
+		(220000, 5295.0)
+		(440000, 4227.0)
+		(650000, 3958.0)
+		(860000, 3793.0)
+		(1060000, 3717.0)
+		(1260000, 3680.0)
+		(1470000, 3628.0)
+		(1680000, 3560.0)
+		(1880000, 3525.0)
+		(2090000, 3538.0)
+		(2300000, 3532.0)
+		(2510000, 3537.0)
+		(2720000, 3518.0)
+		(2930000, 3513.0)
+		(3140000, 3490.0)
+		(3350000, 3491.0)
+		(3568494, 3475.0)
+		(3628494, 3454.0)
+		(3778494, 3499.0)    
+    }; \label{perplexityLda}
+    \end{axis}
+    
+    \begin{axis}[
+    	ylabel shift = -7 pt,
+        width=7cm,
+        height=5cm,
+        axis lines=left,
+        axis x line*=top,
+        xtick=\empty,
+        axis y line*=right,
+        ymin = 0, ymax = 100,
+        ylabel near ticks,             
+        ylabel={\scriptsize $\mathrm{\bf Sparsity}$},
+        legend columns=3, 
+        legend style={
+            text width=5.5em,
+            text height=1.5ex,
+            text depth=.5ex,        
+        	draw=none,
+            /tikz/column 3/.style={
+                column sep=0pt,
+            },
+            at={(axis description cs:1.14,-0.14)}
+        },
+        every axis legend/.append style={nodes={right}},
+        ]
+    \addlegendimage{black}        
+    \addlegendimage{dashed, black} 
+    \addlegendimage{dotted, black}
+    \addlegendimage{/pgfplots/refstyle=perplexityPlsa}\addlegendentry{\scriptsize $\mathrm{Perplexity}$} 
+    \addplot[dashed,line width=0.4mm] plot coordinates {
+		(10000, 26.32)
+		(220000, 70.01)
+		(440000, 84.19)
+		(650000, 89.63)
+		(860000, 92.02)
+		(1060000, 93.24)
+		(1260000, 93.97)
+		(1470000, 94.42)
+		(1680000, 94.8)
+		(1880000, 95.11)
+		(2090000, 95.33)
+		(2300000, 95.52)
+		(2510000, 95.65)
+		(2720000, 95.78)
+		(2930000, 95.89)
+		(3140000, 95.98)
+		(3350000, 96.07)
+		(3568494, 96.15)
+		(3628494, 96.18)
+		(3778494, 96.29)
+    };           
+    \addlegendentry{\scriptsize $\mathrm{Phi}$}
+
+    \addplot[dashed,line width=0.2mm] plot coordinates {
+		(10000, 26.32)
+		(50000, 10.45)
+		(90000, 2.89)
+		(150000, 0.56)
+		(220000, 0.01)
+		(440000, 0.0)
+		(650000, 0.0)
+		(860000, 0.0)
+		(1060000, 0.0)
+		(1260000, 0.0)
+		(1470000, 0.0)
+		(1680000, 0.0)
+		(1880000, 0.0)
+		(2090000, 0.0)
+		(2300000, 0.0)
+		(2510000, 0.0)
+		(2720000, 0.0)
+		(2930000, 0.0)
+		(3140000, 0.0)
+		(3350000, 0.0)
+		(3568494, 0.0)
+		(3628494, 0.0)
+		(3778494, 0.0)
+    };
+    
+    \addplot[dotted,line width=0.4mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 55.86)
+		(440000, 71.38)
+		(650000, 75.64)
+		(860000, 77.47)
+		(1060000, 78.39)
+		(1260000, 78.82)
+		(1470000, 79.04)
+		(1680000, 79.49)
+		(1880000, 79.69)
+		(2090000, 79.81)
+		(2300000, 79.92)
+		(2510000, 79.93)
+		(2720000, 80.02)
+		(2930000, 80.01)
+		(3140000, 80.12)
+		(3350000, 80.18)
+		(3568494, 80.27)
+		(3628494, 83.71)
+		(3778494, 80.52)
+    };         
+    \addlegendentry{\scriptsize $\mathrm{Theta}$}  
+    
+    \addplot[dotted,line width=0.2mm] plot coordinates {
+		(10000, 0.0)
+		(220000, 0.0)
+		(440000, 0.0)
+		(650000, 0.0)
+		(860000, 0.0)
+		(1060000, 0.0)
+		(1260000, 0.0)
+		(1470000, 0.0)
+		(1680000, 0.0)
+		(1880000, 0.0)
+		(2090000, 0.0)
+		(2300000, 0.0)
+		(2510000, 0.0)
+		(2720000, 0.0)
+		(2930000, 0.0)
+		(3140000, 0.0)
+		(3350000, 0.0)
+		(3568494, 0.0)
+		(3628494, 0.0)
+		(3778494, 0.0)
+    };
+    \end{axis}
+\end{tikzpicture}
+\normalsize
+
+\end{document}
