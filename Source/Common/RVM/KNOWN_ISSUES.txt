@@ -1,0 +1,61 @@
+=========================================================
+
+28-Nov-2012 19:23:43: Exception occurred. Error using SB1_PosteriorMode (line 80)
+Sorry! Cannot recover from ill-conditioned Hessian.
+
+Error in SB1_Estimate (line 113)
+    [w(useful) Ui dataLikely] = ...
+
+Error in SB1_RVM (line 67)
+[weights, used, marginal, alpha, beta, gamma] = ...
+
+Error in rvmtrain (line 32)
+    [weights, used, bias, ml, alpha, beta, gamma] = ...
+
+Error in RVM_Evaluation (line 12)
+        [composition] = rvmtrain(trainTask, params);
+
+Error in EvaluationEngine>(parfor body) (line 130)
+                [trainErr, testErr] = params.func(indexes{j}, localTask, localParams);
+
+Error in parallel_function>make_general_channel/channel_general (line 879)
+                    O = F(C{:});
+
+Error in remoteParallelFunction (line 31)
+        out = distcompMakeByteBufferHandle(distcompserialize(feval(channel, channelArgs{:})));
+
+
+
+============================================================
+
+
+
+
+
+
+28-Nov-2012 18:31:03: Exception occurred. Error using chol
+Matrix must be positive definite.
+
+Error in SB1_PosteriorMode (line 99)
+  U		= chol(Hessian);
+
+Error in SB1_Estimate (line 113)
+    [w(useful) Ui dataLikely] = ...
+
+Error in SB1_RVM (line 67)
+[weights, used, marginal, alpha, beta, gamma] = ...
+
+Error in rvmtrain (line 32)
+    [weights, used, bias, ml, alpha, beta, gamma] = ...
+
+Error in RVM_Evaluation (line 12)
+        [composition] = rvmtrain(trainTask, params);
+
+Error in EvaluationEngine>(parfor body) (line 130)
+                [trainErr, testErr] = params.func(indexes{j}, localTask, localParams);
+
+Error in parallel_function>make_general_channel/channel_general (line 879)
+                    O = F(C{:});
+
+Error in remoteParallelFunction (line 31)
+        out = distcompMakeByteBufferHandle(distcompserialize(feval(channel, channelArgs{:})));

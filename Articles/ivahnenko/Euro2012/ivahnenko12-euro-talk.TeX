@@ -1,0 +1,791 @@
+\documentclass[unicode,lefteqn]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath,mathrsfs}
+\usepackage{mathrsfs}
+\usepackage[russian]{babel}
+\usepackage{array}
+\usepackage{ulem}\normalem
+\usepackage[all]{xy}
+\usepackage[noend]{algorithmic}
+%\documentclass{article}\usepackage{beamerarticle}
+
+\usetheme{Warsaw}%{Darmstadt}
+\usefonttheme[onlylarge]{structurebold}
+\setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+%\setbeameroption{show notes}
+%\setbeameroption{show only notes}   % for printing notes
+
+%\newcommand{\XX}{\mathbb{X}}
+\newcommand{\XX}{\mathbb{X}^L}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+\renewcommand{\AA}{A}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\fI}{\mathbb{S}}
+%\newcommand{\fI}{\mathfrak{I}}
+\def\cL{\mathscr{L}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathsf{const}}
+\newcommand{\sign}{\mathop{\mathsf{sign}}\limits}
+\newcommand{\bbr}[1]{\text{\itshape\b#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\Arg}{\mathop{\mathsf{Arg}}\limits}
+\definecolor{light-green}{rgb}{0.6,1.0,0.6}
+\definecolor{light-red}{rgb}{1.0,0.6,0.6}
+\definecolor{light-yellow}{rgb}{1.0,1.0,0.8}
+\definecolor{green}{rgb}{0.0,0.5,0.0}
+\definecolor{yellow}{rgb}{0.6,0.6,0.0}
+\definecolor{rred}{rgb}{1.0,0.5,0.4}
+\definecolor{ggreen}{rgb}{0.0,1.0,0.0}
+\def\g#1{{\color{green}#1}}
+\def\r#1{{\color{red}#1}}
+\def\G#1{{\color{ggreen}#1}}
+\def\R#1{{\color{rred}#1}}
+\newcommand{\fbx}[2]{\fcolorbox{#2}{light-#2}{\vphantom{o}\hspace{#1mm}}}
+%\newcommand{\a}[1]{\alert{#1}}
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+
+\makeatletter
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,\,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\makeatother
+
+\newtheorem{vkAxiom}{Axiom}
+\newtheorem{vkHyp}{Conjecture}
+\newtheorem{vkTheorem}{Theorem}
+\newtheorem{vkLemma}{Lemma}
+\newtheorem{vkDef}{Definition}
+\newtheorem{vkProblem}{Problem}
+\newtheorem{vkCorr}{Corrolary}
+
+% Оформление алгоритмов в пакетах algorithm, algorithmic
+\definecolor{KwColor}{rgb}{0,0,0.6}
+\newcommand{\vkKw}[1]{{\bf\color{KwColor} #1}}
+\renewcommand{\algorithmicrequire}{\rule{0pt}{2.5ex}\vkKw{Require:}}
+\renewcommand{\algorithmicensure}{\vkKw{Ensure:}}
+\renewcommand{\algorithmicend}{\vkKw{end}}
+\renewcommand{\algorithmicif}{\vkKw{if}}
+\renewcommand{\algorithmicthen}{\vkKw{then}}
+\renewcommand{\algorithmicelse}{\vkKw{else}}
+\renewcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\renewcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\renewcommand{\algorithmicfor}{\vkKw{for}}
+\renewcommand{\algorithmicforall}{\vkKw{for all}}
+\renewcommand{\algorithmicdo}{}
+\renewcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
+\renewcommand{\algorithmicwhile}{\vkKw{while}}
+\renewcommand{\algorithmicendwhile}{\algorithmicend\ \algorithmicwhile}
+\renewcommand{\algorithmicloop}{\vkKw{loop}}
+\renewcommand{\algorithmicendloop}{\algorithmicend\ \algorithmicloop}
+\renewcommand{\algorithmicrepeat}{\vkKw{repeat}}
+\renewcommand{\algorithmicuntil}{\vkKw{until}}
+%\renewcommand{\algorithmiccomment}[1]{{\footnotesize // #1}}
+\renewcommand{\algorithmiccomment}[1]{{\itshape\quad (#1)}}
+% Мои дополнительные команды для описания алгоритмов
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\PARAMS}{\renewcommand{\algorithmicrequire}{\vkKw{Params:}}\REQUIRE}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\vkReturn}{\vkKw{return} }
+\newcommand{\RET}{\STATE\vkReturn}
+\newcommand{\EXIT}{\STATE\vkKw{exit}}
+\newcommand{\CONTINUE}{\STATE\vkKw{continue} }
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\vkProcedure}[1]{\text{#1}\:}
+\newcommand{\vkProc}[1]{\text{#1}\:}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\vkKw{PROCEDURE} \vkProcedure{#1}}
+
+% Рисование нейронных сетей и диаграмм
+\newenvironment{network}%
+    {\begin{xy}<1ex,0ex>:}%
+    {\end{xy}}
+\def\nnNode[#1](#2)#3{\POS(#2)*#3="#1"}
+\def\nnLink[#1,#2]#3{\POS"#1"\ar #3 "#2"}
+
+% Для подписей на рисунках, вставляемых includegraphics
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title
+    [\hbox to 56mm{Generalization Bounds \& Rule Learning\hfill\insertframenumber\,/\,\inserttotalframenumber}]
+    {Combinatorial Generalization Bounds for Learning Ensemble of Rules}
+\author[Andrey Ivahnenko]{%
+    \underline{Andrey~Ivahnenko} \quad~ (\texttt{ivahnenko@forecsys.ru})\\
+    Konstantin~Vorontsov \qquad (\texttt{voron@forecsys.ru})
+    }
+\institute{\footnotesize Computing Center RAS~~$\bullet$~~Moscow Institute of Physics and Technology}
+
+\date[EURO-XXV, July 11, 2012]{\footnotesize \\[1ex]
+    25th European Conference on\\
+    Operational Research (EURO-XXV)\\
+    Vilnius, Lithuania~~$\bullet$~~July~8\,--\,11, 2012
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contents}
+    %\scriptsize
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Classification Problems $\&$ Generalization Bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem}
+
+\begin{frame}[t]{Classification problem}
+    $\XX$ --- an \emph{object space}
+
+    $f_1(x),\dots,f_n(x)$ --- real-value features of an object $x\in \XX$
+
+    \bigskip
+    $Y = \{1,\ldots,M\}$ --- a finite set of \emph{class} labels
+
+    $y\colon X\to Y$ --- unknown \emph{target} function
+
+    \bigskip
+    $X^\ell = \{(x_1,y_1),\ldots,(x_\ell,y_\ell)\}$ --- \emph{training set}, $y_i = y(x_i)$,\; $i=1,\ldots,\ell$
+
+    \bigskip
+    \textbf{Problem:} given a~set $X^\ell$ find a classifier $r\colon X\to Y$ such that
+    \begin{itemize}
+        \item $r$ is well-interpretable (humans can understand it);
+        \item $r$ approximates a~target~$y$ on the training set~$X^\ell$;
+        \item $r$ approximates a~target~$y$ everywhere on $X$\\
+            (has a good generalization ability);
+    \end{itemize}
+\end{frame}
+
+\subsection{The Probability of Overfitting}
+
+\begin{frame}[t]{The probability of overfitting}
+    Let $\XX = \{x_1,\ldots,x_L\}$ be a~finite set of objects.
+
+    \smallskip
+    Let $R$ be a~set of classifier, and $r\in R$.
+
+    \smallskip
+    Let $\mu$ be a~learning method, such that $\mu(X^\ell)=\mu X^\ell=r$.
+
+    \smallskip
+    $I(r,x_i) = \bigl[ r(x_i) \neq [y_i\!=\!y] \bigr]$ --- binary loss function for a~class~$y$.
+
+    \medskip
+    $\nu(r,U) = \frac1{|U|} \sum\limits_{x_i\in U} I(r,x_i)$ --- error rate of a $r$ on a~sample~$U$.
+
+    \medskip
+    \textbf{Assumption.}
+    All partitions $\XX=X^\ell \sqcup X^k$
+    into an~observed training set~$X^\ell$ and
+    a~hidden testing set~$X^k$
+    are equiprobable.
+
+    \medskip
+    \textbf{Definition.}
+    The \emph{probability of overfitting} is the probability that \\
+    the testing error is greater that the training error by~$\epsilon$ or~more:
+    \[
+        Q_\eps (X^L) =
+        \Prob\bigl[
+            \nu \bigl( r, X^k \bigr)  -
+            \nu \bigl( r, X^\ell \bigr)
+            \geq \eps
+        \bigr],
+    \]
+    or
+    \[
+        Q_\eps (\mu, X^L) =
+        \Prob\bigl[
+            \nu \bigl( \mu X^\ell, X^k \bigr)  -
+            \nu \bigl( \mu X^\ell, X^\ell \bigr)
+            \geq \eps
+        \bigr].
+    \]
+\end{frame}
+
+
+\begin{frame}[t]{Vapnik-Chervonenkis bound (VC-bound), 1971}
+    For any $\XX=X^\ell \sqcup X^k$, $R$, $\mu$, and $\eps\in(0,1)$
+    \vskip-1.5ex
+    \begin{align*}
+        Q_{\eps}
+        &=
+        \Prob
+        \bigl[
+            \nu \bigl( \mu X^\ell, X^k \bigr)  -
+            \nu \bigl( \mu X^\ell, X^\ell \bigr)
+            \geq \eps
+        \bigr] \leq {}
+    \\\intertext{\textbf{STEP 1: } \emph{uniform bound} makes the result independent on $\mu$:}
+        {}\leq \wtil Q_{\eps} &=
+        \Prob
+        \max_{a\in R}
+        \bigl[
+            \nu \bigl( r, X^k \bigr)  -
+            \nu \bigl( r, X^\ell \bigr)
+            \geq \eps
+        \bigr] \leq {}
+    \\\intertext{\textbf{STEP 2: } \emph{union bound} (wich is usually higly overestimated):}
+        &\leq
+        \Prob
+        \sum_{r\in R}
+        \bigl[
+            \nu \bigl( r, X^k \bigr)  -
+            \nu \bigl( r, X^\ell \bigr)
+            \geq \eps
+        \bigr] = {}
+    \\\intertext{exact one-classifier bound:}
+        &=
+        \sum_{r\in R}
+        \Hyper{L}{m}{\ell}{\frac{\ell}{L}(m-\eps k)},
+        \,
+        m=\sum_{x\in X^\ell}I(r, x)
+    \end{align*}
+
+\end{frame}
+
+\begin{frame}[t]{Example. Loss matrix and SC-graph for a~set of linear classifiers}
+    \tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{SimpleSample0num.PNG.eps} &
+        \includegraphics[width = 50mm]{SimpleGraph0.PNG.eps}
+        \XYtext(-18mm,0.5mm){\scriptsize\alert{layer 0}}%
+        \XYtext(-11mm,4mm){\scriptsize{layer 1}}%
+        \XYtext(-6mm,7.5mm){\scriptsize{layer 2}}%
+    \end{tabular}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|}
+        & \alert{layer 0} \\
+        $x_1$ & 0 \\[-0.6ex]
+        $x_2$ & 0 \\[-0.6ex]
+        $x_3$ & 0 \\[-0.6ex]
+        $x_4$ & 0 \\[-0.6ex]
+        $x_5$ & 0 \\[-0.6ex]
+        $x_6$ & 0 \\[-0.6ex]
+        $x_7$ & 0 \\[-0.6ex]
+        $x_8$ & 0 \\[-0.6ex]
+        $x_9$ & 0 \\[-0.6ex]
+     $x_{10}$ & 0
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[t]{Example. Loss matrix and SC-graph for a~set of linear classifiers}
+    \tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{SimpleSample1.PNG.eps} &
+        \includegraphics[width = 50mm]{SimpleGraph1.PNG.eps}
+        \XYtext(-18mm,0.5mm){\scriptsize{layer 0}}%
+        \XYtext(-11mm,4mm){\scriptsize\alert{layer 1}}%
+        \XYtext(-6mm,7.5mm){\scriptsize{layer 2}}%
+    \end{tabular}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|ccccc|}
+        & {layer 0} &
+        \multicolumn{5}{c|}{\alert{layer 1}} \\
+        $x_1$ & 0 & 1 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_2$ & 0 & 0 & 1 & 0 & 0 & 0 \\[-0.6ex]
+        $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 \\[-0.6ex]
+        $x_4$ & 0 & 0 & 0 & 0 & 1 & 0 \\[-0.6ex]
+        $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 \\[-0.6ex]
+        $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_7$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_8$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_9$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+     $x_{10}$ & 0 & 0 & 0 & 0 & 0 & 0
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[t]{Example. Loss matrix and SC-graph for a~set of linear classifiers}
+    \tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{SimpleSample2.PNG.eps} &
+        \includegraphics[width = 50mm]{SimpleGraph2.PNG.eps}
+        \XYtext(-18mm,0.5mm){\scriptsize{layer 0}}%
+        \XYtext(-11mm,4mm){\scriptsize{layer 1}}%
+        \XYtext(-6mm,7.5mm){\scriptsize\alert{layer 2}}%
+    \end{tabular}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|ccccc|cccccccc|c}
+        & {layer 0} &
+        \multicolumn{5}{c|}{layer 1} &
+        \multicolumn{8}{c|}{\alert{layer 2}} \\
+        $x_1$ & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_2$ & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_4$ & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_7$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_8$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_9$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+     $x_{10}$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots
+    \end{tabular}
+\end{frame}
+
+\subsection{Splitting and Connectivity Graph}
+
+\begin{frame}[t]{\G{Connectivity} and \R{inferiority} of a classifier}
+    \textbf{Def.} \g{\emph{Connectivity} of a classifier $a\in A$}
+    \\~\qquad
+    \g{$p(a) =
+        \# \bigl\{
+            x_{ba}\in\XX \colon
+            b \prec a
+        \bigr\}$} --- low-connectivity.
+    \\~\qquad
+    \g{$q(a) =
+        \# \bigl\{
+            x_{ab}\in\XX \colon
+            a \prec b
+        \bigr\}$} --- up-connectivity;
+
+    \medskip
+    \textbf{Def.} \r{\emph{Inferiority} of a classifier $a\in A$
+    \\~\qquad
+    $r(a) =
+        \# \bigl\{
+            x_{cb}\in\XX \colon
+            c \prec b \leq a
+        \bigr\}$}
+    $\;\in\; \bigl\{ p(a),\ldots, n(a) \bigr\}$.
+
+    \bigskip
+    \parbox[m]{42mm}{%
+        \textbf{Example:}\\
+        $\g{p(a)} = \#\{ \mathit{x1,x2} \} = 2$,\\
+        $\g{q(a)} = \#\{ \mathit{x3,x4} \} = 2$,\\
+        $\r{r(a)} = \#\{ \mathit{x1,x2} \} = 2$.\\
+        \vspace{25mm}%
+    }%
+    \parbox[m]{70mm}{%
+        \includegraphics[width=70mm,height=42mm]{SC-graph-3a.eps}
+    }%
+\end{frame}
+
+\begin{frame}[t]{The \R{Splitting} and \G{Connectivity} (SC-) bound}
+    \begin{vkTheorem}[SC-bound]
+        For any $\XX$, any $R$ and any $\eps\in(0,1)$
+        \vskip-1.5ex
+        \[
+            Q_\eps %(\mu,\XX)
+            \leq
+            \sum_{r\in R}
+            %[q\leq\ell]
+            %\,[r\leq k]
+            \left(\frac{C_{L-\g q-\r h}^{\ell-\g q}}{C_L^\ell}\right)
+            \Hyper{L-\g q-\r h}{m-\r h}{\ell-\g q}{s_m(\eps)},
+        \]
+        \vskip-0.5ex
+        where
+        $m = L\nu(r,\XX)$,\;
+        \g{$q = q(r)$},\;
+        \r{$h = h(r)$}.
+    \end{vkTheorem}
+
+    \begin{enumerate}
+    \item
+        If $q(r) \equiv h(r) \equiv 0$ then SC-bound transforms to Vapnik-Chervonenkis bound:
+        $Q_\eps \leq \sum\limits_{r\in R} \Hyper{L}{m}{\ell}{s_m(\eps)}$.
+    \item
+        The contribution of~$r\in R$ decreases exponentially by:\\
+        \g{$q(r)$ \textbf{$\Rightarrow$ connected sets are less subjected to overfitting}};\\
+        \r{$h(r)$ \textbf{$\Rightarrow$ only lower layers contribute significantly \rlap{to~$Q_\eps$.}}}
+    \end{enumerate}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Rule Induction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}[t]{Conjunctive rules}
+    \emph{Conjunctive rule} is a simple well interpretable 2-class classifier:
+    \[
+        r_y(x) = \bigwedge_{j\in J} \bigl[ f_j(x) \lessgtr_j \theta_j \bigr],
+    \]
+    where
+    $f_j(x)$ --- features,\\
+    $J \subseteq \{ 1,\dots,n \}$ --- subset of features, not very big, usually $|J| \lesssim 7$,\\
+    $\theta_j$ --- thresholds,\\
+    $\lessgtr_j$ --- one of the signs $\leq$ or $\geq$,\\
+    $y$ --- the class of the rule.
+
+    \bigskip
+    If $r_y(x)=1$ then the rule~$r$ classifies $x$ to the class $y$.
+
+    \smallskip
+    All objects $x$ such that $r_y(x)=0$ are not classified by $r_y$.
+
+    \medskip
+    \textbf{One need a~lot of rules to cover all objects and build a~good classifier.}
+\end{frame}
+
+\begin{frame}[t]{Decision List and Weighted Voting of conjunctive rules}
+    \emph{Decision list (DL)} is defined by
+    a~sequence of rules $r_1(x),\dots,r_T(x)$
+    of respective classes $c_1,\dots,c_T \in Y$:
+
+    \medskip
+    \begin{algorithmic}[1]
+        \FORALL{$t = 1,\dots,T$}
+            \IFTHEN{$r_t(x)=1$} \vkReturn $c_t$
+        \ENDFOR
+        \RET $c_0$ \COMMENT{abstain from classification}
+    \end{algorithmic}
+
+    \bigskip
+    \emph{Weighted voting (WV)} is defined by rule sets $R_y$ of all classes $y\in Y$,
+    with respective weights $w_r$ for each rule~$r$:
+    \[
+        a(x) = \arg\max_{y\in Y} \sum_{r\in R_y} w_r r(x).
+    \]
+%    \textbf{Margin} of an object $x_i$:
+%    \[
+%        M_i = W_{y_i}(x_i) - \max_{\bar y \in Y\setminus y_i} W_{\bar y}(x_i)
+%    \]
+
+    \medskip
+    To learn DL or WV one learns rules one-by-one,
+    gradually covering the entire training set $X^\ell$
+    (a~lot of standard procedures!)
+\end{frame}
+
+\subsection{Rule Evaluation Metrics}
+
+\begin{frame}[t]{Rule evaluation metrics}
+    The rule learning is a two-criteria optimization problem:
+
+    \qquad 1) maximize the number of \emph{positive examples} (of class $y$):
+    \[
+        p(r_y,X^\ell) = \sum_{i=1}^\ell r_y(x_i) \bigl[ y_i =    y \bigr] \to \max_{r_y};
+    \]
+    \qquad 2) minimize the number of \emph{negative examples} (not of class $y$):
+    \[
+        n(r_y,X^\ell) = \sum_{i=1}^\ell r_y(x_i) \bigl[ y_i \neq y \bigr] \to \min_{r_y};
+    \]
+
+    Common practice is to combine them into one \rlap{\emph{rule evaluation metric}}
+    \[
+        H(p,n)\to\max\limits_{r_y}
+    \]
+\end{frame}
+
+\begin{frame}[t]{Examples of rule evaluation metrics}
+    \begin{itemize}
+        \item Entropy criterion also called \emph{Information gain}:
+            \\[1ex]
+            $\displaystyle
+                h\left( \frac{P}{\ell} \right)
+                - \frac{p+n}{\ell}      {h} \left( \frac{p}{p+n} \right)
+                - \frac{\ell-p-n}{\ell} {h} \left( \frac{P-p}{\ell-p-n} \right) \to \max$,
+            \\[1ex]
+            where $h(q) = - q \log_2 q - (1-q) \log_2 (1-q)$;
+        \item Gini Index --- the same, but $h(q)= 2 q(1-q)$;
+        \item Fisher's exact test:\\
+            $- \log {C_{P}^{p}C_{N}^{n\vphantom{p}}} / {C_{P+N}^{p+n}} \to \max$;
+        \item Boosting criterion [Cohen, Singer, 1999]:\\
+            $\sqrt{p} - \sqrt{n} \to \max$
+        \item Meta-learning criteria [J.\,F\"urnkranz at al., 2001--2007].
+    \end{itemize}
+
+    \rlap{where}\hskip11mm
+    $P = \bigl|\bigl\{ x_i \colon y_i{=}y \bigr\}\bigr|$ --- number of positives in the set $X^\ell$;
+
+    \hskip11mm
+    $N = \bigl|\bigl\{ x_i \colon y_i{\neq}y \bigr\}\bigr|$ --- number of negatives in the set $X^\ell$.
+\end{frame}
+
+\subsection{The overfitting of rules}
+
+\begin{frame}{The problem: rules can suffer from overfitting}
+    \begin{block}{A common shortcoming of all rule evaluation metrics:}
+
+        They ignore an overfitting resulting from thresholds $\theta_j$ learning.
+
+        \medskip
+        On the independent testing set $X^k$
+
+        \smallskip
+        \quad $n(r,X^k)$ may be greater than expected;
+
+        \smallskip
+        \quad $p(r,X^k)$ may be less than expected.
+    \end{block}
+\end{frame}
+
+\begin{frame}[t]{The problem: rules are typically overfitted in real applications}
+    \centering
+    \includegraphics[width=100mm,height=64mm]{overfitting-anastomosis-eng.eps}\\
+    \footnotesize
+    \textbf{Real task:} predicting the result of atherosclerosis surgical treatment, $L=98$.
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Incorporating the SC-bound in Rule Evaluation Metric}
+
+\begin{frame}[t]{SC-modification of rule evaluation metric}
+    \begin{block}{Problem:}
+         Estimate $n(r,\r{X^k})$ and $p(r,\r{X^k})$ to~select rules more carefully.
+    \end{block}
+    \begin{block}{Solution:}
+        1. Calculate data-dependent SC-bounds:
+        \vskip-4ex
+        \begin{align*}
+            \Prob\bigl[ \tfrac1k n(r,\r{X^k}) - \tfrac1\ell n(r,\g{X^\ell}) \geq \eps \bigr] \leq \eta_{{}_n}(\eps);
+        \\
+            \Prob\bigl[ \tfrac1\ell p(r,\g{X^\ell}) - \tfrac1k p(r,\r{X^k}) \geq \eps \bigr] \leq \eta_{{}_p}(\eps);
+        \end{align*}
+        \vskip-1.5ex
+        2. Invert SC-bounds: with probability at least $1-\eta$
+        \vskip-4ex
+        \begin{align*}
+            \frac\ell k n(r,\r{X^k}) \leq  n(r,\g{X^\ell}) + \ell \eps_{{}_n}(\eta) \quad \equiv \hat n(r,\r{X^k});
+        \\
+            \frac\ell k p(r,\r{X^k}) \geq  p(r,\g{X^\ell}) - \ell \eps_{{}_p}(\eta) \quad \equiv \hat p(r,\r{X^k}).
+        \end{align*}
+        \vskip-1.5ex
+        3. Substitute $\hat p$, $\hat n$ in evaluation metric: $H(\hat p, \hat n)\to\max\limits_r$.
+    \end{block}
+\end{frame}
+
+\subsection{The Bottom-Up Traversal or the SC-graph}
+
+\begin{frame}[t]{Classes of equivalent rules: one point per rule}
+    \textbf{Example:} separable 2-dimensional task, $L=10$, two classes.\\
+    \leavevmode\phantom{\textbf{Example:}}
+    rules:
+    $r(x) =
+        \bigl[ f_1(x) \leq \theta_1 \text{ and } f_2(x) \leq \theta_2 \bigr]
+    $.
+
+    \centering
+    \includegraphics[width=80mm]{ivahnenko-correctAlgorithm.eps}%
+    \XYtext(-1mm,10.7mm){$\theta_1$}%
+    \XYtext(-85mm,59.7mm){$\theta_2$}%
+
+\end{frame}
+
+\begin{frame}[t]{Classes of equivalent rules: one point per class}
+    \textbf{Example:} the same classification task. \r{One point per class.}\\
+    \leavevmode\phantom{\textbf{Example:}}
+    rules:
+    $r(x) =
+        \bigl[ f_1(x) \leq \theta_1 \text{ and } f_2(x) \leq \theta_2 \bigr]
+    $.
+
+    \centering
+    \includegraphics[width=80mm]{ivahnenko-Links.eps}%
+    \XYtext(-1mm,8mm){$\theta_1$}%
+    \XYtext(-85mm,57mm){$\theta_2$}%
+
+\end{frame}
+
+\begin{frame}[t]{Classes of equivalent rules: SC-graph}
+    \textbf{Example:} SC-graph isomorphic to the graph at previous slide.
+
+    \medskip\centering
+    \includegraphics[width=75mm]{ivahnenko-LinksTree.eps}
+
+\end{frame}
+
+\begin{frame}[t]{SC-bound calculation for the set of conjunction rules}
+    \begin{algorithmic}[1]
+        \REQUIRE
+            features subset~$J$,\;
+            class label~$y\in Y$,\;
+            set of objects~$\XX$.
+        \ENSURE
+            $Q_\eps$ --- SC-bound on probability of overfitting.
+        \BEGIN
+        \STATE $R_0 := {}$the bottom rule of the SC-graph;
+        \REPEAT
+            \FORALL{$r\in R_0$}
+                \STATE
+                    find all neighbor rules $r'\in R\setminus R_0$ for the rule $r$;
+                \STATE
+                    calculate $q:= q(r)$, $h:= h(r)$, $m:= L\nu(r,\XX)$;
+                \STATE
+                    calculate the contribution of the rule $r$:\\
+                    $Q_{\eps}(r) :=
+                    \frac 1{C_{L}^{\ell}}
+                    {C_{L-q-h}^{\ell-q}}
+                    \Hyper
+                        {L-q-h}
+                        {m-h}
+                        {\ell-q}
+                        {\tfrac\ell L (m-\eps k)}$;
+                \STATE
+                    add all neighbor rules $r'$ in $R_0$;
+                \STATE
+                    $Q_{\eps} := Q_{\eps} + Q_{\eps}(r)$;
+            \ENDFOR
+        \UNTIL{the contributions of layers $Q_{\eps,m}$ become small.}
+    \end{algorithmic}
+
+    \medskip
+    \alert{Really, 5--10 lower layers of the SC-graph are sufficient.}
+
+%    \begin{algorithmic}[1]
+%        \REQUIRE
+%            features subset~$J$,\;
+%            class label~$y\in Y$,\;
+%            set of objects~$\XX$.
+%        \ENSURE
+%            $Q_\eps$ --- SC-bound estimate.
+%        \BEGIN
+%        \STATE $\Theta := \Arg\min\limits_\theta n(\theta)$;
+%        \quad $Q_\eps := 0$;
+%        \REPEAT
+%            \STATE $Q_{\eps,m} := 0$;\quad $\Theta' := \emset$;
+%            \FORALL{$\theta\in\Theta$}
+%                \STATE
+%                    \textbf{call} Algorithm~\ref{alg:Vtheta} to build the neighborhood $V_\theta$;
+%                \STATE
+%                    $Q_{\eps,m} := Q_{\eps,m} +
+%                    \frac 1{C_{L}^{\ell}}
+%                    {C_{L-q(\theta)-r(\theta)}^{\ell-q(\theta)}}
+%                    \Hyper
+%                        {L-q(\theta)-r(\theta)}
+%                        {n(\theta)-r(\theta)}
+%                        {\ell-q(\theta)}
+%                        {\tfrac\ell L (n(\theta) - \eps k)}$;
+%                \STATE
+%                    $\Theta' := \Theta' \cup
+%                        \bigl\{
+%                            \theta'\in V_\theta\colon n(\theta') = n(\theta)+1
+%                        \bigr\}$;
+%                \STATE $Q_{\eps} := Q_{\eps} + Q_{\eps,m}$;\quad $\Theta := \Theta'$;
+%            \ENDFOR
+%        \UNTIL{the contribution of the $m$-th layer $Q_{\eps,m}$ becomes small.}
+%    \end{algorithmic}
+\end{frame}
+
+\subsection{Experiments on Real Data Sets}
+
+\begin{frame}[t]{Experiment on real data sets}
+
+    \textbf{Data sets} from UCI repository:
+
+    \medskip{\small
+        \begin{tabular}{|l|r|r|}
+        \hline
+            Task & Objects & Features \\
+        \hline
+           australian      & 690 & 14 \\
+           echo cardiogram & 74  & 10 \\
+           heart disease   & 294 & 13 \\
+           hepatitis       & 155 & 19 \\
+           labor relations &  40 & 16 \\
+           liver           & 345 & 6  \\
+        \hline
+        \end{tabular}
+    }
+
+    \medskip
+    \textbf{Learning algorithms:}
+    \begin{itemize}
+        \item WV --- weighted voting (boosting);
+        \item DL --- decision list;
+        \item LR --- logistic regression.
+    \end{itemize}
+
+    \textbf{Testing method:} 10-fold cross validation.
+\end{frame}
+
+\begin{frame}[t]{Experiment on real data sets. Results}
+    \centering
+    \begin{tabular}{|l||l|l|l|l|l|l|}
+    \hline
+    & \multicolumn{6}{c|}{tasks} \\
+    \hline
+    \hline
+    Algorithm  & austr  & echo  & heart   & hepa   & labor   & liver  \\
+    \hline
+    RIPPER-opt &15.5&\r{2.97}&19.7&20.7&18.0&32.7\\
+    \hline
+    RIPPER+opt &15.2&5.53&20.1&23.2&18.0&\r{31.3}\\
+    \hline
+    C4.5(Tree) &14.2&5.51&20.8&18.8&14.7&37.7\\
+    \hline
+    C4.5(Rules)&15.5&6.87&20.0&18.8&14.7&37.5\\
+    \hline
+    C5.0       &\r{14.0}&4.30&21.8&20.1&18.4&31.9\\
+    \hline
+    SLIPPER    &15.7&4.34&\r{19.4}&\r{17.4}&\r{12.3}&32.2\\
+    \hline
+    LR         &14.8&4.30&19.9&18.8&14.2&32.0\\
+    \hline
+    \hline
+    WV         &14.9&4.37&20.1&19.0&14.0&32.3\\
+    \hline
+    DL         &15.1&4.51&20.5&19.5&14.7&35.8\\
+    \hline
+    \hline
+    \g{WV+CS}     &\r{14.1}&\r{3.2}&\r{19.3}&\r{18.1}&\r{13.4}&\r{30.2}\\
+    \hline
+    \g{DL+CS}     &14.4&3.6&19.5&18.6&13.6&32.3\\
+    \hline
+    \end{tabular}
+    \medskip\footnotesize\\
+    ~~~~Two top results are \r{highlighted} for each task.
+\end{frame}
+
+\begin{frame}[t]{Conclusions}
+    \begin{enumerate}
+        \item
+            Splitting and connectivity properties of the set of classifiers together reduce overfitting significantly.
+        \item
+            The \emph{splitting} property:\\ only a~small part of classifiers are suitable for a given task.
+        \item
+            The \emph{connectivity} property:\\ there a~lot of similar classifiers in the set.
+        \item
+            \emph{SC-bound} is a combinatorial generalization bound that takes into account both splitting and connectivity.
+        \item
+            \emph{SC-bound} can be effectively calculated for the set of threshold conjunctive rules...
+        \item
+            ...reducing the testing error by 1--2\% on real data sets.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[t]{Questions, please}
+    \vskip10mm
+    \begin{center}
+    Andrey Ivahnenko\\
+    {\color{blue}\underline{\url{ivahnenko@forecsys.ru}}}
+    \end{center}
+\end{frame}
+
+\end{document}

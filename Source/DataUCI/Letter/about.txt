@@ -1,0 +1,4 @@
+http://archive.ics.uci.edu/ml/machine-learning-databases/letter-recognition/
+
+Manual changes:
+- letters A..Z in letter-recognition.data were replaced to numbers (1..26)

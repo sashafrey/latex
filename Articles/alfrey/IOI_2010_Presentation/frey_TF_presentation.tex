@@ -1,0 +1,439 @@
+\documentclass{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  к.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+%\title[Dense and Sparse Predictors Grid]{Overfitting Probability for Dense and Sparse Predictors Grid}
+\title[Плотные и разреженные сети алгоритмов]{Вероятность переобучения для плотных и разреженных сеток алгоритмов}
+
+\author{Фрей Александр Ильич}
+\date{20 октября 2010}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\Xl}{X^\ell}
+\newcommand{\Xk}{X^k}
+\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\renewcommand{\P}{\textbf{P}}
+\newcommand{\E}{\textbf{E}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+
+\begin{frame}
+    \frametitle{Проблема переобучения: комбинаторный подход}
+    \begin{itemize}
+        \item $\XX = (x_1\, \dots\, x_L)$ "--- генеральная выборка объектов, $x_i \in \mathcal{X}$;
+        \item $\YY = (y_1\, \dots\, y_L)$ "--- вектор классов объектов, $y_i \in \mathcal{Y}$;
+        \item $a : \mathcal{X} \rightarrow \mathcal{Y}$ "--- алгоритм классификации;
+        \item ошибка алгоритма: $a(x_i) \neq y_i$;
+        \item $n(a, U)$ "--- число ошибок алгоритма на подвыборке $U \subset \XX$;
+        \item $\nu(a, U) = \frac {n(a, U)}{|U|}$ "---
+        частота ошибок;
+        \item $\Xl \subset \XX$ "--- обучающая выборка длины $\ell$;
+        \item $\Xk = \XX \backslash \Xl$ "--- контрольная выборка длины $k = L - \ell$;
+        \item разность частоты ошибок на контроле и обучении:
+        \[\delta(a, \Xl) = \nu(a, \Xk) - \nu(a, \Xl);\]
+        \item $\mu \colon \{\Xl\} \rightarrow \AA$ "--- детерминированный метод обучения;
+        \item вероятность переобучения:
+        \[Q_{\mu}(\epsilon) = \P \Big[ \delta ( \mu \Xl, \Xl ) \geq \epsilon \Big],
+            \text{ где } \P \stackrel{def}{=} \frac 1{C_L^\ell}\sum_{\Xl \in \XXell} \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Проблема переобучения: выбор лучшего алгоритма}
+    \begin{itemize}
+        %\item $\mu \colon \{\Xl\} \rightarrow \AA$ "--- детерминированный метод обучения;
+        \item $\mu X = \argmin_{a \in \AA} n(a, \Xl)$ "--- детерминированный МЭР;
+        \item Вероятность переобучения:
+        \[
+            \begin{aligned}
+            Q_{\mu}(\epsilon) & = \P \, [ \delta ( \mu \Xl, \Xl ) \geq \epsilon ]
+            = \P \sum_{a \in A} \, \alert{[\mu \Xl = a]} [ \delta ( a, \Xl ) \geq \epsilon ].
+            \end{aligned}
+        \]
+
+        \item Рандомизированная минимизация эмпирического риска:
+            \[
+               \mu(A, X, a) = \frac{[a \in A(X)]}{|A(X)|}, \text{ где } A(X) = \Argmin_{a \in A} n(a, X);
+            \]
+        \item Вероятность переобучения для рандомизированного метода обучения:
+            \[
+                Q_\mu(\epsilon, A) = \E \sum_{a \in A}  \alert{\mu(A, X, a)} [\delta(a, X) \geq \epsilon]
+            \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Группа симметрий множества алгоритмов}
+        Граф смежности двумерной унимодальной сетки:
+        \vspace{-0.3cm}
+        \begin{figure}[t]
+            \centering {
+                \hspace{1cm}
+                \includegraphics[width=68mm]{OrbitExample2.eps}
+                \vskip-3.5ex
+            }
+        \end{figure}
+    \begin{itemize}
+    \item $S_L$ "--- группа всех перестановок объектов выборки,
+    \item $S_L$ действует множестве всех алгоритмов $2^\AA$,
+    \item $\Sym(A) = \{\pi \in S_L \colon \pi A = A\} \subset S_L$.
+    \item Орбита алгоритма $a$ это $\{\pi a \colon \pi \in \Sym(A)\}\subset A$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Равный вклад алгоритмов одной орбиты}
+    \begin{itemize}
+        \item Вероятность переобучения "--- сумма вкладов алгоритмов:
+        \[
+        \begin{aligned}
+            & Q_\mu(\epsilon, A) = \sum_{a \in A} Q_\mu(\epsilon, a, A), \text{ где } \\
+            & Q_\mu(\epsilon, a, A) = \E \mu(A, X, a) [ \delta ( a, \Xl ) \geq \epsilon ];
+        \end{aligned}
+        \]
+        \item Алгоритмы одной орбиты дают равный вклад:
+        \[
+            Q_\mu(\epsilon, a, A) = Q_\mu(\epsilon, \pi a, A), \text { где } \pi \in \Sym(A)
+        \]
+        \item Обозначим $\Omega(A)$ "--- множество орбит $\Sym(A)$ на $A$;
+        \item Вероятность переобучения с учетом структуры множества алгоритмов:
+        \begin{equation}
+            Q_\mu(\epsilon, A) =
+                %\frac 1{C_L^\ell}
+                \sum_{\omega \in \Omega(A)}\!\! |\omega| \,
+                \E \mu(A, X, a)
+                \left[ \delta(a_\omega, \Xl) \geq \epsilon \right].
+        \end{equation}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Равный вклад разбиений  одной орбиты}
+    \begin{itemize}
+        \item Вклад разбиения $\Xl \in \XXell$ в вероятность переобучения РМЭР:
+        \[
+            \begin{aligned}
+            \phi(A, X, \epsilon) &= \frac{1}{|A(X)|} \sum_{a \in A(X)} [\delta(a, X) \geq \epsilon]; \\
+            Q_\mu(\epsilon, A) &= \frac 1{C_L^\ell} \sum_{\Xl \in \XXell} \phi(A, X, \epsilon);
+            \end{aligned}
+        \]
+        \item Разбиения одной орбиты дают равный вклад:
+        \[
+            \phi(A, X, \epsilon) = \phi(A, \pi X, \epsilon), \text{ где } \pi \in \Sym(A);
+        \]
+        \item Обозначим $\Omega(\XX)$ "--- множество орбит $\Sym(A)$ на $\XXell$;
+        \item Вероятность переобучения с учетом структуры множества алгоритмов:
+        \[Q_\mu(\epsilon, A) = \frac{1}{C_L^\ell} \sum \limits_{\tau \in \Omega(\XX)} |\tau| \phi(A, X_\tau, \epsilon).\]
+    \end{itemize}
+    %\[
+    %\includegraphics[height=24mm]{mu_explanation.eps}
+    %\]
+\end{frame}
+
+\begin{frame}
+   \frametitle{Overfitting probability for fixed predictor}
+    \vspace{-0.5cm}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+       \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(eps).eps}
+        \hfill
+        \medskip
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(m).eps}
+        \hfill
+        \end {multicols}
+    \end{figure}
+    \begin{Th}[Overfitting probability for fixed predictor]
+        \[
+            Q_{\mu(f)}(\epsilon) =
+        \P \Big\{ \delta_{\mu} (  \Xl, \Xk ) \geq \epsilon \Big\} =
+            H_{L}^{\ell, m}(s_0),
+        \]
+        where
+        $m = n(f, \XX)$, $s_0 = \frac \ell L(m - \epsilon k)$,
+        $H_{L}^{\ell, m}(s_0) =
+            \sum \limits_{s=0}^{\lfloor z \rfloor}
+            \frac {C_m^s C_{L-m}^{\ell - s}}{C_L^\ell}$.
+    \end{Th}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Результаты, полученные для РМЭР}
+      \begin{itemize}
+        \item \textbf{Связка монотонных цепочек}
+            \begin{itemize}
+                \item Фрей\;А.\,И.,
+                    Точные оценки вероятности переобучения для симметричных семейств алгоритмов~//
+                    Всеросс. конф. ММРО-14 "--- М.:~МАКС Пресс, 2009.  "---  \mbox{С.\,66--69}.
+            \end{itemize}
+        \item \textbf{Шар алгоритмов и центральный слой шара}
+            \begin{itemize}
+                \item
+                    Толстихин \;И.\,О.,
+                    Точная оценка вероятности переобучения для одного специального семейства алгоритмов~//
+                    Конференция <<Ломоносов-2010>>.
+            \end{itemize}
+        \item \textbf{Полный слой и полный куб алгоритмов}
+            \begin{itemize}
+                    \item Frei\;A.\,I.,
+                    Accurate Estimates of the Generalization Ability for Symmetric Sets of Predictors and Randomized Learning Algorithms ~//
+                    Pattern Recognition and Image Analysis. "--- 2010. "--- Vol. 20, No. 3. "--- Pp. 241-250.
+            \end{itemize}
+        \item \textbf{Монотонные и унимодальные сетки}
+            \begin{itemize}
+                    \item Фрей\;А.\,И.,
+                    Вероятность переобучения плотных и разреженных семейств многомерных сеток алгоритмов~//
+                    Международ. конф. ИОИ-8 "--- М.:~МАКС Пресс, 2010.  "---  \mbox{С.\,87--90}.
+            \end{itemize}
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Overfitting probability: predictors with random errors}
+
+\vspace{-1cm}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{RandomSlice.eps}
+        \hfill
+        \medskip
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(RandomSlice).eps}
+        \hfill
+        \end {multicols}
+    \end{figure}
+\vspace{-1cm}
+
+\begin{itemize}
+        \item $A_m^n$ "--- set of $n$ predictors, with $m$ errors for each one.
+        Errors are not correlated.
+\end{itemize}
+
+\begin{Th}[Overfitting probability for $A_m^n$]
+    Let $\mu$ "--- randomized ERM. Then
+    \[\E_G P_{\mathbb{F}}(\epsilon, A_m^n) = 1 - \left(1 - P_{\mathbb{F}}(\epsilon, a_m) \right)^n\]
+\end{Th}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Отсутствие связности: случайные множества алгоритмов}
+\begin{itemize}
+    \item Пронумеруем алгоритмы: $A = (a_1, \dots, a_d)$
+    \item $S_L$ "--- симметрическая группа порядка $L$;
+    \begin{itemize}
+%        \item $|S_L| = L!$
+        \item $S_L$ действует на объектах выборки;
+        \item $S_L$ действует на векторах ошибок алгоритмов;
+    \end{itemize}
+    \item $G = (S_L)^{d}$ "--- свободное произведение $S_L$;
+    \begin{itemize}
+    \item $g = (g_1, \dots, g_d) \in G$ "--- элемент группы $G$, $g_i \in S_L$;
+        \item $G$ действует на векторе алгоритмов: \[gA = \Big(g_1(a_1), \dots, g_d(a_d)\Big).\]
+    \end{itemize}
+    \item Вероятность переобучения несвязной перестановки $A$:
+        \[\bar{Q}_\mu(\epsilon, A) = \E_G  Q_\mu(\epsilon, gA),  \text{ где } \E_G \stackrel{def}{=} \frac{1}{(L!)^d} \sum_{g \in G} \]
+    \item $\bar{Q}_\mu(\epsilon, A)$ зависит только от профиля расслоения $A$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Проблема переобучения: случайный слой алгоритмов}
+
+\vspace{-1cm}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{RandomSlice.eps}
+        \hfill
+        \medskip
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(RandomSlice).eps}
+        \hfill
+        \end {multicols}
+    \end{figure}
+\vspace{-1cm}
+
+\begin{itemize}
+        \item $A_m^n$ "--- множество из $n$ алгоритмов, допускающих по $m$ ошибок.
+        Ошибки расположены <<случайным>> образом.
+\end{itemize}
+
+\begin{Th}[Вероятность переобучения для $A_m^n$]
+    Пусть $\mu$ "--- рандомизированный МЭР. Тогда
+    \[\E_G Q_\mu(\epsilon, A_m^n) = 1 - \left(1 - Q_\mu(\epsilon, a_m) \right)^n\]
+\end{Th}
+
+\end{frame}
+
+%\begin{frame}
+%   \frametitle{Проблема переобучения: компактный слой алгоритмов}
+
+%    Компактный слой шара:
+%    \[B_m^r(a_0) = \{a \in \AA \colon \rho(a, a_0) \leq r, \text { и } n(a, \XX) = m\},\]
+%    $\rho(a, a_0)$ "--- расстояние хэмминга между векторами ошибок.
+
+%    Число алгоритмов в слое шара очень велико:
+%    \[
+%        |B_m^r(a_0)| = \sum_{d=0}^{\lfloor r / 2 \rfloor} C_m^d C_{L-m}^d.
+%    \]
+
+%    \vspace{-0.25cm}
+%    \begin{Th}[Вероятность переобучения для $B_m^r(a_0)$]
+%    Пусть $n(a_0, \XX) = m$, $\epsilon' = \epsilon - \frac{L}{\ell k} \big\lfloor r/2 \big\rfloor$.
+%    Тогда
+%        \[
+%            Q_\mu \left(B_m^r(a_0), \epsilon \right)
+%            =
+%            Q_\mu \left(B_m^0(a_0), \epsilon'\right).
+%        \]
+%    \end{Th}
+%\end{frame}
+
+\begin{frame}
+    \frametitle{Continuous predictors set}
+    Let us study behavior of the following predictors set:
+    \[
+    \includegraphics[height=65mm]{MUB.eps}
+    \]
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+    \item $A_B$ "--- Monotonic chains binding of $h$, length $D$,
+    \item $A_M$ "--- Monotonic $h$"~dim lattice,
+    \item $A_U$ "--- Unimodal  $h$"~dim lattice.
+\end{itemize}
+\begin{Theorem}[Overfitting probability $A_B$, $A_M$, and $A_U$.]
+\[
+    \begin{aligned}
+    P_{\mathbb{F}}( \epsilon, A_B) & =
+        \sum_{p=0}^{D}
+        \sum_{S=p}^{h D}
+         \sum_{F = 0}^{h}
+         \frac{|\omega_p| R_{D, h}^p(S, F)}{1 + S}
+         \frac{C_{L'}^{\ell'}}{C_L^\ell}
+         H_{L'}^{\ell', m}(s_0),\\
+    P_{\mathbb{F}}(\epsilon, A_M) & = \sum_{\vec \lambda \in Y_{*}^{h, D}}
+         \sum_{\substack{\vec t \geq \vec  \lambda, \\\|\vec t\| \leq D}}
+         \frac {|S_h \vec \lambda|} {T( \vec t )}
+         \frac{C_{L'}^{\ell'}}{C_L^\ell}
+         H_{L'}^{\ell', m}(s_0), \\
+    P_{\mathbb{F}}( \epsilon, A_U) & =
+         \sum_{\vec \lambda \in Y_{*}^{h, D}}
+         \sum_{\substack{\vec  t   \geq \vec \lambda, \\\|\vec  t  \| \leq D}}
+         \sum_{\substack{\vec {t'} \geq \vec 0,       \\\|\vec {t'}\| \leq D}}
+         \frac {|S_h \vec \lambda| \cdot 2^{n(\vec \lambda)}}
+            {T( \vec t  + \vec {t'} )}
+         \frac{C_{L'}^{\ell'}}{C_L^\ell}
+         H_{L'}^{\ell', m}(s_0), \\
+    \end{aligned}
+\]
+where $H_{L'}^{\ell', m}(s_0)$ "--- hypergeometric distribution.
+\end{Theorem}
+\end{frame}
+
+\begin{frame}
+\frametitle{Сравнение сеток и связки монотонных цепочек}
+\begin{figure}[p]
+    \centering
+    \includegraphics[height=42mm]{netcomparison_D5_color_rastr.eps}
+    \vspace{-0.4cm}
+    \caption{Сравнение при разных $\epsilon$; $D=5$, $m = 5$, $L = 50$, $\ell = 30$.}
+%    \label{fig:netcomp_eps}
+    \vspace{-0.4cm}
+    \begin {multicols}{3}
+    \centering
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h12_color.eps}
+    \hfill
+    \medskip
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h24_color.eps}
+    \hfill
+    \medskip
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h36_color.eps}
+    \hfill
+    \end {multicols}
+    \vspace{-0.5cm}
+    \caption{Сравнение при разных D, в размерностях $H=1(2)$, $H=2(4)$ и $H=3(6)$. $\epsilon = 0.04$, $m = 5$, $L = 50$, $\ell = 30$.}
+%    \label{fig:netcomp_h}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Разреженная монотонная сетка}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+        \hfill
+        \includegraphics[width=45mm,height=45mm]{frey_fig1.eps}
+        \caption{Узлы сетки соответствуют алгоритмам,
+        направление стрелок "--- возрастанию числа ошибок алгоритмов.}
+        \hfill
+        \bigskip
+        \hfill
+        \includegraphics[width=54mm,height=45mm]{Q(Sparce_monotonic_qrid_appriximation).eps}
+        \caption{Зависимость $Q_\mu(\epsilon, \ddot{A}_M)$ от разреженности монотонной сетки
+        при $L=100$, $\ell=60$, $\epsilon = 0.04$, $D=12$, $m=5$.}
+        \hfill
+        \end {multicols}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Результаты и выводы}
+    \begin{itemize}
+      \item Предложен теоретико-групповой подход для вывода формул вероятности переобучения;
+      \item Получены теоретические результаты для несвязного множества алгоритмов;
+      \item Предложено два семейства для аппроксимации сеток их подмножествами малой мощности:
+      \begin{itemize}
+        \item Связки монотонных цепочек;
+        \item Разреженные сети алгоритмов;
+      \end{itemize}
+      \item Экспериментально показано, что точность предложенных аппроксимаций падает с возрастанием размерности и разреженности.
+    \end{itemize}
+\end{frame}
+
+\end{document} 

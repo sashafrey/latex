@@ -1,0 +1,18 @@
+target	| the target attribute
+
+feature1:	0, 1.
+feature2:	continuous.
+feature3:	continuous.
+feature4:	1, 2, 3.
+feature5:	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14.
+feature6:	1, 2, 3, 4, 5, 7, 8, 9.
+feature7:	continuous.
+feature8:	0, 1.
+feature9:	0, 1.
+feature10:	continuous.
+feature11:	0, 1.
+feature12:	1, 2, 3.
+feature13:	continuous.
+feature14:	continuous.
+
+target:	0, 1.

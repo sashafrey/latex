@@ -1,0 +1,479 @@
+\documentclass{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Факультет Управления и Прикладной Математики \\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  д.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+\title[Симметричные семейства алгоритмов]{Точные оценки вероятности переобучения для симметричных семейств алгоритмов
+и рандомизированных методов обучения}
+
+
+\author{Фрей Александр Ильич}
+\date{16 июня 2010}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\Xl}{X}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\begin{frame}
+    \frametitle{Проблема переобучения}
+    \begin{itemize}
+        \item Строки таблицы $\{x_1\, \dots\, x_\ell, x_{\ell + 1}, x_L\}$ "--- объекты полной выборки
+        \item Столбцы $\{a_1\, \dots\, a_D\}$\, "--- векторы ошибок алгоритмов
+    \end{itemize}
+    \begin{center}
+    \vskip-2ex
+    \begin{tabular}[t]{|c|llllll|}
+    \hline
+          & $a_1$ & $a_2$ & \dots & \textbf{$a_d$} & \dots & $a_D$ \\
+    \hline
+    $x_1$ & 0 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 1 \\
+    $\dots$ & 1 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    $x_\ell$ & 0 & 0 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    \hline
+    $x_{\ell + 1}$ & 1 & 1 & \dots & \textcolor{red}{\textbf{1}} & \dots & 1 \\
+    $\dots$ & 1 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    $x_L$ & 0 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    \begin{itemize}
+        %\item $\{x_1, x_2, x_3\}$ "--- наблюдаемая обучающая подвыборка
+        %\item $\{x_4, x_5, x_6\}$ "--- скрытая контрольная подвыборка
+        \item Метод обучения "--- минимизация эмпирического риска
+        \item Цель: получить точные, вычислительно-эффективные оценки вероятности переобучения.
+    \end{itemize}
+\end{frame}
+
+%\begin{frame}
+%    \frametitle{Содержание работы}
+%    \textbf{Цель работы} "--- разработать новый математический инструментарий для вывода
+%    формул вероятности переобучения; показать его эффективность.
+
+%    \vspace{0.25cm}
+
+%    \textbf{План выступления:}
+%    \begin{enumerate}
+%        \item Обзор методов вывода формул для вероятности переобучения
+%        \item Описание предлагаемого \textbf{метода орбит}
+%        \begin{itemize}
+%            \item Рандомизированные методы обучения
+%            \item Симметрия множества алгоритмов
+%        \end{itemize}
+%        \item Точные формулы и численные эксперименты
+%        \begin{itemize}
+%            \item Полный слой и куб алгоритмов
+%            \item Связка из монотонных цепочек
+%            \item Монотонные цепочки и сетки
+%            \item Численные эксперименты
+%        \end{itemize}
+%        \item Результаты и направления дальнейших исследований
+%    \end{enumerate}
+%\end{frame}
+
+\begin{frame}
+    \frametitle{Методы вывода формул для вероятности переобучения}
+    \begin{enumerate}
+      \item Метод производящих и запрещающих объектов
+      \begin{itemize}
+        \item Монотонная цепочка и сетка
+      \end{itemize}
+      \item Блочная оценка
+      \begin{itemize}
+        \item Пара алгоритмов
+      \end{itemize}
+      \item Рекуррентное вычисление вероятности переобучения по заданной матрице ошибок
+      \begin{itemize}
+        \item Теоретический инструмент для доказательства универсальных оценок
+      \end{itemize}
+      \item Гипотеза $t$-слоев и метод $\beta$-многочленов
+      \begin{itemize}
+        \item Точные оценки для унимодальных цепочек
+        \item Приближенные оценки для унимодальных сеток
+      \end{itemize}
+      \pause
+      \item Метод разбиения множества алгоритмов на орбиты
+      \begin{itemize}
+        \item Пучок монотонных цепочек
+        \item Полный слой, полный куб алгоритмов
+        \item Шар алгоритмов
+        \item Точные оценки для монотонных и унимодальных сеток
+      \end{itemize}
+    \end{enumerate}
+
+%    \begin{Th}[О производящих и запрещающих объектах.]
+%        Пусть для каждого алгоритма $a \in A$ можно указать пару непересекающихся множеств
+%        $X_a \subset \XX$ и $X'_a \subset \XX$, таких что
+%        $[\mu X = a] = [X_a \subset \XX][X'_a \subset \XX]$.
+%        Обозначим $L_a = L - |X_a| - |X'_a|$, $|\ell_a = \ell - |X_a|$, $k_a = k - |X'_a|$.
+%        Тогда
+%        \[
+%           Q_\mu(\epsilon, A) = \sum_{a \in A}\frac{C_{L_a}^{\ell_a}}{C_L^\ell} H_{L_a}^{\ell_a, m_a}(s_a(\epsilon)).
+%        \]
+%
+%    \end{Th}
+
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Рандомизированный метод обучения}
+    \begin{itemize}
+        \item Генеральная выборка $\XX=\bigl( x_i \bigr){}_{i=1}^L$
+        \item Алгоритм "--- бинарный вектор $a \equiv \bigl( a(x_i) \bigr){}_{i=1}^L$ длины~$L$
+        \item Конечное множество алгоритмов $A = \{a_1, \dots, a_D\}$
+        \item Метод обучения:
+            \[
+                \begin{aligned}
+                  & \mu : 2^\AA \times \XXell \rightarrow A \quad\quad\quad\quad\quad\quad \;
+                    \text{ "--- \; детерминированный; } \\
+                  & \mu : 2^\AA \times \XXell \rightarrow \{f : A \rightarrow [0, 1]\} \; \text{ "--- \; рандомизированный; }
+                \end{aligned}
+            \]
+        \item \emph{Вклад} алгоритма $a\in A$ в~вероятность переобучения:
+        \[
+            Q_\mu(\epsilon, a,A)
+            =
+            \frac1{C_L^\ell}
+                \sum_{X \in \XXell}
+                    \mu(A, X, a)
+                    \bigl[ \delta(a, X) \geq \varepsilon \bigr].
+        \]
+        \item \emph{Вероятность переобучения}:
+        $
+            Q_\mu(\epsilon, A)
+            =
+            \sum \limits_{a\in A} Q_\mu(\epsilon, a,A).
+        $
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    Граф смежности множества алгоритмов:
+    \begin{itemize}
+        \item Вершины соответствуют алгоритмам
+        \item Ребро $a_1 \rightarrow a_2$:
+        \begin{itemize}
+            \item соединяет алгоритмы, различающиеся  на одном объекте
+            \item идет в направлении возрастания числа ошибок
+            \end{itemize}
+    \end{itemize}
+    \frametitle{Орбита алгоритмов}
+        \vspace{-0.3cm}
+        \begin{figure}[t]
+            \centering {
+                \hspace{1cm}
+                \includegraphics[width=72mm]{OrbitExample2.eps}
+                \vskip-3.5ex
+            }
+        \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Теорема о равном вкладе алгоритмов одной орбиты}
+    \begin{itemize}
+        \item Группа перестановок объектов выборки $S_L$ \emph{действует} на
+        множестве всех алгоритмов перестановками координат.
+        \item \emph{Группой симметрий} $\Sym(A) \subset S_L$ множества алгоритмов назовем
+        стационарную подгруппу $S_L$:
+        \[
+            \Sym(A) = \{\pi \in S_L \colon \pi(A) = A\}.
+        \]
+        %\item $\Sym(A)$ действует на  множестве алгоритмов $A$.
+        \item Пусть $\pi \in \Sym(A)$, $a \in A$ "--- алгоритм множества $A$.
+              Тогда $a$ и $\pi a$ дают \textbf{равный вклад} в вероятность переобучения.
+    \end{itemize}
+    \begin{Th}
+        Вероятность переобучения метода $\mu$ записывается в виде:
+        \begin{equation}
+            Q_\mu(\epsilon, A) =
+                \frac 1{C_L^\ell}
+                \sum_{\omega \in \Omega(A)}\!\! |\omega| \,
+                \sum_{\substack{
+                        \Xl \in \XXell
+               }}
+                \mu(A, X, a)
+                \left[ \delta(a_\omega, \Xl) \geq \epsilon \right].
+        \end{equation}
+    \end{Th}
+\end{frame}
+
+\begin{frame}
+\frametitle{Модельные семейства алгоритмов}
+
+\emph{Унимодальная сетка} размерности $h$ является
+реалистичной моделью \emph{связного} параметрического семейства алгоритмов.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[height=64mm]{MUB.eps}
+\end{figure}
+
+%Если мы имеем лучший алгоритм $a_0$ c оптимальным значением
+%вектора вещественных параметров, то отклонение значений этого параметра как в~б\'ольшую, так и в меньшую,
+%сторону приводит к~увеличению числа ошибок.
+
+\end{frame}
+
+%\begin{frame}
+%    \frametitle{Семейства простой структуры}
+%    \begin{itemize}
+%        \item 1. Связка из монотонных цепочек
+%        \begin{itemize}
+%            \item $p$ "--- число ветвей
+%            \item $D$ "--- длина каждой ветви
+%        \end{itemize}
+%    \end{itemize}
+%    \vskip-2ex
+%    \begin{figure}[t]
+%        \centering {
+ %           \includegraphics[width=100mm]{frey_algSetGraph.eps}
+ %           \vskip-3.5ex
+ %       }
+ %   \end{figure}
+ %   \begin{itemize}
+%        \item Частные случаи:
+%        \begin{itemize}
+%            \item 2. Монотонная цепочка: $p = 1$.
+%            \item 3. Унимодальная цепочка: $p = 2$.
+%            \item 4. Единичная окрестность лучшего алгоритма: $D = 1$.
+%        \end{itemize}
+%    \end{itemize}
+%\end{frame}
+
+ \begin{frame}
+    \frametitle{Точные формулы для вероятности переобучения}
+    \begin{Th}[Связка из $p$ монотонных цепочек]
+    \label{th:pMonot}
+        \[
+                Q_\mu(\epsilon, A) =
+                    \sum_{h=0}^{D}
+                    \sum_{S=h}^{p D}
+                    \sum_{F = 0}^{p}
+                    \frac{|\omega_h| R_{D, p}^h(S, F)}{1 + S}
+                    \frac{C_{L'}^{\ell'}}{C_L^\ell}
+                    H_{L'}^{\ell', m}(s(\varepsilon)),
+        \]
+
+        где
+            $L' = L {-} S {-} F$,\;
+            $\ell' = \ell {-} F$,\;
+            $s(\varepsilon) = \bigl\lfloor \frac{\ell}L (m {+} h {-} \varepsilon k) \bigr\rfloor$;\;
+
+            $|\omega_h| = 1$ при $h = 0$ и $|\omega_h| = p$ при ${h \geq 1}$;
+
+            $H_{L'}^{\ell', m}(s)$ "--- функция гипергеометрического распределения;
+
+            $R_{D,p}^h(S,F)$ "--- число способов представить~$S$
+                в виде суммы $p$~неотрицательных слагаемых $S = t_1+ \ldots + t_p$,
+                каждое из~которых не~превосходит~$D$,
+                некоторые $F$~слагаемых строго меньше $D$,
+                а $t_1 \geq h$.
+    \end{Th}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Точные формулы для вероятности переобучения}
+    \begin{itemize}
+        \item{Множество орбит как монотонных, так и унимодальных сеток,
+        индексированно диаграммами Юнга $Y_{*}^{h, D}$.}
+    \end{itemize}
+    \begin{Th}[$Q_\mu(\epsilon, A)$ для $h$-мерной монотонной сетки]
+        \[
+            Q_\mu(\epsilon, A) = \sum_{\lambda \in Y_{*}^{h, D}}
+                                 \sum_{\substack{\vec t \geq \lambda, \\\|\vec t\| \leq D}}
+                                 \frac {|S_h \lambda|} 
+                                 {\prod_j (t_j + 1)}
+                                 %{T(\vec t)}
+                                 \frac{C_{L'}^{\ell'}}{C_L^\ell}
+                                 H_{L'}^{\ell', m}(s_0),
+        \]
+    \end{Th}
+    \begin{Th}[$Q_\mu(\epsilon, A)$ для $h$-мерной унимодальной сетки]
+        \[
+            Q_\mu(\epsilon, A) = \sum_{\lambda \in Y_{*}^{h, D}}
+                                 \sum_{\substack{\vec  t   \geq \lambda, \\\|\vec  t  \| \leq D}}
+                                 \sum_{\substack{\vec {t'} \geq 0,       \\\|\vec {t'}\| \leq D}}
+                                 \frac {|S_h \lambda| \cdot 2^{|\lambda > 0|}} 
+                                 {\prod_j (t_j + t'_j + 1)}
+                                 %{T(\vec t, \vec {t'})}
+                                 \frac{C_{L'}^{\ell'}}{C_L^\ell}
+                                 H_{L'}^{\ell', m}(s_0),
+        \]
+    \end{Th}
+\end{frame}
+
+%\begin{frame}
+%    \frametitle{Численные результаты - сравнение оценок}
+%    \begin{figure}[t]
+%        \centering {
+%            \includegraphics[width=110mm]{frey_monot_legend.eps}
+%            \vskip-2ex
+%            \caption{$L=100$, $\ell=60$, $D=40$, $m=20$.}
+%        }
+%    \end{figure}
+%\end{frame}
+
+
+%\begin{frame}
+%    \frametitle{Численные результаты - сравнение оценок}
+%    \begin{figure}[t]
+%        \centering {
+%            \includegraphics[width=110mm]{frey_unit_legend.eps}
+%            \vskip-2ex
+%            \caption{$L=100$, $\ell=60$, $p=10$, $m=20$.}
+%        }
+%    \end{figure}
+%\end{frame}
+
+\begin{frame}
+\frametitle{Сравнение сеток и связки монотонных цепочек}
+\begin{figure}[p]
+    \centering
+    \includegraphics[height=42mm]{netcomparison_D5_color_rastr.eps}
+    \vspace{-0.4cm}
+    \caption{Сравнение при разных $\epsilon$. $D=5$, $m = 5$, $L = 50$, $\ell = 30$.}
+%    \label{fig:netcomp_eps}
+    \vspace{-0.4cm}
+    \begin {multicols}{3}
+    \centering
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h12_color.eps}
+    \hfill
+    \medskip
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h24_color.eps}
+    \hfill
+    \medskip
+    \hfill
+    \includegraphics[width=32mm,height=20mm]{netcomparison_h36_color.eps}
+    \hfill
+    \end {multicols}
+    \vspace{-0.5cm}
+    \caption{Сравнение при разных D, в размерностях $H=1(2)$, $H=2(4)$ и $H=4(6)$. $\epsilon = 0.04$, $m = 5$, $L = 50$, $\ell = 30$.}
+%    \label{fig:netcomp_h}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Точные формулы для вероятности переобучения}
+
+\begin{Th}[Полный слой $A_m$ алгоритмов с $m$ ошибками]
+\[
+    Q_\mu(\epsilon, A)
+    =
+    \bigl[
+        \epsilon k \leq m \leq L - \epsilon \ell
+    \bigr].
+\]
+\end{Th}
+
+\begin{Th}[Полный куб алгоритмов $A = \{0, 1\}^L$]
+\[
+    Q_\mu(\epsilon, A) =
+    \frac 1{2^k}
+    \sum_{m = \lceil \epsilon k \rceil}^k
+    C_k^m.
+\]
+\end{Th}
+
+\begin{Th}[Сечение $B_r(a_0) \cap A_m$ шара центральным слоем]
+\[
+    Q_\mu(\epsilon, A)
+    =
+    H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor),
+\]
+где $s_d(\epsilon) = \frac \ell L (m - \epsilon k)$,\\
+$H_{L}^{\ell, m}(s)$ "--- функция гипергеометрического распределения.
+\end{Th}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Точные формулы для вероятности переобучения}
+
+\begin{Th}[Шар алгоритмов]
+Пусть $A = B_r(a_0)$ "--- шар алгоритмов, $m = n(a_0, \XX)$, $r \leq \min(m, L-m)$.
+Тогда вероятность переобучения рандомизированного метода минимизации
+эмпирического риска записывается в виде
+\[
+    Q_\mu(\epsilon, A)
+    =
+    \sum_{i=0}^{r}
+        h_L^{\ell, m}(i)
+        \frac {
+            \sum \limits_{p=0}^{r - i}
+            \sum \limits_{q = q_0}^{r-i-p}
+            C_{m-i}^p C_{k-(m-i)}^q
+        } {
+            \sum \limits_{p=0}^{r-i}C_k^p
+        } +
+    \sum_{i=r + 1}^{\lfloor s'_d(\epsilon) \rfloor}
+        h_L^{\ell, m}(i),
+\]
+где
+$q_0 = \max(\lceil \epsilon k + i + p - m \rceil, 0)$,
+$s'_d(\epsilon) = \frac {\ell}{L} (m - \epsilon k ) + \frac{r k}{L}$,
+$h_L^{\ell, m}(i) = \frac{C_m^i C_{L-m}^{\ell - i}}{C_L^\ell}$.
+\end{Th}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Результаты, выносимые на защиту}
+    \begin{enumerate}
+        \item Предложен рандомизированный метод минимизации эмпирического риска;
+        \item Разработан новый теоретико-групповой метод вывода оценок для вероятности переобучения;
+        \item Получены точные оценки вероятности переобучения для:
+        \begin{itemize}
+            \item Пучка монотонных цепочек;
+            \item Полного слоя, полного куба алгоритмов;
+            %\item Шара и сечения шара центральным слоем;
+            \item Монотонных и унимодальных сеток;
+        \end{itemize}
+        \item Экспериментально показано, что в широком диапазоне параметров вероятность переобучения
+        связки монотонных цепочек не превосходит вероятности переобучения многомерных монотонных и унимодальных сеток.
+    \end{enumerate}
+
+    %Направления дальнейших исследований:
+    %\begin{itemize}
+    %    \item Применение метода для множества алгоритмов, построенного по принципу кодов, исправляющих ошибки;
+    %    \item Универсальные верхних оценок вероятности переобучения;
+    %    \item Оценка вероятности переобучения для реальных задач.
+    %\end{itemize}
+
+\end{frame}
+
+
+\end{document} 

@@ -1,0 +1,105 @@
+==== Единственное правило проекта - запускать CVT.m перед каждым коммитом в SVM. CVT = Check-in Verification Tests. ====
+(перед первым запуском тестов нужно зайти в папку Tools и вызвать svnfreepath для папок Common, Common-Tests, Tools, Tools-Tests).
+
+1. Полезные штуки:
+	а) циклическая очередь с автоматическим выделением памяти - Common\Collections\Queue*
+	б) вектор (аналог std::vector и C# List) - Common\Collections\Vector
+2. Эффективная работа с бинарной матрицей ошибок - Common\Collections\Algset
+	а) упаковка матрицы ошибок в 64-битный битвектор (для экономии памяти; todo: сделать упаковку отключаемой!)
+	б) матрица ошибок поддерживает эффективную операцию вставки (без перевыделения памяти)
+	в) матрица поддерживается в лексикографически-упорядоченном виде, что позволяет эффективно проверять наличие алгоритма в семействе (для борьбы с дубликатами).
+	   Пункты б) и в) не противорячат друг другу - см. описание объекта Common\Collections\SortedMatrix (ниже по тексту)
+	г) Объект Common\Collections\Edges для хранения ребер графа Хассе (с сохранением ссылок в обе стороны: от детей к потомкам и от потомков к родителям)
+3. Построение графа Хассе --- alfrey\Algorithms\BuildHasseGraph.
+4. Вычисление вероятности переобучения методом монте-карло --- Common\Algorithms\CalcOverfitting, и по графу Хассе --- Common\Algorithms\CalcQEpsHasse.
+5. Простенькая библиотечка для работы с логическими закономерностями 
+	а) Загрузка UCI задач - Common\LogicPro\LaodTask (LoadTasks)
+	б) Градуирование признаков Common\LogicPro\Calibrate
+	в) Построение логических закономерностей Common\LogicPro\RuleSetGeneratorTEMP
+	г) Вычисление покрытия правил и их информативности Common\LogicPro\CalcRulesCoverage, HInfo (гипергеометрический критерий), PNpn.
+	д) Подвыборка со стратификацией (сохранение баланса классов) Common\LogicPro\SplitTask
+	
+	(!) ВНИМАНИЕ (!)   
+	Правила сохраняют внутри себя индексы термов (из входного массива термов).
+	Термы сохраняют индексы признаков.
+		terms = Calibrate(task)
+		rules = RuleSetGeneratorTEMP(task, terms)	
+	Про это нужно помнить. Например, иногда хочется ограничить генератор правил заданым набором признаков. Первая мысль - удалить лишние термы из terms. Дальше нужно действовать аккуратно. Как только возникло несколько мешков термов - нужно помнить, какие мешки правил получены от каких мешков термов.
+
+Измерения различных матриц:
+	LogicPro:   coverage(i, j) - ошибка правила i на объекте j
+	Collection: rawalgset(i, j) - ошибка алгоритма i на объекте j
+
+Подробности
+1. VectorCreate, VectorAdd, VectorContains, VectorTrim
+   Аналог std::vector из C++, или List<T> из C#.
+   Работают со структурой данных со следующими полями:
+	vector.Data
+	vector.Count
+  Пример использования:
+  	vector = VectorCreate();
+  	vector = VectorAdd(vector, [1 2 3]);
+  	vector = VectorAdd(vector, [3 4 5]);
+  Данный пример показывает, что элементами vector могут быть как не только скаляры, но и горизонтально-ориентированные массивы матлаб. 
+  Это позволяет использовать вектор для хранения бинарной матрицы ошибок, в которой вектора ошибок каждого алгоритма расположены горизонтально. Добавление алгоритмов соответствует добавлению строк в матрицу vector.Data.
+  vector.Count содержит количество использованных ячеек вектора. Оставшая часть вектора --- т.е. vector.Data(vector.Count + 1, end, :) --- заполнена нулями.
+  Операция VectorContains выполняется за O(N) - линейным просмотром вектора.
+  Операция VectorTrim освобождает неиспользованную часть вектора.
+
+2. SortedMatrixCreate, SortedMatrixAdd, SortedMatrixContains
+  Реализована с помощью структуры типа Vector. В дополнении к ней содержит поля Idx, которое вновь является структурой типа Vector. Данное поле Idx содержит упорядочивающую перестановку:
+  sortedMatrix.Data(sortedMatrix.Idx.Data(1), :) < sortedMatrix.Data(sortedMatrix.Idx.Data(2), :) < ... < sortedMatrix.Data(sortedMatrix.Idx.Data(sortedMatrix.count), :);
+  В данном случае под < подразумевается лексикографическое сравнение. 
+  Матрица содержит только различные элементы. SortedMatrixAdd игнорирует элемент, если он уже присутствует в матрице.
+  SortedMatrixContains использует операцию бинарного поиска, т.е. работает за логарифмическое время.
+  
+  (!) ВНИМАНИЕ (!) 
+  [contains, index] = SortedMatrixContains(sortedMatrix, key) нетривиально возвращает значение index.
+  index - это ранг, т.е. порядковое место в отсортированном line в отсортированном массиве.
+  Допустим, contains = true. Тогда верно следующее:    key == sortedMatrix.Data(sortedMatrix.Idx(index), 1:length(key))
+  
+  Замечание.
+  SortedMatrix умеет работать по принципу C#:Dictionary<int[], int[]>. То есть каждой "строке матрицы" можно приписать вектор значений.
+  При хранении ключ конкатенируется со значением, и хранятся в sortedMatrix.Data. 
+  Важно, что операция SortedMatrixCountains(key) ищет key среди sortedMatrix.Data(1:length(key), :).
+ 
+3. AlgsetCreate, AlgsetCountains, AlgsetGet.
+  Данные класс - очень тонкая обертка над SortedMatrix. Единственное дополнение - упаковка бинарных векторов с помощью методов PackLogicals и UnpackLogicals.
+  Используйте algI = AlgsetGet(algset, i) для получение бинарного вектора ошибок из матрицы.
+  (!) ВНИМАНИЕ (!) 
+  AlgsetContains имеет такую же особенность, что и SortedMatrixContains.
+  
+4. EdgesCreate, EdgesAdd, EdgesContains, EdgesRemove
+  Позволяет работать с графом Хассе. Хранятся только его рёбра:
+  	edges.Children{i}
+  	edges.Parents{i}
+  Оба cell-array индексированы числами от 1 до числа алгоритмов в семействе. В ячейках cell-array лежит вектор - список номеров дочерних / родительских алгоритмов.
+  Пример:
+  	edges = BuildHasseGraph(algset);
+  	child = edges.Children{10}(1);  	% посмотрим на первого ребенка у алгоритма номер 10.
+  	alg = AlgsetGet(algset, 10);
+  	childAlg = AlgsetGet(algset, child);
+  	assert(all(alg <= childAlg) & any(alg ~= childAlg)) % верно, что дочерний алгоритм монотонно-хуже чем исходный - его вектор ошибок включает в себя вектор ошибок исходного алгоритма.
+  	
+ 5. QueueCreate, QueuePush, QueuePop, QueueIsEmpty, QueueCount
+   Циклическая очередь, автоматически увеличивающая буфер при переполнении.
+   
+ 6. [algset_IC, edges_IC] = BuildInternalClosure[algset, edges]
+   Строит внутреннее замыкание множества алгоритмов. Новое множество обладает следующими свойствами:
+   a) algset_IC cодержит исходное множество algset в качестве подмножества
+   b) для любой тройки алгоритмов (a, b, c), такой что (a,b) и (a,c) - ребра в edges_IC, следует что пересечение векторов ошибок алгоритмов b и c даёт алгоритм a. 
+      Другими словами, множество ошибок, соответствующее ребрам графа хассе algset_IC, не пересекаются.
+   Промерить множество на внутреннюю замкнутость можно с помощью функции IsInternalClosure(algset, edges); Утверждается, что IsInternalClosure(BuildInternalClosure(algset, edges)) всегда true.
+ 
+ 7. CalcOverfitting - вычисление вероятности переобучения пессимистического метода минимизации эмпирического риска методом монтекарло.
+    Пример использования см. CommonTests\CalcOverfittingTests
+ 
+ 8. RawAlgSetRemoveDuplicates
+    	RawAlgSet - это просто бинарная матрица ошибок (в отличии от algset - который является SortedMatrix)
+    	RawAlgSetRemoveDuplicates cортирует и удаляет повторяющиеся алгоритмы из RawAlgSet.
+ 
+ 9. SAU (CreateSAU, CalcSAU)
+    Позволяет вычислять количество векторов с целочисленными координатами с суммой координат $u$ и по-координатно не превосходящих вектора $v$
+    $SAU(u, \vec v) = #{\vec w \colon |\vec w| = u, \vec w \leq \vec v}$.
+    Вычисление рекурсивное, но все промежуточные результаты сохраняются в виде SortedMatrix.
+    

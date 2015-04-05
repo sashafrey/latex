@@ -1,0 +1,722 @@
+\documentclass[unicode,14pt]{extarticle}
+\usepackage[cp1251]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage[russian]{babel}
+\usepackage{theorem}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{indentfirst}
+
+% Параметры страницы
+\textheight=24cm
+\textwidth=16cm
+\oddsidemargin=0mm
+\topmargin=-1cm
+\parindent=24pt
+\footnotesep=3ex
+%\flushbottom
+\raggedbottom
+\tolerance=3000
+\renewcommand{\baselinestretch}{1.19} %для печати с большим интервалом
+
+% Абзацный отступ и пропорциональные ему отступы
+\parindent=24pt
+%\mathindent=24pt
+
+\makeatletter
+\theorembodyfont{\rmfamily\slshape}
+\theoremstyle{plain}
+% Шаманские притоптывания, чтобы ставить точку после номера теоремы
+\gdef\th@plain{\normalfont
+    \def\@begintheorem##1##2{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2.\;]}%
+    \def\@opargbegintheorem##1##2##3{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2 (##3).\;]}%
+}
+\newtheorem{vkProblem}{Задача}%[section]
+\newtheorem{vkAxiom}{Аксиома}%[section]
+\newtheorem{vkTheorem}{Теорема}%[section]
+\newtheorem{vkLemma}[vkTheorem]{Лемма}
+\newtheorem{vkHyp}{Гипотеза}%[section]
+\newtheorem{vkCorr}{Следствие}
+\newtheorem{vkDef}{Определение}%[section]
+\theorembodyfont{\rmfamily}
+\newtheorem{vkExample}{Пример}%[section]
+\newtheorem{vkRemark}{Замечание}%[section]
+\newenvironment{vkProof}[1][.\;]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\hfill$\scriptstyle\blacksquare$\par\medskip}
+%\newcommand{\proof}[1][Доказательство.]{\smallskip\noindent{\em #1}}
+%\def\endproof{\hfill\par\medskip}
+%\renewcommand{\refname}{Литература}
+
+% Переопределение колонтитулов
+\def\MYheadfoot{
+\renewcommand{\@oddfoot}{}
+\renewcommand{\@oddhead}{\hfil-- \thepage\ --\hfil}
+\renewcommand{\@evenfoot}{}
+\renewcommand{\@evenhead}{\hfil-- \thepage\ --\hfil}
+} \MYheadfoot
+
+% Нумерацию переподчиним разделам
+\@addtoreset{equation}{section}
+%\def\theequation{\thesection.\arabic{equation}}
+
+% Оформление плавающих иллюстраций
+\def\@caption@left@right@skip{\leftskip=24pt\rightskip=24pt}
+\def\nocaptionskips{\def\@caption@left@right@skip{}}
+\renewcommand\@makecaption[2]{%
+    \vskip\abovecaptionskip
+    \sbox\@tempboxa{\footnotesize\textbf{#1.} #2}%
+    \ifdim\wd\@tempboxa >\hsize
+        {\@caption@left@right@skip\footnotesize\textbf{#1.} #2\par}
+    \else
+        \global\@minipagefalse
+        \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+}
+
+% Команды для формул
+\newcommand{\XX}{\mathbb{X}}
+%\newcommand{\XX}{U}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+%\newcommand{\vA}{A}
+%\newcommand{\va}{\tilde a}
+\renewcommand{\AA}{A}
+%\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\bv}{\vec}
+
+% Команды для текста
+\renewcommand{\em}{\it}
+\newcommand{\TODO}[1]{{%
+    \color{red}\small{#1}%
+    \marginpar{\raisebox{1ex}{\color{red}ToDo}}
+}}
+%\renewcommand{\TODO}[1]{}
+
+% Скромная нумерация
+\newcounter{vkItem}
+\renewcommand{\thevkItem}{\arabic{vkItem}}
+\newenvironment{vkItemize}{\setcounter{vkItem}{0}}{}
+\newcommand{\vkItem}{\par\refstepcounter{vkItem}\thevkItem.\enspace}%  \hspace{\me}
+
+% Перенос знака операции на следующую строку
+\newcommand\brop[1]{#1\discretionary{}{\hbox{$#1$}}{}}
+
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Точные оценки вероятности переобучения}
+\author{К.\,В.\,Воронцов ({\tt www.ccas.ru/voron})}
+%\date{Computing Centre RAS, Vavilov st. 40, 119333 Moscow, Russia}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+Получение точных оценок обобщающей способности
+остаётся открытой проблемой в~теории статистического обучения, % (statistical learning theory).
+начиная с~работ В.\,Н.\,Вапника и~А.\,Я.\,Червоненкиса~\cite{vapnik71uniform,vapnik74rus}.
+Попытки уточнения оценок предпринимались многократно, см.~обзоры~%
+\cite{vayatis99distributiondependent,voron04mpc},
+однако лучшие из известных оценок всё ещё сильно завышены~%
+\cite{herbrich02algorithmic,langford02quantitatively}
+и~не~всегда подходят для управления процессом обучения.
+Остаётся открытым вопрос,
+не~связано~ли переобучение с~какими-то более тонкими и~пока не~изученными свойствами
+методов статистического обучения.
+В~данной работе развивается комбинаторный подход,
+в~рамках которого получены \emph{точные} оценки вероятности переобучения
+для ряда специальных случаев.
+
+Пусть задано конечное множество объектов~$\XX = \{x_1,\ldots,x_L\}$,
+называемое \emph{генеральной выборкой},
+и~множество~$\AA$, элементы которого называются \emph{алгоритмами}.
+Существует бинарная функция $I\colon \AA\times \XX\to \{0,1\}$,
+называемая \emph{индикатором ошибки}.
+Если $I(a,x)=1$, то~говорят, что алгоритм~$a$ допускает ошибку на объекте~$x$.
+\emph{Вектором ошибок} алгоритма~$a$ будем называть
+$L$-мерный бинарный вектор
+$\bigl( I(a,x_i) \bigr){}_{i=1}^L$.
+%Поскольку в~дальнейшем нас будут интересовать не~сами алгоритмы,
+%а,~главным образом, их~векторы ошибок,
+%для краткости будем использовать обозначение $a$~вместо~$(a)_\XX$
+%и~говорить <<вектор~$a$>>.
+Числом ошибок алгоритма~$a$ на выборке~$X\subseteq \XX$ называется величина
+\[
+    n(a,X) = \sum_{x\in X} I(a,x),
+\]
+а~\emph{частотой ошибок} или \emph{эмпирическим риском}
+алгоритма~$a$ на выборке~$X$ "--- величина $\nu(a,X) = \frac1{|X|} n(a,X)$.
+
+Зафиксируем натуральное число~$\ell<L$.
+Обозначим через~$\XXell$ множество всех $\ell$-элементных подмножеств генеральной выборки~$\XX$.
+Очевидно, его мощность равна $C_L^\ell$.
+
+\emph{Методом обучения} называется отображение $\mu\colon \XXell \to \AA$,
+которое произвольной \emph{обучающей выборке} $X\in \XXell$
+ставит в соответствие некоторый алгоритм~$a = \mu(X)$ из~$\AA$.
+Метод обучения~$\mu$ называется методом \emph{минимизации эмпирического риска}, если
+\begin{equation}
+\label{eqERM}
+    \mu(X) = \arg\min\limits_{a\in \AA} n(a,X).
+\end{equation}
+
+\emph{Уклонением частот} ошибок алгоритма~$a$
+на выборках~$X$ и ${\X = \XX {\setminus} X}$
+называется разность $\delta(a,X) = \nu(a,\X) - \nu(a,X)$.
+
+\emph{Переобученностью} метода~$\mu$ на~выборке~$X$
+будем называть уклонение частот ошибок алгоритма~$a = \mu(X)$:
+\[
+    \delta_\mu(X)
+    \equiv
+    \delta\bigl( \mu(X),X \bigr)
+    =
+    \nu\bigl( \mu(X),\X \bigr) -
+    \nu\bigl( \mu(X), X \bigr).
+\]
+
+Будем говорить, что
+метод~$\mu$ \emph{переобучен} на выборке~$X$,
+если ${\delta_\mu(X) \geq \eps}$
+для заданного значения $\eps\in(0,1)$. %"--- параметр, называемый \emph{порогом переобучения}.
+
+Придерживаясь слабых вероятностных предположений~\cite{voron08pria-eng},
+будем полагать, что все $C_L^\ell$ разбиений множества объектов $\XX$
+на~наблюдаемую обучающую выборку~$X$ длины~$\ell$
+и~скрытую контрольную выборку~$\X$ длины~$k = L-\ell$
+реализуются с~равной вероятностью.
+Целью работы является получение точных оценок \emph{вероятности переобучения}
+для метода минимизации эмпирического риска~$\mu$:
+\begin{align}
+\label{eqMainProblem}
+    Q_\eps
+    \equiv
+    \Pr[ \delta_\mu(X) \geq \eps ]
+    =
+    \frac 1{C_L^\ell} \sum_{X\in\XXell} [ \delta_\mu(X) \geq \eps ],
+%    =
+%    \frac 1{C_L^\ell} \sum_{X\in\XXell}
+%    \bigl[ \delta_\mu(X) \geq \eps \bigr].
+\end{align}
+
+Здесь и~далее логическое выражение в~квадратных скобках
+означает, соответственно,
+$[\textit{истина}]=1$, $[\textit{ложь}]=0$.
+%(нотация Айверсона~\cite{knuth98concrete})
+
+Для фиксированного алгоритма~$a$,
+допускающего на~генеральной выборке $m=n(a,\XX)$~ошибок,
+вероятность получить ровно $s$~ошибок на подвыборке~$X$
+описывается {гипергеометрической функцией вероятности}:
+\[
+    \Prbig[ n(a,X)=s ]
+    =
+    \hyper{L}{m}{\ell}{s}
+    =
+    {C_m^s C_{L-m}^{\ell-s}} / {C_L^\ell},
+\]
+где $m\in\{0,\ldots,L\}$;\; аргумент~$s$ принимает целочисленные значения
+от $s_0\brop= \max\{0,m-k\}$ до~$s_1 = \min\{m,\ell\}$.
+При всех остальных целых~$m$~и~$s$
+договоримся доопределять
+биномиальные коэффициенты $C_m^s$ и~функцию $\hyper{L}{m}{\ell}{s}$
+нулём.
+Вероятность большого уклонения частот ошибок алгоритма~$a$ описывается
+гипергеометрической функцией распределения:
+\begin{equation}
+\label{eqOneAlg}
+    \Prbig[ \delta(a,X) \geq \eps ]
+    =
+    \Prbig[ n(a,X) \leq s ]
+    =
+    \Hyper{L}{m}{\ell}{s}
+    =
+    \sum\limits_{s'=s_0}^{\lfloor s \rfloor}
+    \hyper{L}{m}{\ell}{s'},
+\end{equation}
+где
+$s = {\bigl\lfloor \tfrac{\ell}{L} (m-\eps k) \bigr\rfloor }$
+есть наибольшее значение $n(a,X)$, при котором
+$\delta(a,X) =\tfrac{m-s}{k}-\tfrac{s}{\ell} \geq \eps$.
+При~$\ell,k \to\infty$ правая часть~\eqref{eqOneAlg} стремится к~нулю
+и~является точной оценкой скорости сходимости частот в~двух выборках.
+
+%Заметим, что
+%$\delta(a,X) =\tfrac{m-s}{k}-\tfrac{s}{\ell} \geq \eps$
+%равносильно
+%$s\leq \tfrac{\ell}{L} (m-\eps k)$,
+%следовательно,
+%${\bigl\lfloor \tfrac{\ell}{L} (m-\eps k) \bigr\rfloor }$
+%есть наибольшее число ошибок алгоритма~$a$ на~выборке~$X$, %$s = n(a,X)$,
+%при котором уклонение частот $\delta(a,X)$ превышает~$\eps$.
+%При~$\ell,k \to\infty$ правая часть~\eqref{eqOneAlg} стремится к~нулю
+%и~является точным выражением скорости сходимости частот в~двух выборках.
+
+Классическая оценка Вапника"=Червоненкиса~\cite{vapnik98stat}
+также легко переформулируется при слабых вероятностных предположениях~\cite{voron04mpc,voron08pria-eng}:
+\begin{equation}
+\label{eq:VCbound}
+    Q_\eps
+%    =
+%    \Prbig[ \delta_\mu(X) \geq \eps ]
+    \leq
+    \Delta \max_{m=0,\ldots,L}\Hyper{L}{m}{\ell}{ \tfrac{\ell}{L} (m-\eps k) },
+\end{equation}
+где $\Delta$ "--- \emph{коэффициент разнообразия} множества~$\AA$, равный
+%\emph{коэффициент разнообразия} (shattering coefficient) множества алгоритмов~$\AA$, равный
+числу различных векторов ошибок, порождаемых всевозможными алгоритмами $a$~из~$\AA$.
+Экспериментальный анализ основных причин завышенности оценки~\eqref{eq:VCbound} показывает, что
+вероятность переобучения существенно зависит
+не~только от~числа различных векторов ошибок,
+но~ещё и~от~степени их~различности~\cite{voron08pria-eng}.
+Для получения более точных оценок необходимо учитывать
+эффекты расслоения и~сходства алгоритмов множества~$A$.
+
+\emph{Эффект расслоения}.
+В~практических ситуациях множество~$\AA$,
+как правило, \emph{расслаивается} по~частоте ошибок $\nu(a,\XX)$,
+причём основная масса алгоритмов концентрируется в~области наихудших частот (около~$50\%$).
+Лишь малая доля алгоритмов имеют высокие шансы быть выбранными
+методом минимизации эмпирического риска.
+%Основная масса алгоритмов фактически остаётся не~задействованной.
+Эксперименты~\cite{voron08pria-eng} на~реальных задачах классификации показывают, что
+пренебрежение эффектом расслоения может ухудшать оценку~$Q_\eps$
+в~$10^2$--$10^5$~раз.
+
+\emph{Эффект сходства}.
+Множество~$\AA$ может содержать большое число пар схожих алгоритмов.
+В~частности, большинство применяемых на~практике алгоритмов классификации
+имеют непрерывную по параметрам разделяющую поверхность,
+следовательно, обладают свойством связности~\cite{sill98phd}.
+Множество алгоритмов~$\AA$ называется \emph{связным} относительно выборки~$\XX$, если
+для любого алгоритма $a\in\AA$ найдётся другой алгоритм $a'\in\AA$,
+такой, что их векторы ошибок отличаются только на~одном объекте.
+Эксперименты~\cite{voron08pria-eng} показывают, что
+пренебрежение сходством алгоритмов может ухудшать оценку~$Q_\eps$ в~$10^3$--$10^4$~раз.
+
+В~экспериментах с~цепочками алгоритмов~\cite{voron08pria-conf-eng}
+вероятность переобучения существенно понижается только при
+одновременном наличии свойств расслоения и~связности.
+Пренебрежение одним из этих свойств в~оценках~$Q_\eps$
+может сводить на~нет все усилия, направленные на~учёт второго.
+Известные попытки учесть их по~отдельности
+не~дают радикального улучшения точности оценок~%
+\cite{herbrich02algorithmic,langford02quantitatively,bax97similar,sill98phd}.
+%не позволяют вплотную приблизиться к~вероятностям переобучения, наблюдаемым в~экспериментах.
+
+В~данной работе приводятся точные оценки вероятности переобучения,
+основанные на~предположении, что для каждого алгоритма $a\in\AA$
+можно в~явном виде записать условия, при которых $\mu(X)=a$.
+Будем полагать, что $A$ "--- конечное множество,
+и~все алгоритмы имеют попарно различные векторы ошибок.
+
+\begin{vkHyp}
+\label{hyp1}
+    Пусть множество~$\AA$, выборка~$\XX$ и~метод~$\mu$ таковы, что
+    для каждого алгоритма $a\in \AA$
+    можно указать пару подмножеств
+    ${X_a \subset \XX}$ и~${X'_a\subset \XX}$
+    такую, что для любого $X\in \XXell$
+    \[
+        {\mu(X) = a}
+        \;\Leftrightarrow\;
+        (X_{a}\subseteq  X) \text{ и } (X'_{a}\subseteq \X).
+    \]
+\end{vkHyp}
+
+Объекты из~$X_a$ будем называть \emph{производящими} (эталонными),
+объекты из~$X'_a$ "--- \emph{разрушающими} (шумовыми),
+а~остальные объекты "--- \emph{нейтральными} для алгоритма~$a$.
+Для каждого~$a\in \AA$ введём обозначения:
+
+$L_a = L - |X_a| - |X'_a|$ "---
+число нейтральных объектов;\;
+
+$\ell_a = \ell - |X_a|$ "---
+число нейтральных обучающих объектов;\;
+
+$m_a = n(a,\XX) - n(a,X_a) - n(a,X'_a)$ "---
+число ошибок на нейтральных объектах;\;
+
+$s_a(\eps) = \tfrac\ell L \bigl( n(a,\XX)-\eps k \bigr) - n(a,X_a)$ "---
+наибольшее число ошибок на~нейтральных обучающих объектах,
+при котором
+$\delta(a,X) \geq \eps$.
+
+\begin{vkTheorem}
+\label{th1}
+    Если справедлива гипотеза~\ref{hyp1}, то для любого $\eps\in(0,1)$
+    \[
+        Q_\eps
+        =
+        \sum_{a\in \AA} P_a \Hyper{L_a}{m_a}{\ell_a}{s_a(\eps)};
+        \quad
+        P_a
+        =
+        \Prbig[ \mu(X){=}a ] = \frac{C_{L_a}^{\ell_a}}{C_{L}^{\ell}}.
+    \]
+\end{vkTheorem}
+
+Гипотеза~\ref{hyp1} и~теорема~\ref{th1} допускают следующее обобщение.
+
+\begin{vkHyp}
+\label{hyp2}
+    Пусть множество~$\AA$, выборка~$\XX$ и~метод~$\mu$ таковы, что
+    для каждого алгоритма $a\in \AA$ можно указать
+    конечное множество индексов~$V_a$,
+    и~для каждого индекса $v\in V_a$ такие
+    подмножества объектов $X_{av}\subset\XX$,\; $X'_{av}\subset\XX$
+    и~коэффициенты $c_{av}\in\RR$,
+    что для любого $X\in \XXell$
+    \[
+        {\mu(X) = a}
+        \;\Leftrightarrow\;
+        \sum_{v\in V_a}
+            c_{av}
+            \bigl[  X_{av}\subseteq  X \bigr]
+            \bigl[ X'_{av}\subseteq \X \bigr]
+        = 1.
+    \]
+\end{vkHyp}
+
+В~частности, если все $c_{av}=1$, то~данное условие означает, что
+один и~тот же алгоритм~$a$ оказывается результатом обучения
+при нескольких различных способах выделения производящих и~разрушающих объектов.
+
+Введём для каждого $a\in\AA$ и~$v\in V_a$ следующие обозначения:
+\begin{align*}
+    L_{av} &= L - |X_{av}| - |X'_{av}|;
+\\
+    \ell_{av} &= \ell - |X_{av}|;
+\\
+    m_{av} &= n(a,\XX) - n(a,X_{av}) - n(a,X'_{av});
+\\
+    s_{av}(\eps) &= \tfrac\ell L \bigl( n(a,\XX)-\eps k \bigr) - n(a,X_{av}).
+\end{align*}
+
+\begin{vkTheorem}
+\label{th2}
+    Если гипотеза~\ref{hyp2} справедлива,
+    то~вероятность получить в~результате обучения алгоритм $a$ равна
+    \[
+        \Prbig[ \mu(X){=}a ]
+        =
+        \sum_{v\in V_a}
+        c_{av} P_{av};
+        \qquad
+        P_{av}
+        =
+        \frac{C_{L_{av}}^{\ell_{av}}}{C_{L}^{\ell}};
+    \]
+    вероятность переобучения равна
+    \[
+        Q_\eps
+        =
+        \sum_{a\in \AA}
+        \sum_{v\in V_a}
+            c_{av} P_{av}
+            \Hyper{L_{av}}{m_{av}}{\ell_{av}}{s_{av}(\eps)}.
+    \]
+\end{vkTheorem}
+
+В~отличие от гипотезы~\ref{hyp1},
+гипотеза~\ref{hyp2} верна при весьма слабых предположениях
+о~выборке~$\XX$, множестве~$\AA$ и~методе~$\mu$.
+
+\begin{vkTheorem}
+\label{th3}
+    Пусть ${\AA = \{a_1,\ldots,a_D\}}$
+    и~все алгоритмы имеют попарно различные векторы ошибок.
+    Пусть $\mu$ "--- метод минимизации эмпирического риска,
+    причём если минимум в~\eqref{eqERM}
+    достигается на~нескольких алгоритмах из~$A$,
+    %то~реализуется <<худший случай>>
+    то~метод~$\mu$ выбирает алгоритм с~б\'ольшим $n(a,\XX)$;
+    \mbox{если~же} и~максимум $n(a,\XX)$ достигается на нескольких алгоритмах,
+    то~выбирается алгоритм с~меньшим номером.
+    Тогда
+    гипотеза~\ref{hyp2} справедлива.
+\end{vkTheorem}
+
+Далее предполагается, что метод~$\mu$ удовлетворяет условиям теоремы~\ref{th3},
+и~рассматриваются четыре частных случая,
+для которых с~помощью теорем~\ref{th1}~и~\ref{th2} получены
+точные оценки вероятности переобучения.
+
+Введём расстояние Хэмминга между векторами ошибок алгоритмов:
+\[
+    \rho(a,a') = \sum_{i=1}^L \bigl| I(a,x_i) - I(a',x_i) \bigr|,
+    \quad
+    \forall a,a' \in \AA.
+\]
+
+\begin{vkDef}
+    Множество алгоритмов $a_0,a_1,\ldots,a_D$
+    называется \emph{цепочкой}, если
+    $\rho(a_{d-1},a_{d})=1$,\; $d\brop=1,\ldots,D$.
+\end{vkDef}
+
+\begin{vkDef}
+    Цепочка алгоритмов $a_0,a_1,\ldots,a_D$
+    называется \emph{монотонной},
+    если $n(a_d,\XX) = m+d$ при некотором $m\geq 0$.
+    %Алгоритм~$a_0$ называется \emph{лучшим в~цепочке}.
+\end{vkDef}
+
+\begin{vkTheorem}
+\label{thMonotoneChain}
+    Пусть $a_0,a_1,\ldots,a_D$ "--- монотонная цепочка алгоритмов;\;
+    $n(a_0,\XX) = m$,\;
+    ${L\geq m+D}$.
+    Тогда в~случае $D\geq k$
+    \begin{align*}
+    &
+        Q_\eps =
+        \sum_{d=0}^k
+            P_d \Hyper{L-d-1}{m}{\ell-1}{s_d(\eps)};
+        \qquad
+            P_d = \frac{C_{L-d-1}^{\ell-1}}{C_L^{\ell}},\; d=0,\ldots,D;
+    \intertext{в~случае $D < k$}
+    &
+        Q_\eps =
+        \sum_{d=0}^{D-1}
+            P_d \Hyper{L-d-1}{m}{\ell-1}{s_d(\eps)}
+        \;+\;
+            P_D \Hyper{L-D}{m}{\ell}{s_d(\eps)};
+    \\&
+            P_d = \frac{C_{L-d-1}^{\ell-1}}{C_L^{\ell}},\; d=0,\ldots,D-1;
+        \qquad
+            P_D = \frac{C_{L-D}^{\ell}}{C_L^{\ell}},
+    \end{align*}
+    где $P_d = \Prob[ \mu(X){=}a_d \bigr]$,\;
+    $s_d(\eps) = \tfrac\ell L(m+d-\eps k)$.
+\end{vkTheorem}
+
+%Более реалистичной моделью однопараметрического связного множества алгоритмов является унимодальная цепочка.
+%Предполагается, что
+%число ошибок на полной выборке монотонно увеличивается
+%при отклонении значения параметра от~оптимума как в~б\'ольшую, так и~в~меньшую, сторону.
+
+\begin{vkDef}
+    Множество алгоритмов
+    $a_0,a_1,\ldots,a_D,a'_1,\ldots,a'_{D'}$
+    называется \emph{унимодальной цепочкой}, если
+    \emph{левая ветвь} $a_0,a_1,\ldots,a_D$
+    и~\emph{правая ветвь} $a_0,a'_1,\ldots,a'_{D'}$
+    являются монотонными цепочками.
+    %Алгоритм~$a_0$ называется \emph{лучшим в~унимодальной цепочке}.
+\end{vkDef}
+
+Будем полагать, что если минимум~\eqref{eqERM} достигается на~нескольких алгоритмах
+с~одинаковым числом ошибок как на обучающей, так и~на генеральной выборке,
+то~метод~$\mu$ выбирает алгоритм из~левой ветви.
+
+\begin{vkTheorem}
+\label{thUnimodalChain}
+    Пусть $a_0,a_1,\ldots,a_D,a'_1,\ldots,a'_{D}$ "---
+    унимодальная цепочка алгоритмов,
+    ${k \leq D}$,\;
+    $m = n(a_0,\XX)$,\;
+    ${2D+m \leq L}$.
+    Тогда вероятность получить каждый из~алгоритмов есть
+    \begin{align*}
+    &
+        P_0
+        = \Prbig[\mu(X){=}a_0]
+        = \frac{C_{L-2}^{\ell-2}}{C_L^{\ell}};
+    \\&
+        P_d
+        = \Prbig[\mu(X){=}a_d]
+        = \frac{C_{L-d-1}^{\ell-1} - C_{L-2d-2}^{\ell-1}}{C_L^{\ell}},
+        \quad d=1,\ldots,D;
+    \\&
+        P'_d
+        = \Prbig[\mu(X){=}a'_d]
+        = \frac{C_{L-d-1}^{\ell-1} - C_{L-2d-1}^{\ell-1}}{C_L^{\ell}},
+        \quad d=1,\ldots,D;
+    \end{align*}
+    вероятность переобучения при
+    $s_d(\eps) = \tfrac\ell L(m+d-\eps k)$
+    выражается в~виде
+%        Q_\eps
+%        =
+%        \frac{C_{L-2}^{\ell-2}}{C_L^{\ell}}
+%        \Hyper{L-2}{m}{\ell-2}{s_0(\eps)}
+%        +
+%        \frac{C_{L-2}^{\ell-1}}{C_L^{\ell}}
+%        \Hyper{L-2}{m}{\ell-1}{s_1(\eps)}
+%        +
+%        \sum_{d=1}^k
+%        \frac{C_{L-d-1}^{\ell-1}}{C_L^{\ell}}
+%        \Hyper{L-d-1}{m}{\ell-1}{s_d(\eps)}.
+    \begin{multline*}
+        Q_\eps
+        =
+        \frac{C_{L-2}^{\ell-2}}{C_L^{\ell}}
+        \Hyper{L-2}{m}{\ell-2}{s_0(\eps)}
+        +
+        \sum_{d=1}^k\Biggl(
+            2\frac{C_{L-d-1}^{\ell-1}}{C_L^{\ell}}
+            \Hyper{L-d-1}{m}{\ell-1}{s_d(\eps)}
+            - {}
+    \\
+            {}-
+            \frac{C_{L-2d-2}^{\ell-1}}{C_L^{\ell}}
+            \Hyper{L-2d-2}{m}{\ell-1}{s_d(\eps)}
+            -
+            \frac{C_{L-2d-1}^{\ell-1}}{C_L^{\ell}}
+            \Hyper{L-2d-1}{m}{\ell-1}{s_d(\eps)}
+        \Biggr).
+    \end{multline*}
+\end{vkTheorem}
+
+%Следующий пример связного множество алгоритмов является <<экстремальным>> случаем,
+%когда алгоритмы максимально близки друг к~другу,
+%и~классические оценки наиболее завышены.
+
+\begin{vkDef}
+    Множество алгоритмов $a_0,a_1,\ldots,a_D$
+    называется \emph{единичной окрестностью} алгоритма~$a_0$,
+    если их векторы ошибок попарно различны,
+    $n(a_d,\XX) = n(a_0,\XX)+1$
+    и~$\rho(a_0,a_d)=1$,\; $d=1,\ldots,D$.
+    %Алгоритм~$a_0$ называется \emph{центром окрестности}.
+\end{vkDef}
+
+\begin{vkTheorem}
+\label{thUnitVicinity}
+    Пусть $a_0,a_1,\ldots,a_D$ "--- единичная окрестность алгоритма~$a_0$;\;
+    $m = n(a_0,\XX)$;\;
+    $L\geq m+D$.
+    Тогда
+    \begin{align*}
+    &
+        Q_\eps =
+        P_0 \Hyper{L-D}{m}{\ell-D}{\tfrac\ell L(m-\eps k)}
+        +
+        \sum_{d=1}^{D}
+            P_d \Hyper{L-d}{m}{\ell-d+1}{\tfrac\ell L(m+1-\eps k)};
+    \\&
+        P_0 = \frac{C_{L-D}^k}{C_L^k};
+        \quad
+        P_d = \frac{C_{L-d}^{k-1}}{C_L^k},\; d=1,\ldots,D;
+    \end{align*}
+    где $P_d$ "--- вероятность получить алгоритм~$a_d$ в~результате обучения.
+\end{vkTheorem}
+
+Последний частный случай "--- двухэлементное множество $\AA\brop=\{a_1,a_2\}$.
+Уже в~этом простейшем случае наблюдается как само явление переобучения,
+так и~эффекты расслоения и~сходства, снижающие вероятность переобучения~\cite{voron08pria-conf-eng}.
+
+\begin{vkTheorem}
+\label{thTwoAlg}
+    Пусть в~выборке~$\XX$ имеется
+    $m_0$, $m_1$ и $m_2$ объектов, на которых допускают ошибку, соответственно,
+    оба алгоритма, только~$a_1$, только~$a_2$.
+    Тогда
+    \begin{align*}
+        %\Prbig[\delta_\mu(X) \geq \eps]
+        Q_\eps
+        =
+    &
+        \sum_{s_0=0}^{m_0}
+        \sum_{s_1=0}^{m_1}
+        \sum_{s_2=0}^{m_2}
+        \frac
+            {C_{m_0}^{s_0} C_{m_1}^{s_1} C_{m_2}^{s_2} C_{L-m_0-m_1-m_2}^{\ell-s_0-s_1-s_2}}
+            {C_L^\ell}
+        \times{}
+    \notag\\
+        {} \times &
+        \Bigl(
+            \big[ s_1 \leq s_2 \bigl]
+            \big[ s_0+s_1 \leq \tfrac{\ell}{L}(m_0+m_1-\eps k) \bigl] + {}
+    \\[-1ex]
+        &\phantom{\Bigl(}\llap{${}+{}$}
+            \big[ s_1 > s_2 \bigl]
+            \big[ s_0+s_2 \leq \tfrac{\ell}{L}(m_0+m_2-\eps k) \bigl]
+        \Bigl).
+    \end{align*}
+\end{vkTheorem}
+
+Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+<<Алгебраические и~комбинаторные методы математической кибернетики
+и~информационные системы нового поколения>>.
+
+\clearpage\newpage
+%\def\BibUrl#1{\\{\def~{\char126}\small\tt\url{http://#1}}}
+\def\BibUrl#1.{}
+\bibliographystyle{gost71u}
+\bibliography{MachLearn}
+
+\newpage
+УДК 519.7:004.855.5
+
+\section*{Перевод названия, имени и~фамилии автора}
+Exact bounds of probability of overfitting
+
+Konstantin Vorontsov
+
+\section*{Данные об авторе}
+Воронцов Константин Вячеславович:
+
+Тел.:\,\verb|+7(916)333-71-69|, служебн.:\,\verb|+7(499)135-41-63|;
+
+Email: \verb|voron@forecsys.ru|;
+
+Учреждение Российской академии наук
+Вычислительный центр
+им.~А.~А.~Дородницына РАН.
+
+\newpage
+
+\section*{Реферат}
+
+\textbf{Точные оценки вероятности переобучения}
+
+\textit{К.\,В.\,Воронцов}
+
+    Предлагается новый подход к~оцениванию
+    обобщающей способности алгоритмов машинного обучения,
+    дающий точные оценки вероятности переобучения.
+    В~отличие от~большинства стандартных подходов,
+    он~не~опирается на~неравенство Буля, которое сильно завышено.
+    \mbox{Общая} оценка основана на~подсчёте
+    числа производящих и~разрушающих объектов для каждого алгоритма.
+    Это позволяет записать точную оценку вероятности получения
+    каждого из~алгоритмов в~результате обучения.
+    Рассматриваются четыре частных случая,
+    в~которых такой подсчёт удаётся выполнить аналитически:
+    монотонные и~унимодальные цепочки алгоритмов,
+    единичная окрестность оптимального алгоритма,
+    множество из~двух алгоритмов.
+    Во~всех этих случаях получены точные оценки вероятности переобучения
+    для метода минимизации эмпирического риска.
+
+\end{document}

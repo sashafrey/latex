@@ -1,0 +1,2 @@
+The last attribute is the class code 
+http://mldata.org/repository/data/viewslug/uci-20070111-optdigits/

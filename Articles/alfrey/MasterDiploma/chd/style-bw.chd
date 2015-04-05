@@ -1,0 +1,34 @@
+#DefColor 30= 190, 190, 168
+#DefColor 31= 210, 210, 172
+##DefFont title= Win: Arial Cyr, 7x22, B
+
+#DefStyle = panel.sty
+	#Slide.Background 7
+    #Background 7
+    #BorderColor 0
+    #GridColor 31
+    #Border 1
+	#IndentHoriz 1
+	#IndentVert 1
+	#ExtraX= 1
+	#ExtraY= 1
+	#XAxis.Rule -1 0 1 1
+	#YAxis.Rule -1 0 1 1
+	#ZAxis.Rule -1 0 1 1
+	#ZAxis.MinWidth 20
+	#ShowTN=last
+	##XNamePose right
+	##PoseTN=up
+    #Title.FontStyle=info
+	#Title.Justify= right
+	#TextNear.Justify right
+	#TextNear.Transparency 1
+	#TextNear.Background 7
+	#TextNear.BorderColor 20
+	#TextNear.Border 1
+	#TextNear.IndentHoriz 3
+	#TextNear.IndentVert 3
+#EndStyle
+
+#Slide.Style panel.sty
+

@@ -1,0 +1,13 @@
+#NewSlide monot
+#Include frey_monot.chd
+
+#NewSlide unit
+#Include frey_unit.chd
+
+#NewSlide P
+#Include frey_P.chd
+
+#NewSlide D
+#Include frey_D.chd
+
+#Slide <<

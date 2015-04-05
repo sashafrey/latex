@@ -1,0 +1,49 @@
+alltasks_3features_adjTables_Hasse_Bool_Clusters002_to_010 
+	Поправки посчитаны с помощью кластеризации правил. Порог кластеризации - фиксированый, eps = 002, 004, 006, 008, 010 (для каждого порога посчитаны свои поправки). Поправки и кластеризация проводились отдельно для ошибок первого/второго рода. Задачи - все, кроме German.
+	Преимущество поправок над стандартной оценкой Hasse:
+	>> EvaluateClusteringBenefits(adjTables)
+		Echo_cardiogram		Hasse clustering at 0.**: pRatio = [ 0.99441,  0.93837 	], nRatio = [ 0.99485,  0.97012 	]
+		Australian		Hasse clustering at 0.**: pRatio = [ 0.98111,  0.96977 	], nRatio = [ 1,  0.99892 	]
+		Heart_Disease		Hasse clustering at 0.**: pRatio = [ 0.95203,  0.92117 	], nRatio = [ 1,  0.9906 	]
+		Hepatitis		Hasse clustering at 0.**: pRatio = [ 0.94639,  0.98112 	], nRatio = [ 0.99822,  0.99054 	]
+		Labor_Relations		Hasse clustering at 0.**: pRatio = [ 0.92699,  0.96391 	], nRatio = [ 0.99041,  0.99565 	]
+		Liver_Disorders		Hasse clustering at 0.**: pRatio = [ 1,  1 	],	   nRatio = [ 1,  1 	]
+	Тут 0.** значит, что для каждой тройки признаков выбиралось своё (оптимальное) значение порога кластеризации eps (выбор вариантов был ограничен 0.02, 0.04, 0.06, 0.08, 0.10).
+alltasks_3features_adjTables_Hasse_Bool_Clusters0XX
+	Те же данные, что в alltasks_3features_adjTables_Hasse_Bool_Clusters002_to_010, но агрегированные по принципу 0.** --- т.е. в качестве поправки взят минимум для каждого набора признаков
+alltasks_3features_adjTables_Hasse_Bool_Clusters0XX_alfreyLAB
+	Результаты ComBoost_Evaluation по соответствующим поправкам.
+alltasks_2features_adjTables_Hasse_Bool_SmartCluster
+	Те самые поправки, которые считались 4 дня на задаче Australian. Еще тут же поправки для Echo_cardiogram, Heart_Disease, Hepatitis, Labor_Relations и Liver_Disorders.
+	Посчитаны CV, Hasse и HasseCluster. Cluster считался следующим образом: жадное слияние, слияние умное - на основе сравнения 0.5 квантили двух распределений (по формуле, и суммах двух отдельных слагаемых). Формула - NoisedSetOverfitting[Prepare|Calc].
+		Task: Echo_cardiogram, hasse clustering: pRatio = [ 0.84319,  0.6943 	], nRatio = [ 0.84737,  0.86397 	]
+		Task: Australian, hasse clustering: pRatio = [ 0.75776,  0.61794 	], nRatio = [ 0.86358,  0.87386 	]
+		Task: Heart_Disease, hasse clustering: pRatio = [ 0.7478,  0.65831 	], nRatio = [ 0.84005,  0.86178 	]
+		Task: Hepatitis, hasse clustering: pRatio = [ 0.80692,  0.83082 	], nRatio = [ 0.89987,  0.8509 	]
+		Task: Labor_Relations, hasse clustering: pRatio = [ 0.73044,  0.76532 	], nRatio = [ 0.85569,  0.93295 	]
+		Task: Liver_Disorders, hasse clustering: pRatio = [ 0.64592,  0.71483 	], nRatio = [ 0.84423,  0.82878 	]
+clustering_random100featuresets_adjTables_EchoCardiogramm_Hepatitis
+clustering_random100featuresets_adjTables_Hepatitis_LaborRelation
+	Посчитаны для статьи frey_pria2. Поскольку множество признаков не содержит всех троек, данные поправки нельзя использовать для ComBoost_Evaluation, а можно только для сравнение оценок вероятности переобучения.
+	Сравниваются семь оценок - см. статью frey_pria2 за их описанием. Основная тема - кластеризация алгоритмов с близкими векторами ошибок.
+2012_10_08_adjTables_Echo_Labor_Hepatitis
+	Поправки (Hasse, HasseCluster, HasseClusterNoSize, Bool, BoolCluster, BoolClusterNoSize, CV) и результаты ComBoost_Evaluation для Echo, Labor и Hepatitis.
+	Поправки посчитаны так же, как и clustering_random100featuresets_adjTables_Hepatitis_LaborRelation.
+	Для COMBoostEvaluation кое-какие следующие были обнулены (из-за низкой корреляции CV и комбинаторной поправки): Hepatitis.pKoef = 0 (для обоих классов), LaborRel.pKoef = 0 (для обоих классов), LaborRel.nKoef = 1 (для первого класса)
+	В 2012_10_08_adjTables_Echo_Labor_Hepatitis_nofiltering.txt --- тоже самое, но без обнуления указанных выше поправок.
+2012_10_20_RSG_Tune_Params
+	Зависимость информативности от MaxRank и T1 для разных задач. RuleSetGeneratorTEMP.
+
+2012_11_04_C50(trees,rules,boost)_ComBoost(RemDup).zip   // here ComBoost used maxRank = 3 and remdup = true.
+2012_11_05_ComBoost(maxRank=[2,3];remdup=[true,false].zip
+2012_11_05_ComBoost(maxRank=[2,3];remdup=[true,false] - no prohibited features.zip
+	Качество классификации различных вариаций ComBoost и C50.
+	Сравнение вариаций COMBoost:
+	1. Применять к правилам remdup - не обязательно
+	2. MaxRank=2 и MaxRank=3 работаю одинаково хорошо (на выборке задач из которых исключили 'faults', 'Liver_Disorders', 'Mushrooms', 'Thyroid_Disease', 'wine'). Эти выборки были выбраны ДО эксперимента с помощью анализа среднего числа термов в правилах после редукции (pruning-а).
+	3. Prohibited Features - очень полезный трюк, его нельзя убирать!
+	
+	
+	
+	
+	      

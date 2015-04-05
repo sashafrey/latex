@@ -1,0 +1,372 @@
+\usepackage[cp1251]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[english,russian]{babel}
+\usepackage{cmap}
+% Для компиляции в разные форматы надо использовать разные драйверы hyperref
+\usepackage[unicode=true, colorlinks=false, breaklinks=false, pdfborder={0 0 0}]{hyperref} % pdfLatex
+%\usepackage[unicode=true, colorlinks=false, breaklinks=false, pdfborder={0 0 0}, hypertex]{hyperref} % DVI preview
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage{theorem}
+\usepackage{indentfirst}
+\usepackage{extsizes}
+\usepackage{longtable}
+\usepackage{ifthen}
+\usepackage[ruled,section]{algorithm}
+\usepackage[noend]{algorithmic}
+%\usepackage{russianb}
+%\usepackage{russcorr}
+\usepackage[all,poly]{xy}
+\usepackage{graphicx}
+%\usepackage{epsfig}
+%\usepackage{color}
+%\usepackage{ifthen}
+\usepackage{url}
+\usepackage{titlesec} % стиль заголовков
+\usepackage[section]{placeins}
+\usepackage{pb-diagram}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{enumitem}
+
+\usepackage{multicol}
+\usepackage{fancyhdr}
+%\usepackage{setspace}
+\usepackage{xfrac}
+
+\textheight=220mm
+\topmargin=-24mm
+\textwidth=155mm
+\oddsidemargin=10mm
+\evensidemargin=10mm
+%\footskip = 0mm % расстояние до низа нижнего колонтитула
+\headheight = 5mm % высота верхнего колонтитула (примерно, 14pt)
+\headsep = 17mm % расстояние до верхнего колонтитула
+\marginparwidth=36pt
+\parindent=3.5ex
+\tolerance=30000
+\hbadness=2000
+\def\baselinestretch{1.4}
+\headheight=15mm
+\parskip=6pt
+
+\tolerance=10000
+% штраф за наличие переносов
+\hyphenpenalty=1000
+% штраф за переносы, идущие подряд
+\doublehyphendemerits=1000000
+\binoppenalty=10000
+\relpenalty=10000
+
+\frenchspacing
+
+\newcommand{\todo}{\noindent\dotfill TODO }
+
+% Оформление заголовков
+% Точки в конце номеров параграфов
+%\renewcommand{\thechapter}{\arabic{chapter}.}
+%\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}.}
+%\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}.}
+%\renewcommand{\thesubsubsection}{\arabic{subsubsection}.}
+%\renewcommand{\theparagraph}{\arabic{paragraph}.}
+% Включать в оглавление все до subsection (включительно)
+\setcounter{secnumdepth}{2}
+
+% Изменение размера шрифта глав
+\titleformat{\chapter}[block]{\normalfont\LARGE\bfseries}{\chaptertitlename\ \thechapter.}{14pt}{\LARGE}
+\titlespacing*{\chapter} {0pt}{0pt}{30pt}
+
+
+%%% добавляем линию под верхним колонтитулом на нечетных страницах
+%%\renewcommand{\@oddhead}%
+%%{\raisebox{0pt}[\headheight][0pt]{% начало блока
+%%\vbox{\hbox to\textwidth{{\normalfont\slshape\rightmark}%
+%%\hfil \strut \thepage}\hrule}}% конец блока
+%%}% конец макроопределения
+%%% добавляем линию под верхним колонтитулом на четных страницах
+%%\renewcommand{\@evenhead}%
+%%{\raisebox{0pt}[\headheight][0pt]{% начало блока
+%%\vbox{\hbox to\textwidth{{\normalfont\slshape\rightmark}%
+%%\hfil \strut \thepage}\hrule}}% конец блока
+%%}% конец макроопределения
+
+%\renewcommand{\@oddhead}{\hfil\footnotesize\thepage\hfil}%
+%\renewcommand{\@oddfoot}{}%
+%\renewcommand{\@evenhead}{\hfil\footnotesize\thepage\hfil}%
+%\renewcommand{\@evenfoot}{}
+
+% Страницы с \chapter печатают номер страницы внизу (вне зависимости от настроек)
+% Лечиться fancyhdr: переопределяем plain стиль
+\fancypagestyle{plain}{%redefining plain pagestyle
+    \fancyhf %clear all headers and footers fields
+    \fancyhead{}
+    \fancyfoot{}
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyhead[C]{\footnotesize\thepage} %prints the page number on the right side of the header
+    \headheight 10pt
+    \headsep 20pt
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Некоторые переопределения для унификации математики
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\varepsilon}
+\renewcommand{\lim}{\mathop{\operator@font lim}\limits}
+\renewcommand{\limsup}{\mathop{\operator@font lim\,sup}\limits}
+\renewcommand{\liminf}{\mathop{\operator@font lim\,inf}\limits}
+\renewcommand{\max}{\mathop{\operator@font max}\limits}
+\renewcommand{\min}{\mathop{\operator@font min}\limits}
+\renewcommand{\sup}{\mathop{\operator@font sup}\limits}
+\renewcommand{\inf}{\mathop{\operator@font inf}\limits}
+\newcommand{\argmax}{\mathop{\rm arg}\mathop{\rm max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg}\mathop{\rm min}\limits}
+\newcommand{\Argmax}{\mathop{\rm Arg}\mathop{\rm max}\limits}
+\newcommand{\Argmin}{\mathop{\rm Arg}\mathop{\rm min}\limits}
+\newcommand{\argminCompact}{\mathop{\operator@font arg\,min}\limits}
+\newcommand{\argmaxCompact}{\mathop{\operator@font arg\,max}\limits}
+\newcommand{\ArgminCompact}{\mathop{\operator@font Arg\,min}\limits}
+\newcommand{\ArgmaxCompact}{\mathop{\operator@font Arg\,max}\limits}
+\newcommand{\T}{^{\text{т}}}
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\Expect}{\mathsf{E}}
+\newcommand{\Var}{\mathsf{D}}
+\newcommand{\Tr}{\mathsf{Tr\,}}
+\def\classF{\mathscr{F}}
+\def\XX{\mathbb{X}}
+\def\YY{\mathbb{Y}}
+\def\RR{\mathbb{R}}
+\def\PP{\mathbb{P}}
+\def\X{\bar X}
+\def\QQ{\mathbb{Q}}
+\def\RR{\mathbb{R}}
+\def\NN{\mathbb{N}}
+\def\HH{\mathbb{H}}
+\def\ZZ{\mathbb{Z}}
+\def\LL{\mathbb{L}}
+\def\II{\mathbb{I}}
+\def\DD{\mathbb{D}}
+\def\cA{\mathscr{A}}
+\def\cL{\mathscr{L}}
+\def\cF{\mathscr{F}}
+\def\cG{\mathscr{G}}
+\def\cJ{\mathcal{J}}
+\def\cP{\mathcal{P}}
+\def\cN{\mathcal{N}}
+\def\cE{\mathcal{E}}
+\def\cB{\mathscr{B}}
+\def\cK{\mathscr{K}}
+\def\fF{\mathfrak{F}}
+\def\fI{\mathfrak{I}}
+\def\fM{\mathfrak{M}}
+\def\fR{\mathfrak{R}}
+\def\fB{\mathfrak{B}}
+\def\fA{\mathfrak{A}}
+\def\LR{\text{LR}}
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\Bhypergeom}[5]{{#1}_{#2}^{#4,#3}\bigl(#5\bigr)}
+\newcommand{\BHyper}[4]{\Bhypergeom{H}{#1}{#2}{#3}{#4}}
+
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CC}{C}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+\newcommand{\ToDo}[1]{\textbf{\textcolor{red}{[ToDo] #1}}}
+\newcommand{\Q}{Q_\eps}
+
+\newcommand{\vkEndProof}{\hfill$\scriptstyle\blacksquare$\par\medskip}
+\newenvironment{vkProof}[1][. ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+\newenvironment{vkProofShort}[1][ ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+% Для переносов знаков операций на следующую строку
+%\newcommand\brop[1]{#1\discretionary{}{\hbox{$#1$}}{}}
+\newcommand*{\brop}[1]{#1\nobreak\discretionary{}{\hbox{$\mathsurround=0pt #1$}}{}}
+
+% 54, 38 => 64
+\newcommand{\IncludeHalfPicture}[1]{\includegraphics[width=72mm,height=51mm]{#1}}
+
+\renewcommand\emph[1]{\textit{#1}}
+
+% Для таблиц: невидимая вертикальная линейка немного расширяет заголовок
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+\newcommand{\headline}{\hline\hstrut}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Новые теоремоподобные окружения
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\theoremstyle{plain}
+% Шаманские притоптывания, чтобы ставить точку после номера теоремы
+\gdef\th@plain{\normalfont
+    \def\@begintheorem##1##2{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2. ]}%
+    \def\@opargbegintheorem##1##2##3{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2 (##3). ]}%
+}
+% Теоремы наклонным шрифтом
+\theorempreskipamount=\smallskipamount
+\theorempreskipamount=\smallskipamount
+\theorembodyfont{\rmfamily\slshape}
+\newtheorem{Theorem}{Теорема}[chapter]
+\newtheorem{Lemma}[Theorem]{Лемма}
+\newtheorem{State}[Theorem]{Утверждение}
+\newtheorem{Corollary}{Следствие}[chapter]
+\newtheorem{Def}{Определение}[chapter]
+\newtheorem{Definition}[Def]{Определение}
+% Теоремы прямым шрифтом
+\theorembodyfont{\rmfamily}
+\newtheorem{Axiom}{Аксиома}[chapter]
+\newtheorem{Hypothesis}{Гипотеза}[chapter]
+\newtheorem{Problem}{Задача}[chapter]
+\newtheorem{Example}{Пример}[chapter]
+\newtheorem{Remark}{Замечание}[chapter]
+\newtheorem{State-rm}{Утверждение}[chapter]
+\newtheorem{Experiment}{Эксперимент}[chapter]
+
+\newenvironment{Proof}
+    {\par\noindent{\bf Доказательство.}}
+    {\hfill$\scriptstyle\blacksquare$\smallskip}
+
+\newenvironment{Alg}
+    {\par\noindent\textsc{\textbf{Алгоритм.}}\vspace{5pt}\hrule\smallskip}
+    {\smallskip\hrule\vspace{14pt minus 14pt}}
+%    {\par\noindent\textsc{\textbf{Алгоритм.}}}
+%    {\hfill$\scriptstyle\blacksquare$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Переопределяем вид списков
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% num)
+%\renewcommand{\labelenumi}{\textup{\theenumi)}}
+%\renewcommand{\theenumi}{\arabic{enumi}}
+% num.num)
+%\renewcommand{\labelenumii}{\textup{\theenumii)}}
+%\renewcommand{\theenumii}{\theenumi.\arabic{enumii}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Оформление алгоритмов в пакетах algorithm, algorithmic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\algorithmicrequire}{\textbf{Вход:}}
+\renewcommand{\algorithmicensure}{\textbf{Выход:}}
+\renewcommand{\algorithmicend}{\textbf{конец}}
+\renewcommand{\algorithmicif}{\textbf{если}}
+\renewcommand{\algorithmicthen}{\textbf{то}}
+\renewcommand{\algorithmicelse}{\textbf{иначе}}
+\renewcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\renewcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\renewcommand{\algorithmicfor}{\textbf{для}}
+\renewcommand{\algorithmicforall}{\textbf{для всех}}
+\renewcommand{\algorithmicdo}{}
+\renewcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
+\renewcommand{\algorithmicwhile}{\textbf{пока}}
+\renewcommand{\algorithmicendwhile}{\algorithmicend\ \algorithmicwhile}
+\renewcommand{\algorithmicloop}{\textbf{цикл}}
+\renewcommand{\algorithmicendloop}{\algorithmicend\ \algorithmicloop}
+\renewcommand{\algorithmicrepeat}{\textbf{повторять}}
+\renewcommand{\algorithmicuntil}{\textbf{пока}}
+\renewcommand{\algorithmiccomment}[1]{{\footnotesize // #1}}
+\renewcommand{\algorithmicloop}{\textbf{повторять}}
+\renewcommand{\listalgorithmname}{Список алгоритмов}
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\RET}{\STATE{\bf Вернуть} }
+\newcommand{\EXIT}{\STATE{\bf выход}}
+\newcommand{\CONTINUE}{\STATE{\bf следующий} }
+\newcommand{\vkProcedure}[1]{{\tt #1}}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE{\bf ПРОЦЕДУРА} \vkProcedure{#1}}
+\floatname{algorithm}{Алгоритм}
+\floatplacement{algorithm}{!t}
+
+\newcommand{\LINEIF}[2]{%
+    \STATE\algorithmicif\ {#1}\ \algorithmicthen\ {#2} %
+}
+\newcommand{\LINEFORALL}[2]{%
+    \STATE\algorithmicforall\ {#1}\ {#2} %
+}
+\newcommand{\LINEFOR}[2]{%
+    \STATE\algorithmicfor\ {#1}\ {#2} %
+}
+\def\algorithmicgoto{\textbf{перейти к шагу}}
+\newcommand{\GOTO}[1]{%
+    \algorithmicgoto\ {\ref{#1};} %
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Переопределения, необходимые для объединения статей в сборник
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Оформление библиографии
+%\def\BibUrl#1{\\{\footnotesize\url{http://#1}}}
+\def\BibAuthor#1{\emph{#1}\;}
+\def\BibTitle#1{#1}
+%\def\BibTitle#1{}  % Возможно, названия потом уберут везде
+\def\BibUrl#1{{\small\url{http://#1}}}
+\def\BibFtp#1{{\small\url{ftp://#1}}}
+% Переопределение горизонтальных и вертикальных промежутков в списке литературы
+\renewenvironment{thebibliography}[1]
+%    {\section{\bibname}%
+    {% Убрать нумерацию глав
+     \setcounter{secnumdepth}{-2}
+     \section*{\refname}%
+        \list{\@biblabel{\@arabic\c@enumiv}}%
+            {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin by 1ex
+            \topsep=0pt\parsep=3pt\itemsep=0ex%
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}%
+            }%
+        %\small
+        \sloppy
+        \clubpenalty4000%
+        \@clubpenalty\clubpenalty
+        \widowpenalty4000%
+        \sfcode`\.\@m}%
+        {\def\@noitemerr
+        {\@latex@warning{Empty `thebibliography' environment}}%
+        \endlist
+    % Включать в оглавление все до subsection (включительно)
+    \setcounter{secnumdepth}{2}
+}
+% Список литературы с точками после номеров, а не с квадратными скобками
+\renewcommand{\@biblabel}[1]{#1.\hfill}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Для включения графиков пакетом graphicx
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareGraphicsRule{.eps}{eps}{*}{}
+\DeclareGraphicsRule{.wmf}{bmp}{}{}
+\DeclareGraphicsRule{.emf}{bmp}{}{}
+\DeclareGraphicsRule{.bmp}{bmp}{}{}
+\DeclareGraphicsRule{.png}{bmp}{}{}
+% Для подписей на рисунках, вставляемых includegraphics
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}

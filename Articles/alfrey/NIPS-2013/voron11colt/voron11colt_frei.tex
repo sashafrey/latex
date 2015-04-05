@@ -1,0 +1,201 @@
+\documentclass{article}
+
+\usepackage{colt11e}
+\usepackage[round,comma]{natbib}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage{graphicx}
+\usepackage[all]{xy}
+\usepackage[ruled,section]{algorithm}
+\usepackage[noend]{algorithmic}
+\bibliographystyle{plainnat}
+\let\cite\citep
+
+\makeatletter
+\def\cL{{\mathscr L}}
+\def\cB{{\mathscr B}}
+\def\cK{{\mathscr K}}
+\def\cR{{\mathscr R}}
+\def\cN{{\mathcal N}}
+\def\cM{{\mathcal M}}
+\def\RC{{\mathcal R}}
+\def\fF{\mathfrak{F}}
+\def\fI{\mathfrak{I}}
+\def\fM{\mathfrak{M}}
+\def\AA{A}
+\def\RR{\mathbb{R}}
+\def\NN{\mathbb{N}}
+\def\ZZ{\mathbb{Z}}
+\def\DD{\mathbb{D}}
+\def\LL{\mathbb{L}}
+\def\YY{\mathbb{Y}}
+\def\XX{\mathbb{X}}
+\newcommand{\XXX}{{\mathscr X}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\x}{\bar x}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\lim}{\mathop{\operator@font lim}\limits}
+\renewcommand{\limsup}{\mathop{\operator@font lim\,sup}\limits}
+\renewcommand{\liminf}{\mathop{\operator@font lim\,inf}\limits}
+\renewcommand{\max}{\mathop{\operator@font max}\limits}
+\renewcommand{\min}{\mathop{\operator@font min}\limits}
+\renewcommand{\sup}{\mathop{\operator@font sup}\limits}
+\renewcommand{\inf}{\mathop{\operator@font inf}\limits}
+\newcommand{\argmin}{\mathop{\operator@font arg\,min}\limits}
+\newcommand{\argmax}{\mathop{\operator@font arg\,max}\limits}
+\newcommand{\Arg}{\mathop{\rm Arg}\limits}
+\newcommand{\Argmin}{\mathop{\rm Arg\,min}\limits}
+\newcommand{\Argmax}{\mathop{\rm Arg\,max}\limits}
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\conv}{\mathrm{conv}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\VCdim}{\mathop{\mathrm{VCdim}}\nolimits}
+\newcommand{\scal}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\eqdef}{\equiv}
+\def\CC_#1^#2{\tbinom{#1}{#2}}
+%\def\CC_#1^#2{C_{#1}^{#2}}
+\providecommand{\Prob}{\mathsf{P}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\Expect}{\mathsf{E}}
+\newcommand{\Var}{\mathsf{D}}
+\newcommand{\bin}{\mathop{\rm bin}\nolimits}
+\newcommand{\Bin}{\mathop{\rm Bin}\nolimits}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,\:#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+% for algorithms
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\REMARK}[1]{\item[]\textsl{#1}}
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\EXIT}{\STATE\textbf{exit}}
+\newcommand{\vkID}[1]{\text{\sf #1}}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\textbf{Procedure} \vkID{#1}}
+
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}
+\newcommand{\TODO}[1]{\par\smallskip\noindent\fbox{\parbox{150mm}{\textsf{\textbf{~~TO DO:} #1}}}\par\smallskip}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Author's hacking for SLANTED THEOREMS -- may be removed
+\makeatletter
+\def\@begintheorem#1#2{\trivlist
+   \item[\hskip \labelsep{\bfseries #1\ #2}]\slshape}
+\def\@opargbegintheorem#1#2#3{\trivlist
+      \item[\hskip \labelsep{\bfseries #1\ #2\ (#3)}]\slshape}
+\def\@endtheorem{\endtrivlist}
+\renewcommand{\emph}[1]{\textit{#1}}
+\makeatother
+% The END of "Author's hacking"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{remark}[theorem]{Remark}
+\newenvironment{proofsketch}{\noindent{\bf Proof sketch:}}{\qed\medskip}
+
+\begin{document}
+
+\section{Generalized cardinality-based bound}
+
+In \cite{koltchinskii11oracle} generalization bounds rely on $L_2$ diameter of $\delta$-minimal sets.
+We use similar considerations to improve cardinality-based bound \eqref{thSumPerAlg}.
+
+\begin{lemma}
+\label{lem:decompA}
+Suppose $A = A_1 \sqcup \dots \sqcup A_T$ is a decomposition of classifier set $A$ into disjoint sets.
+Then the following bound holds for pessimistic ERM:
+\begin{equation}
+    \label{eq:decompA}
+    Q_\eps(A) \leq \sum_{t = 0}^T Q_\eps(A_t).
+\end{equation}
+\end{lemma}
+\begin{proof}
+Let $\mu(A, X)$ be a classifier, retrieved from set $A$ by pessimistic ERM given training sample $X$.
+Using the definition of pessimistic ERM we get that $\delta(\mu(A_1 \sqcup A_2, X), X)$ is equal to either $\delta(\mu(A_1, X), X)$ or $\delta(\mu(A_2, X), X)$.
+This immediately implies that $Q_\eps(A_1 \sqcup A_2) \leq Q_\eps(A_1) + Q_\eps(A_2)$, and the general case \eqref{eq:decompA} follows by induction.
+\end{proof}
+
+\begin{lemma} 
+\label{lem:inclusionBound}
+Let $B$ be a set where all classifiers have equal number of errors.
+Consider arbitrary subset $A_t \subset B$.
+Then the following bound holds for pessimistic ERM :
+\begin{equation}
+\label{eq:inclusionBound}
+    Q_\eps(A_t) \leq Q_\eps(B).
+\end{equation}
+\end{lemma}
+\begin{proof}
+Let us notice that pessimistic ERM and discrepancy maximization are the same learning algorithms for sets where all classifiers have equal number of errors.
+For discrepancy maximization inequality \eqref{eq:inclusionBound} follows from the fact that function $f(A) = \max_{a \in A} \delta(a, X)$ is monotonic
+in the sense that $A_1 \subset A_2$ implies $f(A_1) \leq f(A_2)$.
+\end{proof}
+
+Previous lemmas allow one to split original set into clusters of classifiers with equal number of errors
+and then expand each of them to larger set with known overfitting bound. Below we give one example of such set:
+\[B_r^m(a_0) = \{a \in A \colon \rho(a, a_0) \leq r, \text { and } n(a, X) = m\}.\]
+This set can be interpreted as the most compact set of classifiers with Hamming diameter $2r$ where all classifiers have equal number of errors.
+
+\begin{lemma}
+\label{lem:QepsBallSlice}
+Let $B \equiv B_r^m(a_0)$ be a set of classifiers defined above. Then
+\begin{equation}
+\label{eq:QepsBallSlice}
+Q_\eps(B) = \Hyper{L}{m}{\ell}{\tfrac\ell L (m - \eps k) + \lfloor r / 2 \rfloor} \cdot [m \geq \eps k].
+\end{equation}
+\end{lemma}
+\begin{proof}
+Denote $s = n(a_0, X)$, $r' = \lfloor r / 2 \rfloor$. Then
+\[
+    \min_{a \in B} n(a, X) =
+    \begin{cases}
+        & 0, \text{ where } s \leq r', \\
+        & s - r', \text{ where } s > r'.
+    \end{cases}
+\]
+Condition $\delta(a, X) \geq \eps$ is therefore equivalent to $s \leq s_a(\eps) + r'$, which implies \eqref{eq:QepsBallSlice}.
+\end{proof}
+
+\begin{theorem}
+Suppose $A = A_1 \sqcup \dots \sqcup A_T$ is a decomposition of classifier set $A$ into disjoint sets,
+such that within set $A_t$ all classifiers make $m_t$ errors each.
+Let $d_t \equiv \sup_{a, a' \in A_t} \rho(a, a')$ denotes Hamming diameter of $A_t$. Then
+\begin{equation}
+    Q_\eps(A) \leq \sum_{t = 1}^T [m_t \geq \eps k] \cdot H_L^{\ell, m_t}(s(\epsilon) + \big\lfloor d_t/2 \big\rfloor).
+\end{equation}
+\end{theorem}
+\begin{proof} follows immediately from lemmas \ref{lem:decompA}, \ref{lem:inclusionBound} and \ref{lem:QepsBallSlice}. \end{proof}
+
+This bound can be much sharper than \eqref{thSumPerAlg} because it accounts for similarities between classifiers.
+
+%\def\url#1{}
+%\bibliography{MachLearn}
+
+\begin{thebibliography}{27}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Koltchinskii(2011)]{koltchinskii11oracle}
+    V.~Koltchinskii.
+    \newblock Oracle Inequalities in Empirical Risk Minimization and Sparse Recovery Problems.
+    \newblock In \emph{Ecole d'Et\'e de Probabilit\'es de Saint-Flour XXXVIII-2008.} Springer, 2011.
+
+\end{thebibliography}
+
+\end{document}

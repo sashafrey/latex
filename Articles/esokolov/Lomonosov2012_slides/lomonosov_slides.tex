@@ -1,0 +1,279 @@
+\documentclass[dvips, 9pt, unicode]{beamer} %для tex -> dvi -> ps -> pdf
+%\documentclass[pdf, intlimits, 9pt, unicode]{beamer} %Для Latex2Pdf  tex -> pdf
+%dvips нужно использовать _только_ если использовать построение слайдов через PostScript
+%unicode - обязательно
+
+%Пакеты для русского языка
+\usepackage[T2A]{fontenc}
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+%Пакет для вставки рисунков
+\usepackage{graphicx}
+%AMS TEX значки и пр.
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+
+%разные пакеты
+\usepackage{wrapfig}
+\usepackage{multicol}
+%\usepackage[mathscr]{eucal}
+%\usepackage{cite}
+%\usepackage{dsfont}
+%\usepackage{indentfirst}
+
+%Привычный шрифт для математических формул
+\usefonttheme[onlymath]{serif}
+
+%Нужно включать, если используется "тема" (стиль оформления) по умолчанию
+\usepackage{beamerthemesplit}
+
+%Общий стиль ("тема") оформления слайдов
+%Можно выбрать любую тему в \localtexmf\tex\latex\beamer\themes\theme\
+%и ее имя подставить в качестве аргумента в \usetheme
+%Требование: черные буквы на белом фоне
+\usetheme{Frankfurt}
+
+%Более крупный шрифт для подзаголовков титульного листа
+\setbeamerfont{institute}{size=\normalsize}
+
+%Задание команды (\bluetext) для выделения конкретным (синим) цветом
+%(используйте \alert для выделения цветом выбранной "темы")
+\setbeamercolor{bluetext_color}{fg=blue}
+\newcommand{\bluetext}[1]{{\usebeamercolor[fg]{bluetext_color}#1}}
+
+%%Если используется последовательное появление пунктов списков на слайде
+%%(не злоупотребляйте в слайдах для защиты дипломной работы), чтобы
+%%еще непоявившиеся пункты были все-таки немножко видны.
+%\setbeamercovered{transparent}
+
+\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate
+%{footline}
+%{\quad\strut
+%\hfill\insertframenumber/\inserttotalframenumber\strut\quad}
+\setlength{\topsep}{0pt}%
+
+\newtheorem{axiom}{Аксиома}
+\newtheorem{goal}{Основная цель}
+\newtheorem{TheoremRu}{Теорема}
+\newtheorem{DefinitionRu}{Определение}
+
+\title[\hbox to 59mm{Оценки вероятности переобучения и отступы\hfill\insertframenumber\,/\,\inserttotalframenumber}]{Оценки вероятности переобучения\\
+и комбинаторные отступы объектов \\
+в задачах классификации}
+\author[Евгений Соколов]{Евгений Соколов \\ ВМК МГУ, кафедра ММП, студент 4-го курса}
+\date{
+    Конференция <<Ломоносов-2012>> \\
+    11 апреля 2012 г.}
+
+\begin{document}
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Задача}
+    \textbf{Основная цель}: построение композиций классификаторов над пространствами малой размерности.
+    
+    \bigskip
+    
+    Шаги:
+    \begin{enumerate}
+        \item \alert{Отбор подпространств признаков};
+        \item Построение классификаторов в найденных подпространствах;
+        \item Объединение классификаторов в композицию.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Определения}
+    Дано:
+    \begin{itemize}
+        \item генеральная выборка $\mathbb{X}^L = \{ x_1, \dots, x_L \}$;
+        \item семейство алгоритмов $\mathcal{A}$;
+        \item индикатор ошибки $I : \mathcal{A} \times \mathbb{X} \rightarrow \{ 0, 1 \}$;
+        \item бинарный вектор ошибок алгоритма $a$: $\vec a = (I(a, x_1), \dots, I(a, x_L))$;
+        \item метод обучения $\mu : 2^{\mathbb{X}} \to \mathcal{A}$.
+    \end{itemize}
+    
+    \bigskip
+    
+    \textbf{Аксиома}: Все разбиения генеральной выборки на обучающую $X^\ell$ и контрольную $X^k$ равновероятны.
+    
+    Вероятность переобучения:
+    \[
+        Q_{\varepsilon}(\mu, X^L) = \Prob [ \nu(\mu X, X^k) - \nu(\mu X, X^\ell) \geqslant \varepsilon ],
+    \]
+    $\nu(a, X)$ --- частота ошибок алгоритма $a$ на выборке $X$.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Критерий отбора признаков}
+    Пусть известна оценка вероятности переобучения $Q_\varepsilon (\mu, X^L) \leqslant \eta(\varepsilon)$.
+    Тогда, если $\varepsilon(\eta)$ --- функция, обратная к $\eta(\varepsilon)$,
+    то с вероятностью не менее $(1 - \eta)$ справедлива оценка
+    \[
+        \nu(\mu X, X^k) \leqslant \nu(\mu X, X^\ell) + \varepsilon(\eta)
+    \]
+    
+    Предлагается минимизировать величину $\nu(\mu X, X^\ell) + \varepsilon(\eta)$,
+    используя ее как внешний критерий для отбора признаков.
+
+    \bigskip
+    
+    \alert{Необходимы точные оценки вероятности переобучения и эффективные способы их вычисления.}
+        
+\end{frame}
+
+\begin{frame}
+    \frametitle{Граф расслоения-связности}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{SimpleGraph0.PNG.eps}
+    \end{figure}
+    
+    Граф расслоения-связности --- граф Хассе естественного отношения порядка на множестве векторов ошибок алгоритмов:
+    $a \leq a \Leftrightarrow \forall x I(a, x) \leq I(b, x)$.
+    
+    Ребру $(a, b)$ соответствует объект $x_{ab}:\ I(a, x_{ab}) = 0, I(b, x_{ab}) = 1$.
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Оценка вероятности переобучения}
+    \begin{TheoremRu}[Воронцов, Решетняк, Ивахненко, 2010]
+        Для пессиместичного метода минимизации эмпирического риска~$\mu$ и любых~$\mathbb{X}$, $\mathcal{A}$ и $\varepsilon \in (0, 1)$
+        \[
+            Q_\varepsilon \leqslant \sum_{i = 1}^D 
+                \frac{C_{L - u - q}^{\ell - u}}{C_L^\ell}
+                \mathcal{H}_{L - u - q}^{\ell - u,\ m - q}
+                \left( \frac{\ell}{L} (m - \varepsilon k) \right),
+        \]
+        где $u$ --- верхняя связность алгоритма $a$ (число ребер, исходящих из $a$), \\
+            $q$ --- неполноценность алгоритма $a$ (мощность множества объектов, соответствующих всем ребрам на путях, ведущих в $a$),\\
+            $m$ --- число ошибок алгоритма $a$,\\
+            \[
+                \mathcal{H}_L^{\ell, m} (z) = \sum_{s = 0}^{\lfloor z \rfloor}\frac{C_m^s C_{L - m}^{\ell - s}}{C_L^\ell}
+            \]
+            --- функция гипергеометрического распределения.
+    \end{TheoremRu}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Улучшенная оценка вероятности переобучения}
+    \begin{TheoremRu}
+        Для пессиместичного метода минимизации эмпирического риска~$\mu$ и любых~$\mathbb{X}$, $\mathcal{A}$ и $\varepsilon \in (0, 1)$
+        \[
+            Q_\varepsilon \leqslant \sum_{i = 1}^D \alert{\min_{s \in S}} \left\{
+                \alert{\sum_{t = 0}^{t_{is}^{\max}}}
+                \frac{\alert{C_{|B_{is}|}^t} C_{L - u - \alert{|B_{is}|}}^{\ell - u - \alert{t}}}{C_L^\ell}
+                \mathcal{H}_{L - u - \alert{|B_{is}|}}^{\ell - u - \alert{t},\ m - \alert{|B_{is}|}}
+                \left( \frac{\ell}{L} (m - \varepsilon k) \right)
+            \right\},
+        \]
+        где $u$ --- верхняя связность алгоритма $a$ (число ребер, исходящих из $a$), \\
+            $m$ --- число ошибок алгоритма $a$,\\
+            \alert{$|A_{is}|$ --- число объектов, на которых ошибается $a_s$ и не ошибается $a_i$}, \\
+            \alert{$|B_{is}|$ --- число объектов, на которых не ошибается $a_s$ и ошибается $a_i$}, \\
+            \[
+                \mathcal{H}_L^{\ell, m} (z) = \sum_{s = 0}^{\lfloor z \rfloor}\frac{C_m^s C_{L - m}^{\ell - s}}{C_L^\ell}
+            \]
+            --- функция гипергеометрического распределения.
+    \end{TheoremRu}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Проблема эффективного вычисления оценки}
+    \textbf{Проблема}: для вычисления оценки необходимо обойти весь граф расслоения-связности, что невозможно на практике.
+
+    \bigskip
+
+    Требуется упростить граф так, чтобы
+    \begin{itemize}
+        \item можно было быстро осуществить его обход;
+        \item вычисленная по нему оценка была близка к истинной.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Комбинаторный отступ}
+    \begin{DefinitionRu}
+        Комбинаторным отступом объекта $x_0$ называется величина
+        \[
+            d(x_0) = \min_{a_s \in S} \min \{ d\ |\ \exists a_i :\ I(a_s, x_0) \neq I(a_i, x_0), |B_{is}| = d \}
+        \]
+    \end{DefinitionRu}
+
+    \bigskip
+
+    Можно эффективно оценить отступы объектов с помощью сэмплирования.
+    
+    %\begin{figure}[h]
+    %    \centering
+    %    \includegraphics[width=0.8\textwidth]{margin.eps}
+    %\end{figure}
+    
+    %\bigskip
+
+    %\begin{DefinitionRu}
+    %    Порождающими объектами для алгоритма $a$ называют все объекты из множества
+    %    \[
+    %        N(a) = \{ x_{a, a^\prime} \ |\ a^\prime \in \mathcal{A} \}
+    %    \]
+    %\end{DefinitionRu}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Свойства отступов}
+    \begin{TheoremRu}
+        Вклад алгоритма $a$ в оценку вероятности переобучения экспоненциально убывает с ростом $\max_{x \in N(a)} d(x)$:
+        \[
+            Q(a) = \mathcal{O} \left( \frac{1}{2^{d(a)}} \right),
+        \]
+        где $d(a) = \max_{x \in N(a)} d(x)$,
+        $N(a) = \{ x_{a, a^\prime} \ |\ a^\prime \in \mathcal{A} \}$.
+    \end{TheoremRu}
+
+    \begin{TheoremRu}
+        Если из алгоритма $a$ выходит ребро, соответствующее объекту $x$ с отступом $d(x) = t$,
+        то существует такой путь из одного из истоков до этого
+        алгоритма, что все ребра в нем соответствуют объектам с отступами не больше $t$.
+    \end{TheoremRu}
+
+    \bigskip
+
+    \textbf{Вывод}: если удалить из графа все ребра, соответствующие объектам с $d(x) > t$,
+                    то недостижимыми могут стать лишь алгоритмы с незначительными вкладами в оценку.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Эксперимент}
+    %\begin{figure}[h]
+    %    \begin{multicols}{2}
+    %        \hfill
+    %        \includegraphics[width=0.5\textwidth]{unsep_8err_sample.eps}
+    %        \hfill
+    %        \includegraphics[width=0.5\textwidth]{unsep_8err.eps}
+    %        \hfill
+    %    \end{multicols}
+    %\end{figure}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{unsep_8err.eps}
+    \end{center}
+
+    $L = 200$, $\ell = 100$, $\varepsilon = 0.1$; $\mathcal{A}$ --- семейство линейных классификаторов.
+
+    Время работы для $t = 20$ --- 20 секунд, полный обход графа занял более часа.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Заключение}
+    \begin{itemize}
+        \item Предложена более точная оценка вероятности переобучения;
+        \item Введено понятие комбинаторного отступа объекта, характеризующее его <<важность>> для вычисления оценки вероятности переобучения;
+        \item Показано, что можно значительно упростить вычисление оценки вероятности переобучения, оставив в графе только те ребра, которые соответствуют объектам с маленькими отступами.
+    \end{itemize}
+\end{frame}
+
+\end{document} 

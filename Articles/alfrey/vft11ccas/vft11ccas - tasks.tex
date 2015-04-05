@@ -1,0 +1,179 @@
+\documentclass{ccaspreprint}
+\usepackage{multicol}
+
+% ----------------------------------------------------------------------------
+% Шаманские пляски
+% ----------------------------------------------------------------------------
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+
+\newcommand{\IncludeHalfPicture}[1]{\includegraphics[width=54mm,height=38mm]{#1}}
+
+\def\RR{\mathbb{R}}
+\def\DD{\mathbb{D}}
+\def\fF{\mathfrak{F}}
+\def\fI{\mathfrak{I}}
+\def\fM{\mathfrak{M}}
+
+% перенос знака операции на следующую строку
+\def\brop#1{#1\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+
+\begin{task}
+Методы минимизации эмпирического риска
+\begin{align*}
+    \mu_o \Xl &= \arg\!\!\min\limits_{a\in A(\Xl)} n(a,\Xk); \\
+    \mu_p \Xl &= \arg\!\!\max\limits_{a\in A(\Xl)} n(a,\Xk);
+\end{align*}
+называются, соответственно, \emph{оптимистичным} и~\emph{пессимистичным}.
+
+Путь $\mu$ "--- рандомизированный метод минимизации эмпирического риска.
+Докажите, что для произвольного
+множества алгоритмов $A \subseteq \AA$ и каждого $\epsilon \in (0, 1]$ справедлива цепочка неравенств:
+\begin{equation}
+    \label{eq:sortedMethods}
+    Q_{\mu_o}(\epsilon, A) \leq Q_{\mu}(\epsilon, A) \leq Q_{\mu_p}(\epsilon, A).
+\end{equation}
+\end{task}
+
+\begin{task}
+    Пусть группа симметрии действует на~множестве алгоритмов транзитивно:
+    $A = \{\pi a_0, \, \pi \in \Sym(A)\}$, где $a_0 \in A$ "--- произвольный алгоритм множества $A$.
+    Докажите, что все алгоритмы множества имеют равную вероятность реализоваться в~результате обучения.
+    Приведите примеры множеств алгоритмов с указанным свойством.
+\end{task}
+
+Согласно данному определению, \emph{алгоритм}
+$a \equiv \bigl( a(x_i) \bigr){}_{i=1}^L$ является вектором,
+следовательно, зависит от~нумерации объектов выборки.
+В следующих задачах предлагается доказать, что
+ни~группа симметрий~$\Sym(A)$, ни~разбиение на~классы идентичных алгоритмов~$\Omega(A)$,
+уже не~зависят от~этой нумерации.
+
+\begin{task}
+    \label{lem:SymGroupIsimorphism}
+    Для любого множества алгоритмов ${A\in 2^\AA}$
+    и~любой перестановки $\pi \in S_L$ группы $\Sym(A)$ и~$\Sym(\pi A)$ сопряжены:
+    $\Sym(\pi A) = \pi \circ \Sym(A) \circ \pi^{-1}$.
+\end{task}
+
+\begin{task}
+    Пусть алгоритмы $a_1$ и~$a_2$ идентичны в~множестве алгоритмов $A$.
+    Тогда $\forall \pi \in S_L$ алгоритмы $\pi a_1$ и~$\pi a_2$ идентичны
+    в~множестве алгоритмов $\pi A$.
+\end{task}
+
+\subsection{Группа автоморфизмов графа расслоения--связности}
+
+\emph{Графом смежности} множества алгоритмов $A$ назовем направленный ациклический граф $\,T(A) = (A, E)$,
+вершины которого соответствуют алгоритмам из $A$, а ребро $(a_1, a_2) \in E$ соединяет пары алгоритмов,
+чьи вектора ошибок отличаются только на одном объекте: $\rho(a_1, a_2) = 1$, причем число ошибок
+алгоритма $a_2$ на единицу больше, чем у $a_1$.
+
+\begin{task}
+
+Приведите пример двух различных множеств алгоритмов с изоморфными графами смежности.
+
+\begin{df}
+\label{def:connectionGraphAutomorphism}
+Группой автоморфизмов графа смежности $T(A) = (A, E)$ множества алгоритмов A называют
+максимальную подгруппу $Aut(T(A))$ группы перестановок вершин графа,
+такую что каждый ее элемент $\pi \in Aut(T(A))$ удовлетворяет двум условиям:
+\begin{itemize}
+      \item Сохранение ребер графа и их ориентации:
+      \begin{equation}
+        (a_1, a_2) \in E \rightarrow (\pi a_1, \pi a_2) \in E;
+      \end{equation}
+      \item Сохранение числа ошибок алгоритмов:
+      \begin{equation}
+        n(a, \XX) = n (\pi a, \XX).
+      \end{equation}
+\end{itemize}
+\end{df}
+
+
+\begin{df} Граф смежности $T(A) = (A, E)$ назовем связным, если в соответствующем
+неориентированном графе существует путь между каждой парой вершин:
+для всех $a, a' \in A$ существует конечная последовательность вершин $\{a_i\}_{i = 1}^n$, такая что
+$a = a_1$, $a' = a_n$, и для всех $i = 2, \dots, n$ одно из ребер
+$(a_{i - 1}, a_i)$ или $(a_i, a_{i-1})$ лежит в $E$.
+\end{df}
+
+\begin{task}
+Пусть граф смежности $T(A) = (A, E)$ связен. Докажите, что в определении
+\ref{def:connectionGraphAutomorphism} условие $n(a, \XX) = n (\pi a, \XX)$ выполняется автоматически.
+\end{task}
+
+\begin{task}
+Докажите, что орбиты действия группы симметрии $\Sym(A)$ на множестве алгоритмов $A$ вложены в орбиты действия
+группы автоморфизмов $Aut(T(A))$ на $A$.
+\end{task}
+
+\begin{cor}
+\label{crl:easyFormula}
+Пусть все $a \in A$ имеют равное число ошибок на полной выборке: $n(a, \XX) = m$.
+Тогда вероятность переобучения рандомизированного метода минимизации эмпирического риска записывается в виде
+\begin{equation}
+    Q_\mu(\epsilon, A)
+    =
+    \frac1{C_L^\ell} \sum_{\tau \in \Omega(\XXell)}
+    %\textbf{E}
+    |\tau| \left[\min_{a \in A} n(a, X_\tau) \leq \frac \ell L(m - \epsilon k)\right].
+\end{equation}
+\end{cor}
+
+\begin{task}
+\emph{Полным $m$-слоем} алгоритмов называют множество,
+состоящее из~всех алгоритмов $a\in\AA$ с~фиксированным числом ошибок:
+$n(a, \XX) = m$.
+
+\label{th:fullSliceFormula}
+Докажите, что при обучении рандомизированным методом минимизации эмпирического риска вероятность
+переобучения для полного $m$-слоя алгоритмов дается формулой:
+\begin{equation}
+    \label{formula:fullSliceFormula}
+    Q_\mu(\epsilon, A)
+    =
+    \bigl[
+        \epsilon k \leq m \leq L - \epsilon \ell
+    \bigr].
+\end{equation}
+\end{task}
+
+
+\end{task}
+
+\cite{voron08pria-eng}
+\cite{voron09roai2008}
+\cite{voron10pria-eng}
+\cite{frey09mmro}
+\cite{frey10pria}
+\cite{frey10iip}
+\cite{tolstikhin10iip}
+
+\clearpage
+\def\url#1.{}
+\bibliographystyle{gost71sv}
+\bibliography{MachLearn}
+%\begin{thebibliography}{10}
+%\bibitem{bishop2006pattern} \BibAuthor{Bishop~C.} Pattern Recognition And Machine Learning. Springer.~2006.
+%\end{thebibliography}
+%
+\clearpage
+\tableofcontents
+
+\end{document}

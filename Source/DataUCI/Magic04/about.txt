@@ -1,0 +1,2 @@
+http://mlearn.ics.uci.edu/databases/magic/
+Modification: replace target labels with numbers (g->0, h->1)

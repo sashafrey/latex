@@ -1,0 +1,214 @@
+\documentclass{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  к.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+%\title[Dense and Sparse Predictors Grid]{Overfitting Probability for Dense and Sparse Predictors Grid}
+\title[Теоретико-групповой подход к проблеме переобучения]{Теоретико-групповой подход в комбинаторной теории обобщающей способности}
+
+\author{Фрей Александр Ильич}
+\date{21 апреля 2011}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\Xl}{X^\ell}
+\newcommand{\Xk}{X^k}
+\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\renewcommand{\P}{\textbf{P}}
+\newcommand{\E}{\textbf{E}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+
+\begin{frame}
+	\frametitle{Общая постановка задачи}
+
+	\begin{itemize}
+		\item Исследуется функционал полного скользящего контроля
+		\begin{itemize}
+			\item Предполагается стационарность данных
+			\item Фиксируется некоторое семейство алгоритмов
+			 
+			      (например, линейные разделяющие поверхности)
+			\item Метод обучения – минимизация эмпирического риска
+		\end{itemize}
+		\item Цели:
+		\begin{itemize}
+			\item Получение новых методов регуляризации (контроля сложности семейства),
+				  учитывающих расслоение и связность
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Карта линейных разделяющих правил}
+	\begin{itemize}
+		\item Выборка $X_L \subset \mathbb{R}^3$
+		\item Правила вида $y = \sign(<w, x>)$
+		\item Точки сферы "--- направляющие векторы линейной разделяющей поверхности
+		\item Грани графа на сфере "--- классы эквивалентных алгоритмов
+		\item ToDo: вставить картинку.
+	\end{itemize}
+\end{frame}		
+
+\begin{frame}
+	\frametitle{Профиль $r$-связности}
+	\begin{itemize}
+		\item Задача бинарной классификации: $Y = \{1, -1\}$
+		\item $S_2 = \{e, h\} \colon Y \rightarrow Y$
+		\item Группа $G = (S_2)^L$, элемент $g \in G = \{h_1, h_2, \dots, h_L\}$
+\[
+    (g a)(x_i) =
+    \begin{cases}
+        a(x_i), \text { при } h_i = e \\
+        1-a(x_i), \text { при } h_i \neq e.& \\
+    \end{cases}
+\]
+		\item Действие G "--- изометрия (по расстоянию Хэмминга)
+		\item Профиль $r$-связности $A$ "--- функцию от параметра $q$:
+\[
+    \Theta_r(q, A) = \sum_{a \in A} [|B_r(a, A)| = q].
+\]
+Значение $\Theta_r(q, A)$ соответствует числу алгоритмов $a \in A$, имеющих ровно $q$ соседей в окрестности $B_r(a, A)$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Профиль расслоения-связности}
+	\begin{itemize}
+		\item Профиль расслоения $\Delta(m, A)$:
+\[
+    \Delta(m, A) = \sum_{a \in A} [ n(a, \XX) = m].
+\]
+		\item Профиль расслоения-связности $\Lambda_r(m, q, A)$ семейства $A$:
+\[
+    \Lambda_r(m, q, A) = \Big|\{a \in A \colon |B_r(a, A)| = q\text{ и } n(a, \XX) = m \}\Big|.
+\]
+	(число алгоритмов $a \in A$ с $m$ ошибками 
+	и $q$ соседями в окрестности радиуса $r$)
+	
+	\item Теорема о наиболее вероятном профиле расслоения:
+\[
+    \frac {1}{|G|} \sum_{g \in G} \Delta(m, g A) = \frac{C_L^m}{2^L} |A|.
+\]
+	\item  Теорема о профиле расслоения-связности
+\[
+    \frac {1}{|G|} \sum_{g \in G} \Lambda_r(m, q, g A) = \frac{C_L^m}{2^L} \cdot \Theta_r(q, A)
+\]	
+
+\end{itemize}
+	
+\end{frame}
+
+\begin{frame}
+    \frametitle{Результаты, полученные для РМЭР}
+      \begin{itemize}
+        \item \textbf{Связка монотонных цепочек}
+            \begin{itemize}
+                \item Фрей\;А.\,И.,
+                    Точные оценки вероятности переобучения для симметричных семейств алгоритмов~//
+                    Всеросс. конф. ММРО-14 "--- М.:~МАКС Пресс, 2009.  "---  \mbox{С.\,66--69}.
+            \end{itemize}
+        \item \textbf{Шар алгоритмов и центральный слой шара}
+            \begin{itemize}
+                \item
+                    Толстихин \;И.\,О.,
+                    Точная оценка вероятности переобучения для одного специального семейства алгоритмов~//
+                    Конференция <<Ломоносов-2010>>.
+            \end{itemize}
+        \item \textbf{Полный слой и полный куб алгоритмов}
+            \begin{itemize}
+                    \item Frei\;A.\,I.,
+                    Accurate Estimates of the Generalization Ability for Symmetric Sets of Predictors and Randomized Learning Algorithms ~//
+                    Pattern Recognition and Image Analysis. "--- 2010. "--- Vol. 20, No. 3. "--- Pp. 241-250.
+            \end{itemize}
+        \item \textbf{Монотонные и унимодальные сетки}
+            \begin{itemize}
+                    \item Фрей\;А.\,И.,
+                    Вероятность переобучения плотных и разреженных семейств многомерных сеток алгоритмов~//
+                    Международ. конф. ИОИ-8 "--- М.:~МАКС Пресс, 2010.  "---  \mbox{С.\,87--90}.
+            \end{itemize}
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Отсутствие связности: случайные множества алгоритмов}
+
+\vspace{-1cm}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{RandomSlice.eps}
+        \hfill
+        \medskip
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(RandomSlice).eps}
+        \hfill
+        \end {multicols}
+    \end{figure}
+\vspace{-1cm}
+
+\begin{itemize}
+        \item Пусть $A_m^n$ "--- множество из $n$ алгоритмов, каждый из которых допускает $m$ ошибок на полной выборке. Векторы ошибок независимы.
+\end{itemize}
+
+\begin{Th}[Вероятность переобучения для $A_m^n$]
+    Пусть $\mu$ "--- рандомизированный МЭР. Тогда
+    \[\E_G Q_{\mu}(\epsilon, A_m^n) = 1 - \left(1 - Q_{\mu}(\epsilon, a_m) \right)^n\]
+\end{Th}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Отсутствие связности: случайные множества алгоритмов}
+\begin{itemize}
+    \item Пронумеруем алгоритмы: $A = (a_1, \dots, a_d)$
+    \item $S_L$ "--- симметрическая группа порядка $L$;
+    \begin{itemize}
+%        \item $|S_L| = L!$
+        \item $S_L$ действует на объектах выборки;
+        \item $S_L$ действует на векторах ошибок алгоритмов;
+    \end{itemize}
+    \item $G = (S_L)^{d}$ "--- свободное произведение $S_L$;
+    \begin{itemize}
+    \item $g = (g_1, \dots, g_d) \in G$ "--- элемент группы $G$, $g_i \in S_L$;
+        \item $G$ действует на векторе алгоритмов: \[gA = \Big(g_1(a_1), \dots, g_d(a_d)\Big).\]
+    \end{itemize}
+    \item Вероятность переобучения несвязной перестановки $A$:
+        \[\bar{Q}_\mu(\epsilon, A) = \E_G  Q_\mu(\epsilon, gA),  \text{ где } \E_G \stackrel{def}{=} \frac{1}{(L!)^d} \sum_{g \in G} \]
+    \item $\bar{Q}_\mu(\epsilon, A)$ зависит только от профиля расслоения $A$.
+\end{itemize}
+
+\end{frame}
+
+\end{document} 

@@ -1,0 +1,76 @@
+\documentclass[12pt, a4paper, oneside, openany]{extbook}%draft,
+\usepackage{dissertation}
+
+% A4 = 210mm x 297mm. ГОСТ margins = 25 (left), 10 (right), 20 (top and bottom)
+
+\textheight=245mm
+\textwidth=172mm
+\oddsidemargin=1mm
+%\evensidemargin=-5mm
+\topmargin=-12mm
+%\footnotesep=3ex
+%\columnsep=6mm
+
+
+%Расценивать warnings как errors
+%\renewcommand{\GenericWarning}[2]{\GenericError{#1}{#2}{}{This warning has been turned into a fatal error.}}
+
+% Подавляем warning Underfull \hbox (badness 10000).
+\hbadness=100000
+\hfuzz=5.002pt
+\vfuzz=30pt
+
+\hypersetup{
+pdftitle={Диссертация на соискание ученой степени кандидата физико-математических наук},
+pdfauthor={Фрей Александр Ильич},
+pdfsubject={Теоретико"=групповой подход в комбинаторной теории переобучения}
+}
+
+%\includeonly{chapter3,chapter4}
+%\includeonly{title,intro}
+
+\begin{document}
+\pagestyle{plain}
+
+% титульный лист
+\include{title}
+
+\linespread{1.35}
+\tableofcontents
+
+%\backmatter
+%\paragraph{Введение}
+\include{intro}
+
+
+%\mainmatter
+%Теория статистического обучения
+\include{chapter1}
+
+%Комбинаторный подхода
+\include{chapter2}
+
+%Теоретико"=групповой подход
+\include{chapter3}
+
+%Точные оценки вероятности переобучения для РМЭР
+\include{chapter4}
+
+%Вычислительные эксперименты на реальных данных
+\include{chapter5}
+
+%завершение
+\include{final}
+
+%песочница. что-то новое, что ждет своего места в основном тексте
+%\include{sandbox}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Список литературы}
+
+\def\BibUrl#1.{}
+\bibliographystyle{gost2008}  %% стилевой файл для оформления по ГОСТу
+\bibliography{MachLearn,bibliography}     %% имя библиографической базы (bib-файла)
+
+\end{document}

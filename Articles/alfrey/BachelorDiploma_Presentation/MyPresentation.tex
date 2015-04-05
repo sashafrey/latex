@@ -1,0 +1,291 @@
+\documentclass{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Факультет Управления и Прикладной Математики \\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  к.ф.-м.н. Воронцов Константин Вячеславович \\
+
+\vspace{0.7cm}
+}
+\title[О дискретных аппроксимациях]{О дискретных аппроксимациях непрерывных вероятностных распределений}
+
+\author{Фрей Александр Ильич}
+\date{18 июня 2008}
+
+\begin{document}
+
+\maketitle
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+
+\begin{frame}
+    \frametitle{Основные определения}
+    \begin{itemize}
+        \item {\bf Выборка} --- набор из $L$ чисел: \\
+            $X^L = \{x_1, x_2, \dots, x_L\}~\in~\mathbb{R}^L$
+
+        \item $X^L = X_n^k \cup X_n^{\ell}$, где $n \in {1, \dots, N}; N = C_L^k$ ---
+        всевозможные разбиения на наблюдаемую и скрытую подвыборки.
+        \item {\bf Отклонение средних} в двух подвыборках ---
+            \[
+                D(X^k, X^{\ell}) = \frac1k \sum_{x \in X^k} {x} - \frac1{\ell} \sum_{x \in X^{\ell}} {x}
+            \]
+        \item {\bf Вероятность больших уклонений} ---
+             \[
+                Q(X^L, \varepsilon) =
+                \frac 1N \sum_{n=1}^N{\left[ D(X_n^k, X_n^{\ell}) \geq \varepsilon \right]},
+             \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Цели исследования}
+    \begin{tabular}[p]{|p{13em}|p{13em}|}
+        \hline
+            Вариационный ряд $X^L$ &
+            Зависимость $Q(X^L, \varepsilon)$ от $\varepsilon$ \\
+        \hline
+            \includegraphics[width=50mm]{Linear100Var_c.eps} &
+            \includegraphics[width=50mm]{Linear100_c.eps} \\
+        \hline
+    \end{tabular}
+
+    \vspace{0.3cm}
+
+    {\bf Цели исследования: }
+    \begin{itemize}
+        \item получить оценку $Q(X^L, \varepsilon) \leq Q(Y^L, \varepsilon)$,
+            где $Y^L$ --- выборка из дискретного множества (например, \{0, 1\}).
+        \item исследовать непрерывные распределения комбинаторными методами
+    \end{itemize}
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Классические верхние оценки}
+    Пусть $X_1, \dots, X_n$ --- независимые случайные величины.
+    Обозначим $S_n = \frac 1n \sum_{i=1}^n{X_i}$,
+    $\sigma _n^2 = \frac 1n \sum _{i=1}^n{\Variance{(X_i)}}$.
+    \begin{itemize}
+        \item Неравенство Чебышева:
+        \[
+            \Prob (|S_n - \Expect (S_n)| \geq \varepsilon ) \leq
+            \frac{\sigma _n^2}{n\varepsilon ^2}
+        \]
+        \item Неравенство Чебышева-Кантелли
+        \[
+            \Prob (S_n - \Expect (S_n) \geq \varepsilon ) \leq
+            \frac{\sigma _n^2}{\sigma _n^2 + n \varepsilon ^2}
+        \]
+        \item Неравенство Хёфдинга
+        \[
+            \Prob (S_n - \Expect (S_n) \geq \varepsilon ) \leq
+            e^{- 2n \varepsilon ^2}
+        \]
+        \item Неравенство Бернштейна
+        \[
+            \Prob (S_n - \Expect (S_n) \geq \varepsilon ) \leq
+            \exp {\left( - \frac {2 n \varepsilon ^2}{4 \sigma _n^2 + \varepsilon} \right)}
+        \]
+    \end{itemize}
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Результаты в слабой вероятностной аксиоматики}
+    \begin{itemize}
+        \item Для выборки $Y^L_m~\in~\{0, 1\}^L$,
+        состоящей из нулей и единиц, выполнена точная оценка
+        \[
+            Q(Y_m^L, \varepsilon) = \sum_{t=s_0}^{s_1}{h(_L^{\, {\ell}} {}_m^t)},
+        \]
+    где
+        $m$ - число единиц в выборке,
+        $s_0 = \max{(0, m-k)}$,
+        $s_1 = \lfloor \left( m - \varepsilon k\right) \frac {\ell}L \rfloor$,
+        ${h(_L^{\, {\ell}} {}_m^t)} = \frac{C_{L-m}^{\, {\ell}-t} C_m^t}{C_L^{\, {\ell}}}$.
+    \end{itemize}
+    \begin{Th}[А. Бадзян]
+        При $k=\ell \;$ $\forall X^L \in [0, 1]^L, \;
+            \forall \varepsilon > 0 \;\;
+            \exists m \in \{0, \dots, L\}$, такое что
+        \[
+            Q(X^L, \varepsilon) \leq Q(Y_m^L, \varepsilon).
+        \]
+    \end{Th}
+
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Трехступенчатая выборка $Z^L$}
+    \begin{tabular}[p]{|p{13em}|p{13em}|}
+        \hline
+            Вариационный ряд $X^L$ &
+            Зависимость $Q(X^L, \varepsilon)$ от $\varepsilon$ \\
+        \hline
+            \includegraphics[width=50mm]{Linear100Var_a.eps} &
+            \includegraphics[width=50mm]{Linear100_a.eps} \\
+        \hline
+    \end{tabular}
+
+    \vspace{0.0cm}
+    \begin{itemize}
+        \item Выборка $Z^L$ из $\{0, q, 1\}$, число значений $n_0 + n_q + n_1 = L$.
+    \end{itemize}
+    \begin{Th}[Вероятность больших уклонений для выборки $Z^L$]
+            \begin{equation}
+                Q(Z^L, \varepsilon) =
+                    \frac 1N
+                    \sum_{{\ell}_q=0}^{n_q}{
+                        C_{n_q}^{{\ell}_q}
+                        \sum_{{\ell}_1=0}^{s_1}{
+                            C_{L-n_q-n_1}^{{\ell}-{\ell}_q-{\ell}_1}
+                            C_{n_1}^{{\ell}_1}
+                        }
+                    },
+            \end{equation}
+        где
+            $s_1 =
+            \left \lfloor
+                \frac{{\ell}(q n_q + n_1)- k {\ell} \varepsilon}{L} - {\ell}_q q
+            \right \rfloor$.
+    \end{Th}
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Метод моментов. Теорема адекватности}
+    \begin{itemize}
+        \item Первые моменты:
+            $\mu_1=\sum{x_i}$, $\mu_2=\sum{x_i^2}$, $\mu_3=\sum{x_i^3}$.
+        \item Метод моментов: для выбора параметров $q$, $n_q$, $n_1$
+            приравняем первые три момента выборки $X^L$ и $Z^L$
+    \end{itemize}
+    \begin{Th}[Адекватности]
+        Решение уравнений метода моментов имеет вид
+            \vspace{-0.2cm}
+            \[
+                \left\{
+                    \begin{aligned}
+                        q     & = \frac{\mu_2 - \mu_3}{\mu_1 - \mu_2} \\
+                        n_q^* & = \frac{(\mu_1 - \mu_2)^3}{(\mu_2-\mu_3)(\mu_1-2\mu_2+\mu_3)} \\
+                        n_1^* & = \frac{\mu_1 \mu_3 - \mu_2^2}{\mu_1 - 2\mu_2 + \mu_3}
+                    \end{aligned}
+                \right.
+            \]
+        \vspace{-0.2cm}
+        и удовлетворяет естественным условиям
+            \vspace{-0.2cm}
+            \[
+                0 \leq q \leq 1, \;
+                n_0^* \geq 0, \;
+                n_q^* \geq 0, \;
+                n_1^* \geq 0.
+            \]
+    \end{Th}
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Тонкости округления}
+
+    \begin{itemize}
+        \item Введем параметр $r$ - размер окрестности округления.
+        \item {\bf Окрестность округления}
+            $B_{r}(n_0^*, n_q^*, n_1^*) $ --- \\
+            все тройки неотрицательных целых чисел $(n_0, n_q, n_1)$,
+            получаемые из $(n_0^*, n_q^*, n_1^*)$ изменением
+            каждой координаты не более чем на $r$, при условии
+            $n_0 + n_q + n_1 = L$.
+    \end{itemize}
+
+    \begin{Th}[О количестве точек в окрестности округления]
+        Пусть $r$ является целым числом, и все параметры задачи
+        $(n_0^*, n_q^*, n_1^*)$ далеко (т.е. не менее чем на $r$) отстоят
+        от граничных значений $0$ и $L$ и не являются целыми.
+        Тогда размер окрестности простым образом выражается через ее радиус:
+        \[
+            |B_{r}| = 3r^2.
+        \]
+    \end{Th}
+
+
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Контрпримеры}
+    \begin{tabular}[p]{|p{13em}|p{13em}|}
+        \hline
+            До усреднений &
+            После усреднения \\
+        \hline
+            \includegraphics[width=50mm]{L100Gauss02.eps} &
+            \includegraphics[width=50mm]{L100Gauss03.eps} \\
+        \hline
+    \end{tabular}
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item Существуют контрпримеры, показывающие что даже при
+        округлении по окрестности радиуса $r=2$ оценка не является верхней.
+        \item Предлагается усреднить выражение $Q(Z^L, \varepsilon)$
+        по всем $(n_0, n_q, n_1) \in B_r(n_0^*, n_q^*,n_1^*)$.
+    \end{itemize}
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+
+    \frametitle{Численные результаты - сравнение оценок}
+    \begin{figure}[t]
+        \centering{
+            \includegraphics[width=110mm]{Comarision.eps}
+        }
+    \end{figure}
+
+\end{frame}
+
+%===============================================================================
+
+\begin{frame}
+    \frametitle{Основные результаты и направления исследований}
+    \begin{itemize}
+        \item Получены {\bf комбинаторные} оценки для непрерывных распределений
+        \item Получено явное выражение для вероятности больших уклонений трехступенчатой выборки $Z^L$
+        \item Предложен метод моментов для вычисления параметров выборки и доказана его
+            корректность
+        \item Изучены тонкости округления, присущие данной задаче
+        \item Вычислено количество точек, приближающих решение метода моментов
+    \end{itemize}
+    \vspace{0.4cm}
+    Направления дальнейших исследований:
+    \begin{itemize}
+        \item Улучшение оценки
+            $Q(X^L, \varepsilon) \leq Q(Y_m^L, \varepsilon)$
+            выбором числа $m$
+        \item Получение строгой верхней оценки
+            $Q(X^L, \varepsilon) \leq Q(Z^L, \varepsilon)$
+        \item Получение асимптотических результатов при больших $L$
+            и оценка скорости сходимости
+    \end{itemize}
+\end{frame}
+
+ \end{document} 

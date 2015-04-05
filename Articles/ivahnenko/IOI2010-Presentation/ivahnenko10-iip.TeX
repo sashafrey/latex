@@ -1,0 +1,355 @@
+\documentclass[unicode,lefteqn]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath,mathrsfs}
+\usepackage{mathrsfs}
+\usepackage[russian]{babel}
+\usepackage{array}
+\usepackage{ulem}\normalem
+\usepackage[all]{xy}
+\usepackage[noend]{algorithmic}
+%\documentclass{article}\usepackage{beamerarticle}
+
+\usetheme{Warsaw}%{Darmstadt}
+\usefonttheme[onlylarge]{structurebold}
+\setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+%\setbeameroption{show notes}
+%\setbeameroption{show only notes}   % for printing notes
+
+%\newcommand{\XX}{\mathbb{X}}
+\newcommand{\XX}{\mathbb{X}^L}
+%\newcommand{\XXell}{\XX_L^\ell}
+%\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+%\newcommand{\va}{\vec a}
+%\newcommand{\vA}{\vec A}
+%\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\AA}{A}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\fI}{\mathbb{S}}
+%\newcommand{\fI}{\mathfrak{I}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathsf{const}}
+\newcommand{\sign}{\mathop{\mathsf{sign}}\limits}
+\newcommand{\bbr}[1]{\text{\itshape\b#1}}
+%\newcommand{\bv}{\vec}
+\newcommand{\Arg}{\mathop{\mathsf{Arg}}\limits}
+\definecolor{light-green}{rgb}{0.6,1.0,0.6}
+\definecolor{light-red}{rgb}{1.0,0.6,0.6}
+\definecolor{light-yellow}{rgb}{1.0,1.0,0.8}
+\definecolor{green}{rgb}{0.0,0.6,0.0}
+\definecolor{yellow}{rgb}{0.6,0.6,0.0}
+\newcommand{\fbx}[2]{\fcolorbox{#2}{light-#2}{\vphantom{o}\hspace{#1mm}}}
+%\newcommand{\a}[1]{\alert{#1}}
+\def\g#1{{\color{green}#1}}
+\def\r#1{{\color{red}#1}}
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+
+\makeatletter
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\makeatother
+
+\newtheorem{vkAxiom}{Аксиома}
+\newtheorem{vkHyp}{Гипотеза}
+\newtheorem{vkTheorem}{Теорема}
+\newtheorem{vkLemma}{Лемма}
+\newtheorem{vkDef}{Определение}
+\newtheorem{vkProblem}{Задача}
+
+% Оформление алгоритмов в пакетах algorithm, algorithmic
+\definecolor{KwColor}{rgb}{0,0,0.6}
+\newcommand{\vkKw}[1]{{\bf\color{KwColor} #1}}
+\renewcommand{\algorithmicrequire}{\rule{0pt}{2.5ex}\vkKw{Вход:}}
+\renewcommand{\algorithmicensure}{\vkKw{Выход:}}
+\renewcommand{\algorithmicend}{\vkKw{конец}}
+\renewcommand{\algorithmicif}{\vkKw{если}}
+\renewcommand{\algorithmicthen}{\vkKw{то}}
+\renewcommand{\algorithmicelse}{\vkKw{иначе}}
+\renewcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\renewcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\renewcommand{\algorithmicfor}{\vkKw{для}}
+\renewcommand{\algorithmicforall}{\vkKw{для всех}}
+\renewcommand{\algorithmicdo}{}
+\renewcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
+\renewcommand{\algorithmicwhile}{\vkKw{пока}}
+\renewcommand{\algorithmicendwhile}{\algorithmicend\ \algorithmicwhile}
+\renewcommand{\algorithmicloop}{\vkKw{цикл}}
+\renewcommand{\algorithmicendloop}{\algorithmicend\ \algorithmicloop}
+\renewcommand{\algorithmicrepeat}{\vkKw{повторять}}
+\renewcommand{\algorithmicuntil}{\vkKw{пока}}
+%\renewcommand{\algorithmiccomment}[1]{{\footnotesize // #1}}
+\renewcommand{\algorithmiccomment}[1]{{\itshape\quad--- #1}}
+% Мои дополнительные команды для описания алгоритмов
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\PARAMS}{\renewcommand{\algorithmicrequire}{\vkKw{Параметры:}}\REQUIRE}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\vkReturn}{\vkKw{вернуть} }
+\newcommand{\RET}{\STATE\vkReturn}
+\newcommand{\EXIT}{\STATE\vkKw{выход}}
+\newcommand{\CONTINUE}{\STATE\vkKw{следующий} }
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\vkProcedure}[1]{\text{#1}\:}
+\newcommand{\vkProc}[1]{\text{#1}\:}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\vkKw{ПРОЦЕДУРА} \vkProcedure{#1}}
+
+% Рисование нейронных сетей и диаграмм
+\newenvironment{network}%
+    {\begin{xy}<1ex,0ex>:}%
+    {\end{xy}}
+\def\nnNode[#1](#2)#3{\POS(#2)*#3="#1"}
+\def\nnLink[#1,#2]#3{\POS"#1"\ar #3 "#2"}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[О~вероятности переобучения пороговых конъюнкций]
+    {О~вероятности переобучения\\ пороговых конъюнкций}
+\author[Андрей Ивахненко (andrey@ivahnenko.ru)]
+    {Андрей Ивахненко }
+\institute{\footnotesize Вычислительный Центр им.\,А.\,А.\,Дородницына РАН}
+
+\date[ИОИ-8, 18--22 октября 2010]{\footnotesize \includegraphics[width=16mm,height=11mm]{ioi.png.eps}\\
+    Интеллектуализация Обработки Информации, ИОИ-8\\
+    18--22 октября 2010, Кипр, г.\,Пафос
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+    %\scriptsize
+    \tableofcontents
+\end{frame}
+
+\section{Постановка задачи}
+\subsection{Задача классификации}
+
+\begin{frame}[t]{Задача классификации}
+\begin{itemize}
+
+\item Выборка объектов: ${\XX=(x_i)_{i=1}^L}$.
+
+\item Объекты описаны $n$ действительными признаками, $x_i = (x_i^1,\ldots,x_i^n)$.
+
+\item Каждому объекту~$x_i$ соответствует ответ~$y_i$ из~заданного конечного множества~$Y$.
+
+\item Алгоритм классификации $a\colon \RR^n \to Y$ --- взвешенное голосование логических правил (rules):
+\[
+    a(x) = \arg\max_{y\in Y} \sum_{r\in R_y} w_r r(x),
+\]
+где $w_r$ "--- вес правила~$r$, обычно неотрицательный;\\
+$R_y$ "--- множество правил класса~$y$.
+\end{itemize}
+
+\end{frame}
+
+\subsection{Правила --- конъюнкции пороговых предикатов}
+\begin{frame}[t]{Правила --- конъюнкции пороговых предикатов}
+В~общем случае \emph{правило} --- это функция вида
+\[
+    r\colon \RR^n\to\{0,1\} \in R.
+\]
+
+В~данной работе правила --- это
+семейство конъюнкций пороговых предикатов:
+\[
+    r(x) \equiv r(x;c^1,\ldots,c^n) = \prod_{j\in \omega} \bigl[ x^j \lessgtr_j c^j \bigr],
+\]
+$x = (x^1,\ldots,x^n) \in \RR^n$ --- произвольный объект;\\
+$\omega\subseteq\{1,\ldots,n\}$ --- подмножество признаков;\\
+$\lessgtr_j$ --- одна из операций сравнения $\{\leq,\geq\}$;\\
+$c^j$ --- порог по $j$"=му признаку.
+\end{frame}
+
+\subsection{Критерии информативности правил}
+\begin{frame}[t]{Хорошие правила}
+
+Для поиска (\emph{индукции}) правил класса~$y$ по обучающей выборке~${X \subset \XX}$
+решается задача двухкритериальной оптимизации:
+\begin{align*}
+    P(r,X) &= \sum_{x_i\in X} \! r(x_i) \, [y_i = y ] \to \max_r;\\
+    N(r,X) &= \sum_{x_i\in X} \! r(x_i) \, [y_i \neq y ] \to \min_r;
+\end{align*}
+
+На практике используются различные критерии информативности $I(P, N)$:
+\begin{itemize}
+\item энтропийный критерий;
+\item индекс Джини;
+\item статистические тесты (точный тест Фишера, $\chi^2$, $\omega^2$ и~др.)
+\end{itemize}
+\end{frame}
+
+\section{Оценка вероятности переобучения}
+\subsection{Структура классов эквивалентности правил}
+\begin{frame}[t]{Структура классов эквивалентности правил}
+
+Два правила эквивалентны, $r\sim r'$, если их векторы ошибок совпадают.
+
+Можно использовать разные индикаторы ошибок $L$:
+\begin{itemize}
+    \item $r \stackrel{p}{\sim} r'$ при $L_p(r,x_i)=[r(x_i)=0][y_i=y]$;
+    \item $r \stackrel{n}{\sim} r'$ при $L_n(r,x_i)=[r(x_i)=1][y_i\neq y]$;
+    \item $r \stackrel{err}{\sim} r'$ при $L(r,x_i)=[r(x_i)\neq [y_i=y]]= L_p(r,x_i) + L_n(r,x_i)$.
+\end{itemize}
+Эквивалентность по информативности:
+\begin{itemize}
+    \item $r \stackrel{I}{\sim} r'$ при $I(P,N)=I(P',N')$.
+\end{itemize}
+\begin{vkLemma}
+Если правило $r \stackrel{err}{\sim} r'$, то $r \stackrel{I}{\sim} r'$, где $I(P,N)$ --- функционал информативности.
+\end{vkLemma}
+
+\end{frame}
+
+\begin{frame}[t]{Пример структуры классов эквивалентности $\stackrel{err}{\sim}$}
+
+\vskip-2.5ex
+\[
+    r(x) = \prod_{j\in \omega} \bigl[ x^j \leq c^j \bigr]
+\]
+\vskip-1ex
+\centering\includegraphics[width = 80mm]{ivahnenko-correctAlgorithm.eps}
+
+\end{frame}
+
+\subsection{Граф расслоения-связности}
+\begin{frame}[t]{Граф расслоения-связности}
+\tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{correctAlg-Links.eps} &
+        \includegraphics[width = 50mm]{correctAlg-linksTree.eps}
+    \end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{Links.eps} &
+        \includegraphics[width = 50mm]{LinksN.eps}\\
+        \includegraphics[width = 50mm]{linksTree.eps}&
+        \includegraphics[width = 50mm]{linksTreeN.eps}
+    \end{tabular}
+
+\end{frame}
+
+\subsection{Метод порождающих и запрещающих множеств}
+\begin{frame}
+Множество объектов $D(q,r) \subseteq \XX$ \emph{ухудшает} правило~$q$ по сравнению с~правилом~$r$, если:
+
+1) $r(x_i) = q(x_i)$ для всех $x_i\in \XX \backslash D(q,r)$;
+
+2) $q(x_i)= [ y_i = y ]$,\;
+   $r(x_i)= [ y_i \neq y]$ для всех $x_i\in D(q,r)$.
+
+\begin{vkTheorem}
+    Пусть множество объектов $D(q,r)$ ухудшает правило~$r$ по~сравнению с~правилом~$q$.
+    Тогда, чтобы пессимистичный метод МЭР выбрал правило~$r$,
+    объекты множества $D(q,r)$ должны находиться~в~$X'_r$.
+\end{vkTheorem}
+
+\begin{vkTheorem}
+    Пусть множество объектов $D(q,r)$ состоит из одного объекта~$x$.
+    Тогда, чтобы пессимистичный метод МЭР выбрал правило~$q$,
+    объект должен находиться~в~$X_q$.
+\end{vkTheorem}
+
+\end{frame}
+
+
+\begin{frame}[t]{Метод порождающих и запрещающих множеств}
+\begin{tabular}{m{23mm}m{80mm}}
+\parbox{23mm}{\textbf{Пример.}}\\$x_i \in D(q_i,r)$ & \includegraphics[width=80mm]{estimProof.eps}
+\end{tabular}
+\[
+[\mu X\!=\!r] \leq [X_r\subseteq X][X'_r\subseteq \X]
+\]
+\vskip-1.5ex
+\begin{vkTheorem}
+\[
+Q_\varepsilon(\mu, \XX)
+        \leq
+        \sum_{r\in R} P_r H^{\ell_r,m_r}_{L_r}(s_r(\varepsilon)),\quad P_r=C_{L_r}^{\ell_r}/C_L^\ell,
+\]
+\vskip-1.5ex
+где
+    ${m_r = m(r,\XX\backslash X_r\backslash X'_r)}$,
+    
+
+    ${L_r = L-|X_r\cup X'_r|}$,\;  ${\ell_r=\ell-|X_r|}$,
+
+    $s_r(\varepsilon) = \frac{\ell}{L}(m(r,\XX)-\varepsilon k) - m(r,X_r)$.
+\end{vkTheorem}
+\end{frame}
+
+\section{Эксперименты}
+
+\subsection{Оценки вероятности переобучения по Монте-Карло}
+\begin{frame}[t]{Оценки вероятности переобучения по Монте-Карло}
+Эксперимент на~модельных данных: число признаков ${n=2}$,\;
+число классов ${Y=\{0,1\}}$,\; число объектов ${L=100}$, по~50 объектов в~каждом классе. Возьмём три модельных выборки, отличающихся только классификацией объектов.
+
+{\footnotesize
+\begin{itemize}
+    \item Correct--- существует правило, разделяющее два класса без ошибок;
+    \item Noise10 --- получается из Correct небольшим зашумлением: для 10~пограничных объектов класс меняется на противоположный;
+    \item Random --- случайное назначение классов объектам.
+\end{itemize}
+}
+
+\centering\includegraphics[width = 70mm]{ivahnenko-presize.eps}
+
+\end{frame}
+
+\subsection{Завышенность оценки вероятности переобучения}
+\begin{frame}[t]{Сравнение с оценкой Вапника-Червоненкиса}
+Оценки для выборок Random, Correct, Noise10. Оценка Вапника-Червоненкиса (одинаковая для всех).
+
+\centering\includegraphics[width = 70mm]{ivahnenko-fix.eps}
+
+Завышенность оценки не велика по сравнению с оценкой Вапника-Червоненкиса.
+\end{frame}
+
+\begin{frame}[t]{Сравнение оценок для выборок разной зашумленности}
+Оценки для выборок Correct и Noise10 по сравнению с точными значениями полученными с помощью метода Монте-Карло.
+
+\centering\includegraphics[width = 70mm]{ivahnenko-presizeVsFix.eps}
+
+Завышенность оценки тем больше, чем менее точной является закономерность, содержащаяся в~выборке.
+\end{frame}
+
+\subsection{Результаты и выводы}
+\begin{frame}[t]{Результаты и выводы}
+\begin{itemize}
+\item Описана структура классов эквивалентности для пороговых конъюнкций.
+\item Получены оценки вероятности переобучения, учитывающие расслоение и связность.
+\item Получен критерий информативности правил, учитывающий возможное переобучение связанное с выбором порогов.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+

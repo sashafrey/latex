@@ -1,0 +1,8 @@
+Experiments:
+1. RulesOverfitting[Evaluation, Plot, EvaluationPlot] - draws overfitting map of informatifity minimization, applied to the fixed set of rules
+2. Code, related to experiments with adjustments tables:
+   EvaluationEngine
+   CreateAdjustmentsTableAllTasks
+   COMBoost_Evaluation
+   RSG_TEMP_Evaluation
+3. TuneRuleSetGeneratorParameters - standard cross-validation of RuleSetGeneratorTEMP.

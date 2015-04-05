@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{color}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+
+\textheight=26cm
+\textwidth=17cm
+\oddsidemargin=0mm
+\topmargin=-20mm
+\parindent=24pt
+\tolerance=500
+%\renewcommand{\baselinestretch}{1.3} %для печати с большим интервалом
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\varepsilon}
+\def\brop#1{#1\discretionary{}{\hbox{$#1$}}{}} % перенос знака операции на следующую строку
+\renewcommand{\em}{\it}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\Expect}{\mathbb{E}}
+%\newcommand{\Prob}{\mathbb{P}}
+
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\Bhypergeom}[5]{{#1}_{#2}^{#4,#3}\bigl(#5\bigr)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\BHyper}[4]{\Bhypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+%\newcommand{\Binom}[2]{\binom{#1}{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\newcommand{\mur}[3]{\mu({#1}, {#2}, {#3})}
+\newcommand{\todo}{\textcolor{red}{[ToDo]} }
+
+\theoremstyle{plain}
+\newtheorem{Theorem}{Теорема}
+\newtheorem{Lemma}[Theorem]{Лемма}
+\newtheorem{State}[Theorem]{Утверждение}
+\theoremstyle{definition}
+\newtheorem{Def}{Определение}
+\newtheorem{Definition}[Def]{Определение}
+\newtheorem{Corollary}{Следствие}
+\newtheorem{Hypothesis}{Гипотеза}
+\newtheorem{Task}{Задача}
+\newtheorem{Example}{Пример}
+\newtheorem{rem}{Замечание}
+
+\newcommand{\vkEndProof}{\hfill$\scriptstyle\blacksquare$\par\medskip}
+\newenvironment{vkProof}[1][. ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+% Проглотить следующий пробел
+\makeatletter
+\def\gobblespace{\@ifnextchar\ {\hspace{-1ex}}\relax}
+\makeatother
+% Вставка замечания рецензента
+\newcommand\REVIEWERNOTE[1]{{%
+    \itshape\bfseries%\color{red}%
+    \marginpar{%\raisebox{-1ex}{%\color{red}%
+        $\checkmark$%\!_{\themmroReviewerNote}
+    }%}%
+    \{#1\}
+}\gobblespace}
+
+\begin{document}
+
+\begin{center}
+{\Large \bf Эвристическая оценка вероятности переобчения}
+
+\end{center}
+
+Изначально наблюдение состоит в следующем: из теоретико-группового подхода следует, что функция $Q(\eps)$ для вероятности переобучения для центрального слоя шара выглядит точно так же, как и для одного алгоритма, но с заменой $\eps$ на $\eps' = \eps - \frac {L}{\ell k} \frac r 2 $, где $r$ - радиус шара. Напомню, что центральный слой шара - это $B_r^m(a_0) = \{a \in \AA \colon n(a, \XX) = m, \text { и } \rho(a, a_0) \leq r\}$.
+
+У Жени в оценке есть проблема, когда в семействе много истоков с равным числом ошибок. Я предлагаю рассматривать <<обобщенные истоки>> --- это наборы алгоритмов, попадающие внутри некоторого центрального слоя шара. Дальше оценку строить как обычно для семейства состоящего из центров этих шаров, но скомпенсировать это поправкой $\eps' = \eps - \frac {L}{\ell k} \frac r 2 $.
+
+Нужно только кластеризовать исходное семейство $A$ на набор кластеров $\sqcup_{i} A_i$. Предлагаю это сделать отдельно для каждого слоя. Внутри каждого слоя можно использовать жадный алгоритм, который стартует с шариков радиуса $0$ вокруг каждого алгоритма, и жадно сливает шарики что бы минимизировать $0.5$-квантиль вероятности переобучения:
+
+\[
+%    Q(A) \leq \sum \limits_{i} Q(A_i) \leq \sum \limits_{i}Q(B_i) =
+     \sum \limits_{i} H_L^{\ell, m}\Big(\frac \ell L (m - \epsilon k) + \big\lfloor r_i/2 \big\rfloor \Big) = \hat Q(\eps).
+\]
+
+
+\end{document}

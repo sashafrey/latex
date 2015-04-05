@@ -1,0 +1,18 @@
+http://mkl.ucsd.edu/dataset/pendigits
+
+The pendigits data set is on pen-based digit recognition (multiclass classification with 10 classes) and contains four different feature representations. The feature representations (D is the number of features) are:
+dyn (D = 16): eight successive pen points on two-dimensional coordinate system.
+sta16 (D = 256): 16 x 16 image bitmap representation formed by connecting the points in dyn representation with line segments.
+sta8 (D = 64): 8 x 8 subsampled bitmap representation.
+sta4 (D = 16): 4 x 4 subsampled bitmap representation.
+  The data set is split into independent training and test sets with 7494 samples for training and 3498 samples for testing. The pendigits.tgz archive contains 10 csv files. The files are:
+pendigits_dyn_train.csv: training instances in dyn representation.
+pendigits_dyn_test.csv: test instances in dyn representation.
+pendigits_sta16_train.csv: training instances in sta16 representation.
+pendigits_sta16_test.csv: test instances in sta16 representation.
+pendigits_sta8_train.csv: training instances in sta8 representation.
+pendigits_sta8_test.csv: test instances in sta8 representation.
+pendigits_sta4_train.csv: training instances in sta4 representation.
+pendigits_sta4_test.csv: test instances in sta4 representation.
+pendigits_label_train.csv: class labels of training instances.
+pendigits_label_test.csv: class labels of test instances.

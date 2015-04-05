@@ -1,0 +1,185 @@
+\documentclass[12pt]{article}
+
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{color}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+
+
+\textheight=26cm
+\textwidth=17cm
+\oddsidemargin=0mm
+\topmargin=-20mm
+\parindent=24pt
+\tolerance=500
+%\renewcommand{\baselinestretch}{1.3} %для печати с большим интервалом
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\varepsilon}
+\def\brop#1{#1\discretionary{}{\hbox{$#1$}}{}} % перенос знака операции на следующую строку
+\renewcommand{\em}{\it}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\Expect}{\mathbb{E}}
+%\newcommand{\Prob}{\mathbb{P}}
+
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\Bhypergeom}[5]{{#1}_{#2}^{#4,#3}\bigl(#5\bigr)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\BHyper}[4]{\Bhypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+%\newcommand{\Binom}[2]{\binom{#1}{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\newcommand{\mur}[3]{\mu({#1}, {#2}, {#3})}
+\newcommand{\todo}{\textcolor{red}{[ToDo]} }
+
+\theoremstyle{plain}
+\newtheorem{Theorem}{Теорема}
+\newtheorem{Lemma}[Theorem]{Лемма}
+\newtheorem{State}[Theorem]{Утверждение}
+\theoremstyle{definition}
+\newtheorem{Def}{Определение}
+\newtheorem{Definition}[Def]{Определение}
+\newtheorem{Corollary}{Следствие}
+\newtheorem{Hypothesis}{Гипотеза}
+\newtheorem{Task}{Задача}
+\newtheorem{Example}{Пример}
+\newtheorem{rem}{Замечание}
+
+\newcommand{\vkEndProof}{\hfill$\scriptstyle\blacksquare$\par\medskip}
+\newenvironment{vkProof}[1][. ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+% Проглотить следующий пробел
+\makeatletter
+\def\gobblespace{\@ifnextchar\ {\hspace{-1ex}}\relax}
+\makeatother
+% Вставка замечания рецензента
+\newcommand\REVIEWERNOTE[1]{{%
+    \itshape\bfseries%\color{red}%
+    \marginpar{%\raisebox{-1ex}{%\color{red}%
+        $\checkmark$%\!_{\themmroReviewerNote}
+    }%}%
+    \{#1\}
+}\gobblespace}
+
+% Для таблиц - невидимая вертикальная линейка немного расширяет заголовок
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+\newcommand{\headline}{\hline\hstrut}
+
+\begin{document}
+
+\begin{center}
+{\Large \bf Модель случайного семейства алгоритмов}
+
+\vspace{0.2cm}
+
+{\bf Фрей А. И.}
+
+\end{center}
+
+В данном параграфе мы построим математическую модель семейства $R_n^m$ "--- множества алгоритмов со случайными и независимыми векторами ошибок,
+и покажем, что вероятность переобучения $Q(\eps, R_n^m)$ экспоненциально быстро стремиться к единице с ростом числа алгоритмов.
+
+Введем нумерацию на множестве алгоритмов  $A = (a_1, \ldots, a_n ) \subset \AA$,\: $n = |A|$,
+и~рассмотрим группу $G = (S_L)^n$, состоящую из~$(L!)^n$ элементов.
+Группа $G$ действует на~множество~$A$,
+всевозможными способами переставляя ошибки разных алгоритмов независимо друг от~друга.
+Формального, элемент
+$g = (\pi_1, \ldots, \pi_n) \in G$ действует на~$A$ по~правилу
+$g A = ( \pi_1 a_1, \ldots, \pi_n a_n )$,
+где действие элементов группы $S_L$ на~$a \in \AA$
+определено перестановками объектов выборки.
+
+Определим усредненный функционал вероятности переобучения:
+\[
+    Q_G(\eps, A) = \frac 1{|G|} \sum_{g \in G} Q(\eps, g A).
+\]
+Тут $Q_G(\eps, A)$ зависит уже не~от
+самого множества алгоритмов $A$, а~только от~его профиля расслоения.
+Рассмотрим в~качестве примера $A$ множество, состоящее из $n$ алгоритмов, каждый из которых допускает $m$ ошибок на полной выборке.
+
+\begin{Theorem}
+Пусть $A$ "--- произвольное множество из~$n$ попарно"=различных алгоритмов,
+каждый из~которых допускает~$m$~ошибок на~полной выборке.
+Тогда
+\begin{equation}
+    \label{eq:scateredSlice}
+    Q_G(\eps, A) = 1 - \left( 1 - \Hyper{L}{m}{\ell}{s(\eps)} \right)^n,
+\end{equation}
+где
+$s(\eps) = \tfrac\ell L(m-\eps k)$.
+\end{Theorem}
+\begin{vkProof}
+Переставим знаки суммирования по~$X \in \XXell$ и~по $g \in G$:
+\[
+    Q_G(\eps, A)
+        = \frac 1{|G|} \frac1{\CLl}
+                \sum_{\Xl \in \XXell}
+                \sum_{g \in G}\;
+                 \sum \limits_{a\in (gA)(\Xl)}
+                    \frac {\bigl[ \delta(a, \Xl) \geq \epsilon \bigr]}
+                            {|(gA)(\Xl)|}.
+\]
+Заметим, все слагаемые под знаком усреднения $\frac 1{\CLl} \sum\limits_{\Xl \in \XXell}$ равны друг другу.
+Выберем произвольного представителя $\Xl \in \XXell$ и, по аналогии леммой с \ref{crl:easyFormula}, получим:
+\[
+    Q_G(\eps, A)
+        = \frac 1{|G|}
+                \sum_{g \in G}\;
+                 \sum \limits_{a\in (gA)(\Xl)}
+                    \frac {\bigl[ \delta(a, \Xl) \geq \epsilon \bigr]}
+                            {|(gA)(\Xl)|} =
+    \frac 1{|G|}\sum \limits_{g\in G}
+        \left[\min_{a \in g A} n(a, \Xl) \leq s(\eps) \right].
+\]
+Далее воспользуемся логическим отрицанием:
+\[
+\begin{aligned}
+    Q_G(\eps, A)
+    &= \frac 1{|G|} \sum_{g \in G} \left[\min_{a \in gA} n(a, \Xl) \leq s(\eps) \right]
+    = \frac 1{|G|} \sum_{g \in G} \Big[\exists a \in g A, n(a, \Xl) \leq s(\eps) \Big] = \\
+    &= 1 - \frac 1{|G|} \sum_{g \in G} \Big[\forall a \in g A, n(a, \Xl) > s(\eps) \Big]
+   = 1 - \frac 1{|G|} \sum_{g \in G} \prod_{i = 1}^n \Big[n(\pi_i a_i, X) > s(\eps) \Big].
+\end{aligned}
+\]
+Пользуясь тем, что группа~$G$ "--- декартово произведение групп, получим
+\[
+    Q_G(\eps, A) = 1 - \prod_{i = 1}^n \frac 1{|S_L|} \sum_{\pi_i \in S_L} \Big[n(\pi_i\, a_i, X) > s(\eps) \Big] = 1 - \prod_{i = 1}^n \Big(1 - \Hyper{L}{m}{\ell}{s(\eps)}\Big).
+\]
+Замечая, что множители в произведении не зависят от $i$, приходим к формуле \eqref{eq:scateredSlice}.
+\end{vkProof}
+
+С увеличением числа алгоритмов в $A_n^m$
+величина $\left(1 - \BHyper{L}{m}{\ell}{s(\eps)} \right)^n$ стремиться к~нулю,
+и, следовательно, вероятность переобучения стремится к~единице.
+При малых значениях параметра $n$ данная величина хорошо приближается выражением $n \BHyper{L}{m}{\ell}{s(\eps)}$,
+соответствующим оценке, полученной с помощью неравенства Буля.
+Это даёт интересную интерпретацию: оценка, полученная с помощью неравенства Буля,
+соответствует вероятности переобучения нового множества алгоритмов, полученного из исходного с помощью
+случайных и независимых перестановок объектов внутри векторов ошибок разных алгоритмов.
+
+\end{document}

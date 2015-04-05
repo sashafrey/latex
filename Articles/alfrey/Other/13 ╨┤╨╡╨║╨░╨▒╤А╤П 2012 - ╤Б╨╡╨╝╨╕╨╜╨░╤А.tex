@@ -1,0 +1,79 @@
+\documentclass{beamer}
+\usepackage{pifont}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+\usepackage{color}
+%\usepackage[showframe=true]{geometry}
+\usepackage{changepage}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  д.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+%\title[Dense and Sparse Predictors Grid]{Overfitting Probability for Dense and Sparse Predictors Grid}
+\title[Теоретико-групповой подход к проблеме переобучения]{Теоретико-групповой подход в комбинаторной теории оценок обобщающей способности}
+
+\author{Фрей Александр Ильич}
+\date{13 декабря 2012}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\X}{\bar X}
+\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\renewcommand{\P}{\textbf{P}}
+\newcommand{\E}{\textbf{E}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+\newcommand{\Q}{Q_\eps}
+
+\begin{frame}
+	\frametitle{Теоретико-групповой подход к проблеме переобучения}
+
+    \textbf{2010 - 2011}
+    \begin{itemize}
+        \item[\ding{51}] предложен рандомизированный метод обучения (РМЭР);
+        \item[\ding{51}] разработан теоретико-групповой метод оценки вероятности переобучения РМЭР для модельных семейств;
+        \item[\ding{51}] получен метод порождающих и запрещающих множеств для РМЭР;
+        \item[\ding{51}] предложена рандомизация на множестве алгоритмов как модель отсутствия связности;
+        \item[\ding{51}] предложена рандомизация на целевых метках и доказана теорема о декомпозиции профиля расслоения-связности;
+    \end{itemize}
+\end{frame}
+
+\end{document}

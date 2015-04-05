@@ -1,0 +1,559 @@
+\documentclass[unicode,lefteqn]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath,mathrsfs}
+\usepackage{mathrsfs}
+%\usepackage[russian]{babel}
+\usepackage{array}
+\usepackage{ulem}\normalem
+\usepackage[all]{xy}
+\usepackage[noend]{algorithmic}
+%\documentclass{article}\usepackage{beamerarticle}
+
+\usetheme{Warsaw}%{Darmstadt}
+\usefonttheme[onlylarge]{structurebold}
+\setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+%\setbeameroption{show notes}
+%\setbeameroption{show only notes}   % for printing notes
+
+%\newcommand{\XX}{\mathbb{X}}
+\newcommand{\XX}{\mathbb{X}^L}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+\renewcommand{\AA}{A}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\fI}{\mathbb{S}}
+%\newcommand{\fI}{\mathfrak{I}}
+\def\cL{\mathscr{L}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathsf{const}}
+\newcommand{\sign}{\mathop{\mathsf{sign}}\limits}
+\newcommand{\bbr}[1]{\text{\itshape\b#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\Arg}{\mathop{\mathsf{Arg}}\limits}
+\newcommand{\argmin}{\mathop{\mathsf{argmin}}\limits}
+\definecolor{light-green}{rgb}{0.6,1.0,0.6}
+\definecolor{light-red}{rgb}{1.0,0.6,0.6}
+\definecolor{light-yellow}{rgb}{1.0,1.0,0.8}
+\definecolor{green}{rgb}{0.0,0.5,0.0}
+\definecolor{yellow}{rgb}{0.6,0.6,0.0}
+\definecolor{rred}{rgb}{1.0,0.5,0.4}
+\definecolor{ggreen}{rgb}{0.0,1.0,0.0}
+\def\g#1{{\color{green}#1}}
+\def\r#1{{\color{red}#1}}
+\def\G#1{{\color{ggreen}#1}}
+\def\R#1{{\color{rred}#1}}
+\newcommand{\fbx}[2]{\fcolorbox{#2}{light-#2}{\vphantom{o}\hspace{#1mm}}}
+%\newcommand{\a}[1]{\alert{#1}}
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+
+\makeatletter
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,\,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\makeatother
+
+\newtheorem{vkAxiom}{Axiom}
+\newtheorem{vkHyp}{Conjecture}
+\newtheorem{vkTheorem}{Theorem}
+\newtheorem{vkLemma}{Lemma}
+\newtheorem{vkDef}{Definition}
+\newtheorem{vkProblem}{Problem}
+\newtheorem{vkCorr}{Corrolary}
+
+% Оформление алгоритмов в пакетах algorithm, algorithmic
+\definecolor{KwColor}{rgb}{0,0,0.6}
+\newcommand{\vkKw}[1]{{\bf\color{KwColor} #1}}
+\renewcommand{\algorithmicrequire}{\rule{0pt}{2.5ex}\vkKw{Require:}}
+\renewcommand{\algorithmicensure}{\vkKw{Ensure:}}
+\renewcommand{\algorithmicend}{\vkKw{end}}
+\renewcommand{\algorithmicif}{\vkKw{if}}
+\renewcommand{\algorithmicthen}{\vkKw{then}}
+\renewcommand{\algorithmicelse}{\vkKw{else}}
+\renewcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\renewcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\renewcommand{\algorithmicfor}{\vkKw{for}}
+\renewcommand{\algorithmicforall}{\vkKw{for all}}
+\renewcommand{\algorithmicdo}{}
+\renewcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
+\renewcommand{\algorithmicwhile}{\vkKw{while}}
+\renewcommand{\algorithmicendwhile}{\algorithmicend\ \algorithmicwhile}
+\renewcommand{\algorithmicloop}{\vkKw{loop}}
+\renewcommand{\algorithmicendloop}{\algorithmicend\ \algorithmicloop}
+\renewcommand{\algorithmicrepeat}{\vkKw{repeat}}
+\renewcommand{\algorithmicuntil}{\vkKw{until}}
+%\renewcommand{\algorithmiccomment}[1]{{\footnotesize // #1}}
+\renewcommand{\algorithmiccomment}[1]{{\itshape\quad (#1)}}
+% Мои дополнительные команды для описания алгоритмов
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\PARAMS}{\renewcommand{\algorithmicrequire}{\vkKw{Params:}}\REQUIRE}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\vkReturn}{\vkKw{return} }
+\newcommand{\RET}{\STATE\vkReturn}
+\newcommand{\EXIT}{\STATE\vkKw{exit}}
+\newcommand{\CONTINUE}{\STATE\vkKw{continue} }
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\vkProcedure}[1]{\text{#1}\:}
+\newcommand{\vkProc}[1]{\text{#1}\:}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\vkKw{PROCEDURE} \vkProcedure{#1}}
+
+% Рисование нейронных сетей и диаграмм
+\newenvironment{network}%
+    {\begin{xy}<1ex,0ex>:}%
+    {\end{xy}}
+\def\nnNode[#1](#2)#3{\POS(#2)*#3="#1"}
+\def\nnLink[#1,#2]#3{\POS"#1"\ar #3 "#2"}
+
+% Для подписей на рисунках, вставляемых includegraphics
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}
+
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title
+    [Geometrical properties of connected search spaces]
+    {Geometrical properties of connected search spaces for binary classification problem}
+\author[Alexander Frey]{%
+    Alexander Frey \;\;\;\quad~\quad~ (\texttt{sashafrey@gmail.com})\\
+    Konstantin~Vorontsov \qquad (\texttt{voron@forecsys.ru})
+    }
+\institute{\footnotesize Computing Center RAS~~$\bullet$~~Moscow Institute of Physics and Technology}
+
+\date[EURO-XXV, July 11, 2012]{\footnotesize \\[1ex]
+    25th European Conference on\\
+    Operational Research (EURO-XXV)\\
+    Vilnius, Lithuania~~$\bullet$~~July~8\,--\,11, 2012
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+%\begin{frame}{Contents}
+    %\scriptsize
+%    \tableofcontents
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Statistical Learning Theory }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Empirical Risk Minimization}
+
+\begin{frame}[t]{Empirical Risk Minimization}
+
+$(S, \mathcal{A}, \mathcal{P})$ a probability space;
+
+$\mathscr{F}$ a class of measurable functions $f \colon S \rightarrow [0, 1]$ (losses)
+
+Example: $S = X \times Y$, $f(x, y) = (g(x) - y)^2$.
+
+\textbf{Risk minimization}
+\[
+    P f \equiv \int_S f d P = \mathbb{E} f(x) \rightarrow min, f \in \mathcal{F}
+\]
+
+\textbf{Empirical risk minimization}
+
+$(x_1, \dots, x_n)$ a sample of i.i.d random variables, $x_i \in S$
+\begin{equation}
+\label{label2}
+    P_n f \equiv \frac 1{n} \sum_{i=1}^n f(x_i) \rightarrow min, f \in \mathcal{F}
+\end{equation}
+
+\textbf{Empirical risk minimizer} $\hat f$ --- solution of \eqref{label2}
+
+\textbf{Excess risk:}
+$
+    \epsilon(\hat f) \equiv P \hat f - \inf\limits_{f \in \mathcal F} P f.
+$
+
+\end{frame}
+
+\subsection{Model Selection Problem}
+
+\begin{frame}
+\textbf{Model Selection Problem:}
+
+Given a family $\mathcal{F}_1 \subset \mathcal{F}_2 \subset \dots \subset \mathcal{F}$ of nested function classes and sequence
+      $\hat f_{n,k}$ of empirical risk minimizers on each class, select
+      $\hat f = \hat f_{n,k} \in \mathcal F_k \subset \mathcal F$
+      with a "nearly optimal" excess risk
+
+Approaches:
+\begin{itemize}
+  \item \textbf{Penalization and oracle inequalities}, based on distribution dependent and data dependent bounds on $\epsilon(\hat f_n)$ that take into account the "geometry" of $\mathcal F$, or
+  \item in practice --- \textbf{cross-validation}.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Combinatorial Learning Theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Empirical risk minimizer and mean overfitting}
+
+\begin{frame}[t]{Empirical risk minimizer and mean overfitting}
+
+$\XX = \{x_1,\ldots,x_L\}$ a~finite set of objects,
+
+$R$ --- set of classifiers,
+
+$\XX=X^\ell \sqcup X^k$ decomposition of $X_L$ into train and test sample,
+
+$\nu(r, X^\ell) = \frac1 \ell \sum \limits_{x_i \in X^\ell} I(r(x_i), y_i)$ --- error rate of $r$ on train sample,
+
+$\hat r = \mu X^\ell = \argmin_{r \in R} \nu(r, X^\ell)$ --- empirical risk minimizer,
+
+$\delta(X^\ell) = \nu(\hat r, X^k) - \nu(\hat r, X^\ell)$ --- \emph{overfitting},
+
+\textbf{With respect to decomposition $\XX=X^\ell \sqcup X^k$, \emph{overfitting} $\delta$ is a random variable,}
+
+$P_n \equiv \frac 1{\CLl}\sum\limits_{X^\ell}$ --- empirical probability measure,
+
+Cumulative distribution function: $Q(\eps) = P_n \{\delta(X^\ell) \geq \eps \} $,
+
+\emph{Mean overfitting}: $\bar \delta = P_n \delta(X^\ell) = \frac 1{\CLl}\sum\limits_{X^\ell} \delta(X^\ell)$
+
+\end{frame}
+
+\begin{frame}[t]{Decision with incomplete information}
+    \begin{itemize}
+        \item Rows $\{x_1\, \dots\, x_\ell, x_{\ell + 1}, x_L\}$ --- objects,
+        \item Columns $\{r_1\, \dots\, r_D\}$\, --- error vectors of classifiers.
+    \end{itemize}
+
+    \begin{center}
+    \vskip-2ex
+    \begin{tabular}[t]{|c|llllll|}
+    \hline
+          & $r_1$ & $r_2$ & \dots & \textbf{$r_d$} & \dots & $r_D$ \\
+    \hline
+    $x_1$ & 0 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 1 \\
+    $\dots$ & 1 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    $x_\ell$ & 0 & 0 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    \hline
+    $x_{\ell + 1}$ & 1 & 1 & \dots & \textcolor{red}{\textbf{1}} & \dots & 1 \\
+    $\dots$ & 1 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    $x_L$ & 0 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    \begin{itemize}
+        \item $\{x_1, x_2, x_3\}$ --- train sample,
+        \item $\{x_4, x_5, x_6\}$ --- test sample.
+    \end{itemize}
+\end{frame}
+
+\subsection{Binary Error Vector and Error Matrix}
+
+%\begin{frame}[t]{Binary Error Vector}
+
+%$\XX = \{x_1,\ldots,x_L\}$ a~finite set of objects,
+
+%$r \colon \XX \rightarrow \YY$ --- classifier,
+
+%$I(r, x_i) \in \{0, 1\}$ --- binary indicator of error, for example $r(x_i) \neq y_i$.
+
+%$(I(r, x_i))_{i=1}^L$ --- binary error vector.
+
+%\end{frame}
+
+\begin{frame}[t]{Example. Binary error matrix for a~set of linear classifiers}
+    \begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width = 50mm]{SimpleSample0num.PNG.eps}
+    \end{centering}
+    \end{figure}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|}
+        & \alert{layer 0} \\
+        $x_1$ & 0 \\[-0.6ex]
+        $x_2$ & 0 \\[-0.6ex]
+        $x_3$ & 0 \\[-0.6ex]
+        $x_4$ & 0 \\[-0.6ex]
+        $x_5$ & 0 \\[-0.6ex]
+        $x_6$ & 0 \\[-0.6ex]
+        $x_7$ & 0 \\[-0.6ex]
+        $x_8$ & 0 \\[-0.6ex]
+        $x_9$ & 0 \\[-0.6ex]
+     $x_{10}$ & 0
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[t]{Example. Binary error matrix for a~set of linear classifiers}
+    \begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width = 50mm]{SimpleSample1.PNG.eps}
+    \end{centering}
+    \end{figure}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|ccccc|}
+        & {layer 0} &
+        \multicolumn{5}{c|}{\alert{layer 1}} \\
+        $x_1$ & 0 & 1 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_2$ & 0 & 0 & 1 & 0 & 0 & 0 \\[-0.6ex]
+        $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 \\[-0.6ex]
+        $x_4$ & 0 & 0 & 0 & 0 & 1 & 0 \\[-0.6ex]
+        $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 \\[-0.6ex]
+        $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_7$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_8$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+        $x_9$ & 0 & 0 & 0 & 0 & 0 & 0 \\[-0.6ex]
+     $x_{10}$ & 0 & 0 & 0 & 0 & 0 & 0
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[t]{Example. Binary error matrix for a~set of linear classifiers}
+    \begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width = 50mm]{SimpleSample2.PNG.eps}
+    \end{centering}
+    \end{figure}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|ccccc|cccccccc|c}
+        & {layer 0} &
+        \multicolumn{5}{c|}{layer 1} &
+        \multicolumn{8}{c|}{\alert{layer 2}} \\
+        $x_1$ & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_2$ & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_4$ & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_7$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_8$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_9$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+     $x_{10}$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[t]{Single classifier}
+
+Let $R$ consists of single classifier.
+
+\begin{figure}[h]
+    \label{fig1}
+    \centering
+    \includegraphics[height=48mm]{QEps_a0.eps}
+    \caption{Cumulative distribution function $Q(\eps) = P\{\delta(X^\ell) \geq \eps\}$ of overfitting.
+    $L=1000$, $\ell = 250$.}
+\end{figure}
+
+\end{frame}
+
+\subsection{Splitting and Connectivity}
+
+\begin{frame}[t]{Pair of classifiers}
+
+Let $R$ consists of the pair of classifier.
+
+\begin{figure}[h]
+    \label{fig2}
+    \centering
+
+    \includegraphics[height=48mm]{MeanOverfittingPairAlgs-png.eps}
+    \caption{Mean overfitting $\bar \delta$ depending on the Hamming distance $d(r_1, r_2)$ in the pair of classifiers.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[t]{The maximal connected set of given diameter}
+
+Maximal set of classifiers with limited hamming diameter ($2\rho$) and fixed number of errors ($m$):
+\[
+    B_r^m(r_0) = \{r \in R \colon n(r, \XX) = m, \text { and } \rho(r, r_0) \leq \rho\}.
+\]
+
+$R_n^m$ --- set of $n$ classifiers with $m$ random errors.
+
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}[t]{|cc|c|c|}
+    \hline
+    $r$ & $|B_r^m|$ & $|R_n^m|$ & $\delta$ \\
+    \hline
+    2 & 401 & 2 & 0.079 \\
+    4 & 35.501 & 7 & 0.160 \\
+    6 & 1.221.101 & 39 & 0.240 \\
+    8 & 20.413.001 & 378 & 0.319 \\
+    \hline
+    \end{tabular}
+  \end{center}
+  \caption{Comparison of $|R_n^m|$ and $|B_r^m|$ that gives the sample $\bar \delta$. $L=50$, $\ell=25$, $m=10$}
+\end{table}
+
+\end{frame}
+
+\begin{frame}[t]{Splitting and connectivity}
+Classical approach:
+\begin{itemize}
+    \item $\delta$-minimal sets:
+    \[
+        \mathcal F(\delta) \equiv \{f \in \mathcal F \colon \eps(f) \leq \delta\}
+    \]
+    
+    \item $L_2$-diameter
+    \[
+        D(\delta) \equiv \sup_{f, g \in \mathcal F(\delta)} (P(f-g)^2)^{1/2}
+    \]
+\end{itemize}
+
+Combinatorial approach:
+\begin{itemize}
+    \item Algorithms with low error rate on $X_L$
+    \[
+        R(m) \equiv \{r \in R \colon n(r, X_L) \leq m\}
+    \]
+    
+    \item Hamming diameter
+    \[
+        D(m) \equiv \sup_{f, g \in R(m)} \rho(f, g)
+    \]
+    ($\rho(r_1, r_2) = \sum_{x_i} [I(r_1, x_i) \neq I(r_2,x_i)]$)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[t]{Error matrix and SC-graph for a~set of linear classifiers}
+    \tabcolsep=2mm
+    \begin{tabular}{m{50mm}m{50mm}}
+        \includegraphics[width = 50mm]{SimpleSample2.PNG.eps} &
+        \includegraphics[width = 50mm]{SimpleGraph2.PNG.eps}
+        \XYtext(-18mm,0.5mm){\scriptsize{layer 0}}%
+        \XYtext(-11mm,4mm){\scriptsize{layer 1}}%
+        \XYtext(-6mm,7.5mm){\scriptsize\alert{layer 2}}%
+    \end{tabular}
+
+    \medskip\scriptsize
+    \begin{tabular}{c|c|ccccc|cccccccc|c}
+        & {layer 0} &
+        \multicolumn{5}{c|}{layer 1} &
+        \multicolumn{8}{c|}{\alert{layer 2}} \\
+        $x_1$ & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_2$ & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_4$ & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & \ldots \\[-0.6ex]
+        $x_7$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & \ldots \\[-0.6ex]
+        $x_8$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+        $x_9$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots \\[-0.6ex]
+     $x_{10}$ & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \ldots
+    \end{tabular}
+\end{frame}
+
+\section{Splitting and connectivity profiles}
+
+\subsection{Definition of SC-profile}
+
+\begin{frame}[t]{Splitting and connectivity profiles}
+
+Lets fix binary error matrix $R$.
+
+\begin{itemize}
+    \item $\Delta_m = |\{r \in R \colon n(r, \XX) = m\}|$ - splitting profile of $R$,
+    \item $q(r_0) = |\{r \in R \colon \rho(r, r_0) = 1\}|$ - connectivity of classifier $r_0$,
+    \item $\Delta_q = |\{r \in R \colon q(r) = q \}|$  - connectivity profile of $R$,
+    \item $\Delta_{m, q} = |\{r \in R \colon q(r) = q \text { and } n(r, \XX) = m\}|$ - SC-profile.
+\end{itemize}
+
+\end{frame}
+
+\subsection{SC-profile for linear classifiers}
+
+\begin{frame}[t]{SC-profile for linear classifiers}
+    \begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width = 72mm]{sc-exp-png.eps}
+    \end{centering}
+    \caption{SC-profile for the set of linear classifiers in $\mathbb R^p$.
+    $p = 5$, $L = 300$, $|R| = 2 \cdot 10^5$.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[t]{SC-profile for linear classifiers}
+    \begin{itemize}
+        \item In $R^3$ consider the set $\mathbb S^2$ of linear classifiers $\{y = [\langle w, x \rangle \leq \alert{0}] \colon w \in \mathbb S^2, ||w|| = 1\}$.
+        \item For a given object $x_0 \in R^3$ consider circle $\mathbb{S}^1 = \{w \in \mathbb{S}^2 \colon \langle w, x_0 \rangle = 0 \}$.
+    \end{itemize}
+    \begin{figure}
+        \begin{centering}
+        \includegraphics[height=48mm]{sphereMap.eps}
+        \end{centering}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[t]{SC-profile for linear classifiers}
+    This split $\mathbb{S}^2$ into cells.
+    \begin{itemize}
+        \item Each cell is the set of classifiers with identical error vectors,
+        \item Edges between cells - classifiers that differs on one object.
+    \end{itemize}
+    Connectivity profile $\Delta_q$ doesn't depend on true classification!
+    \begin{figure}
+        \begin{centering}
+        \includegraphics[height=48mm]{sphereMap.eps}
+        \end{centering}
+    \end{figure}
+\end{frame}
+
+\subsection{Decomposition of SC-profile}
+
+\begin{frame}
+    \begin{itemize}
+        \item Binary classification problem: $Y = \{+1, -1\}$,
+        \item $S_2 = \{e, h\}$ --- group that acts on $Y$,
+        \item $S_2^L$ --- group that acts on $X_L$ (and hense on R)
+    \end{itemize}
+    \begin{vkLemma}
+        $S_2^L$ doesn't change Hamming distance between classifiers:
+        \[
+            \forall g \in S_2^L, \forall r_1, r_2 \in R \text{ holds }
+            \rho(g r_1, g r_2) = \rho(r_1, r_2).
+        \]
+    \end{vkLemma}
+    \begin{vkTheorem}
+        The decomposition of SC-profile holds on average:
+        \[
+            \frac 1{2^L}\sum_{g \in S_2^L} \Delta_{m, q} = \Delta_q \times \frac 1{2^L}\sum_{g \in S_2^L} \Delta_m
+        \]
+    \end{vkTheorem}
+\end{frame}
+
+\begin{frame}[t]{Conclusions}
+    \begin{itemize}
+        \item Combinatorial approach deals with the same problems, as Statistical learning theory (model selection or sharp overfitting bounds),
+        \item Instead of dealing with unknown underlying destribution, we study Complete Cross-Validation,
+        \item We observe the same phenomena as in SLT --- splitting and connectivity,
+        \item We have proven that for binary classification problem connectivity is the geometrical propery of points, which doesn't depend on their target classes. 
+    \end{itemize}    
+\end{frame}
+
+\end{document}

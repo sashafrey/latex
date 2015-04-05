@@ -1,0 +1,338 @@
+\documentclass{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Факультет Управления и Прикладной Математики \\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  к.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+\title[Симметричные семейства алгоритмов]{Точные оценки вероятности переобучения для симметричных семейств алгоритмов}
+
+
+\author{Фрей Александр Ильич}
+\date{22 сентября 2009}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+
+\begin{frame}
+    \frametitle{Проблема переобучения}
+    \begin{itemize}
+        \item Строки таблицы $\{x_1\, \dots\, x_6\}$ "--- объекты полной выборки
+        \item Столбцы $\{a_1\, \dots\, a_D\}$\, "--- векторы ошибок алгоритмов
+    \end{itemize}
+    \begin{center}
+    \vskip-2ex
+    \begin{tabular}[t]{|c|llllll|}
+    \hline
+          & $a_1$ & $a_2$ & \dots & \textbf{$a_d$} & \dots & $a_D$ \\
+    \hline
+    $x_1$ & 0 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 1 \\
+    $x_2$ & 1 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    $x_3$ & 0 & 0 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    \hline
+    $x_4$ & 1 & 1 & \dots & \textcolor{red}{\textbf{1}} & \dots & 1 \\
+    $x_5$ & 1 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    $x_6$ & 0 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    \begin{itemize}
+        %\item $\{x_1, x_2, x_3\}$ "--- наблюдаемая обучающая подвыборка
+        %\item $\{x_4, x_5, x_6\}$ "--- скрытая контрольная подвыборка
+        \item Метод обучения "--- минимизация эмпирического риска
+        \item Цель: получить точные, вычислительно-эффективные оценки вероятности переобучения.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Содержание}
+    \begin{enumerate}
+        \item Наделить структурой произвольное множество алгоритмов
+        \begin{itemize}
+            \item Группа симметрий множества алгоритмов
+            \item Классы идентичных алгоритмов
+        \end{itemize}
+        \item Вывести общую оценку вероятности переобучения с учетом симметрии семейства
+        \begin{itemize}
+            \item Рандомизированный метод обучения
+            \item Теорема о равном вкладе идентичных алгоритмов в вероятность переобучения
+        \end{itemize}
+        \item Исследовать семейства алгоритмов простой структуры
+        \begin{itemize}
+            \item Явная формула для связки монотонных цепочек
+            \item Графики вероятности переобучения для трех случаев
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Группа симметрий множества алгоритмов}
+    \begin{itemize}
+        \item Генеральная выборка $\XX=\bigl( x_i \bigr){}_{i=1}^L$
+        \item Алгоритм "--- бинарный вектор $a \equiv \bigl( a(x_i) \bigr){}_{i=1}^L$ длины~$L$
+        \item Множество $\AA = \{0, 1\}^L$ "--- все алгоритмы длины L
+        \item Аналогия:
+    \end{itemize}
+    \begin{center}
+    \vskip-3.5ex
+    \begin{tabular}[t]{|l|l|}
+    \hline
+    Точка на плоскости & Алгоритм \\
+    Плоскость $\mathbb{R}^2$ & Множество всех алгоритмов $\AA$ \\
+    Плоская фигура $F \subset \mathbb{R}^2$ & Множество алгоритмов $A \subset \AA$\\
+    Группа движений плоскости & Группа перестановок $S_L$ \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    \vskip-2ex
+    \begin{Def}[Группа симметрий]
+    \emph{Группой симметрий} $S(A)$ множества алгоритмов $A\subset\AA$
+    назовем его стационарную подгруппу:
+    \[
+        S(A) = \{\pi \in S_L \colon \pi(A) = A\}.
+    \]
+    \end{Def}
+\end{frame}
+
+%\begin{frame}
+%    \frametitle{Пример: унимодальная цепочка $U_3$}
+%        \begin{center}
+%        \vskip-2ex
+%            \begin{tabular}[t]{|c|l|lll|lll|}
+%                \hline
+%                      & $a_0$ & $a_1$ & $a_2$ & $a_3$ & $a_4$ & $a_5$ & $a_6$ \\
+%                \hline
+%                $x_1$ & 0 & 1 & 1 & 1 & 0 & 0 & 0 \\
+%                $x_2$ & 0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+%                $x_3$ & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+%                \hline
+%                $x_4$ & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
+%                $x_5$ & 0 & 0 & 0 & 0 & 0 & 1 & 1 \\
+%                $x_6$ & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+%                \hline
+%            \end{tabular}
+%        \end{center}
+%    \vskip-2ex
+%    \begin{itemize}
+%        \item $S(U_3)$ "--- перестановка левой и правой ветви цепочки
+%        (${x_1{\,\leftrightarrow\,}x_4}$, $x_2{\,\leftrightarrow\,}x_5$, $x_3{\,\leftrightarrow\,}x_6$)
+%    \end{itemize}
+%
+%\vskip-2ex
+%\begin{Th}[Корректность определения группы симметрий]
+%    Для любого множества алгоритмов ${A \subset \AA}$
+%    и любой перестановки $\pi \in S_L$ группы $S(A)$ и~$S(\pi(A))$ сопряжены:
+%    $S(\pi(A)) = \pi \circ S(A) \circ \pi^{-1}$.
+%\end{Th}
+%\end{frame}
+
+\begin{frame}
+    \frametitle{Классы идентичных алгоритмов}
+
+\begin{itemize}
+    \item Орбитой элемента $m$ множества $M$, на котором действует группа $G$, называется подмножество
+    $Gm = \{gm \colon g \in G\}$.
+    \item Две орбиты либо не пересекаются, либо совпадают.
+    \item Разбиение на орбиты: $M = G m_1 \sqcup G m_2 \sqcup \dots \sqcup G m_k$.
+    \vskip2ex
+    \item Группа $S(A)$ \emph{действует} на множестве алгоритмов $A$.
+    \item Алгоритмы внутри одной орбиты назовем \emph{идентичными}.
+    \item Обозначим $\Omega(A)$ "--- множества орбит, $\omega \in \Omega(A)$ "--- класс идентичных алгоритмов.
+\end{itemize}
+
+\begin{Th}
+    Идентичные алгоритмы имеют равное число ошибок на полной выборке.
+\end{Th}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Рандомизированный метод обучения}
+    \begin{itemize}
+        \item Метод минимизации эмпирического риска ставит в соответствие обучающей выборке алгоритм из заранее фиксированного множества: $\mu : 2^\AA \times \XXell \rightarrow \AA$
+    \end{itemize}
+
+    \begin{Def}\label{searchMethod}
+        Рандомизированный метод обучения "--- это отображение вида
+        \[
+            \mu : 2^\AA \times \XXell \times \AA \rightarrow [0, 1],
+        \]
+        такое что для всех
+        $\, A \subset \AA$,\; ${X \in \XXell}$,\; $a,\, b \in A$ и~$\pi \in S_L$ имеем
+        \begin{enumerate}
+        \item $\sum\limits_{a \in A} \mu(A, X, a) = 1$;
+        \item $n(a, X) = n(b, X) \;\to\; \mu(A, X, a) = \mu(A, X, b)$;
+        \item $\mu(A, X, a) = \mu \bigl( \pi(A), \pi(X), \pi(a) \bigr)$.
+        \end{enumerate}
+    \end{Def}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Вероятность переобучения}
+    \begin{itemize}
+        \item Вероятность получить алгоритм в результате обучения
+        \[
+            P(a,A) = \frac1{C_L^\ell} \sum_{X \in \XXell} \mu(A, X, a).
+        \]
+
+        \item \emph{Вклад} алгоритма $a\in A$ в~вероятность переобучения:
+        \[
+            Q_\varepsilon(a,A)
+            =
+            \frac1{C_L^\ell}
+                \sum_{X \in \XXell}
+                    \mu(A, X, a)
+                    \bigl[ \delta(a, X) \geq \varepsilon \bigr].
+        \]
+
+        \item \emph{Вероятность переобучения}:
+        $
+            Q_\varepsilon(A)
+            =
+            \sum_{a\in A} Q_\varepsilon(a,A).
+        $
+    \end{itemize}
+
+    \begin{Th}
+        Идентичные алгоритмы дают равный вклад в вероятность переобучения:
+        \[
+            Q_\varepsilon(A) =
+                \sum_{\omega \in \Omega(A)} |\,\omega| \,
+                Q_\varepsilon(A, a_\omega).
+        \]
+    \end{Th}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Семейства простой структуры}
+    \begin{itemize}
+        \item (1) Связка из монотонных цепочек
+        \begin{itemize}
+            \item $p$ "--- число ветвей
+            \item $D$ "--- длина каждой ветви
+        \end{itemize}
+    \end{itemize}
+    \vskip-2ex
+    \begin{figure}[t]
+        \centering {
+            \includegraphics[width=100mm]{frey_algSetGraph.eps}
+            \vskip-3.5ex
+        }
+    \end{figure}
+    \begin{itemize}
+        \item Частные случаи:
+        \begin{itemize}
+            \item (2) Монотонная цепочка: $p = 1$.
+            \item (3) Унимодальная цепочка: $p = 2$.
+            \item (4) Единичная окрестность лучшего алгоритма: $D = 1$.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Явная формула вероятности переобучения}
+    \begin{itemize}
+        \item Рандомизированный метод минимизации эмпирического риска.
+    \end{itemize}
+    \begin{Th}
+    \label{th:pMonot}
+        Для связки из $p$ монотонных цепочек
+        вероятность переобучения рандомизированного метода минимизации эмпирического риска
+        может быть записана в явном виде:
+        \[
+                Q_\varepsilon(A) =
+                    \sum_{h=0}^{D}
+                    \sum_{S=h}^{p D}
+                    \sum_{F = 0}^{p}
+                    \frac{|\omega_h| R_{D, p}^h(S, F)}{1 + S}
+                    \frac{C_{L'}^{\ell'}}{C_L^\ell}
+                    H_{L'}^{\ell', m}(s(\varepsilon)),
+        \]
+        где
+            $L' = L {-} S {-} F$,\;
+            $\ell' = \ell {-} F$,\;
+            $s(\varepsilon) = \bigl\lfloor \frac{\ell}L (m {+} h {-} \varepsilon k) \bigr\rfloor$;\;
+            $|\omega_h| = 1$ при $h = 0$ и $|\omega_h| = p$ при ${h \geq 1}$,
+            $H_{L'}^{\ell', m}(s)$ "--- функция гипергеометрического распределения.
+    \end{Th}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Численные результаты - сравнение оценок}
+    \begin{figure}[t]
+        \centering {
+            \includegraphics[width=110mm]{frey_monot_legend.eps}
+            \vskip-2ex
+            \caption{$L=100$, $\ell=60$, $D=40$, $m=20$.}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Численные результаты - сравнение оценок}
+    \begin{figure}[t]
+        \centering {
+            \includegraphics[width=110mm]{frey_unit_legend.eps}
+            \vskip-2ex
+            \caption{$L=100$, $\ell=60$, $p=10$, $m=20$.}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Основные результаты и направления исследований}
+
+    \begin{enumerate}
+        \item Наделить структурой произвольное множество алгоритмов
+        \begin{itemize}
+            \item Группа симметрий множества алгоритмов
+            \item Классы идентичных алгоритмов
+        \end{itemize}
+        \item Вывести общую оценку вероятности переобучения с учетом симметрии семейства
+        \begin{itemize}
+            \item Рандомизированный метод обучения
+            \item Теорема о равном вкладе идентичных алгоритмов в вероятность переобучения
+        \end{itemize}
+        \item Исследовать семейства алгоритмов простой структуры
+        \begin{itemize}
+            \item Явная формула для связки монотонных цепочек
+        \end{itemize}
+    \end{enumerate}
+
+    Направления дальнейших исследований:
+    \begin{itemize}
+        \item Монотонные и унимодальные сетки большой размерности
+        \item Исследование семейств алгоритмов, возникающих в реальных задачах
+    \end{itemize}
+
+\end{frame}
+
+
+\end{document} 

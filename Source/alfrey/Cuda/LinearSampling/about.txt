@@ -1,0 +1,23 @@
+This project aims to provide high-performance tools for sampling the graph of linear classifiers and computing combinatorial overfitting bounds.
+If you are interested in this project you are welcome to e-mail sashafrey@gmail.com and I will be happy to share details with you!
+
+Relevant slides in english:
+	http://www.machinelearning.ru/wiki/images/4/49/Voron11premi-talk-1.pdf
+	http://www.machinelearning.ru/wiki/images/d/d7/Voron11premi-talk-2.pdf
+	http://www.machinelearning.ru/wiki/images/e/e0/Voron11premi-talk-3.pdf
+	http://www.machinelearning.ru/wiki/images/b/b1/Voron10pria-talk.pdf
+
+Environment, dependencies, and hardware:
+- Windows Server 2008 R2 SP1
+- Visual Studio 2010 SP1
+- CUDA 5.0
+- GPU card Nvidia GTX 660 Ti
+- [optional] Matlab R2011b
+
+
+Description
+This project produces two DLLs - LinearSamplingGPU.dll and LinearSamplingCPU.dll. Both DLLs has the same interface (described by ls_api.h). 
+GPU-version is implemented in CUDA. The development of CPU-version is possible even without CUDA drivers installed (just unload the GPU-project in Visual Studio).
+The code duplication between CPU- and GPU- versinos is keept at minimum (files are reused between projects whenever this is possible).
+
+Note[7-mar-12]: CPU-version is a placeholder, it is missing all key methods which will be added soon.

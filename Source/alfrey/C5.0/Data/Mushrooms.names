@@ -1,0 +1,25 @@
+target	| the target attribute
+
+feature1:	0, 1, 2, 3, 4, 5.
+feature2:	0, 1, 2, 3.
+feature3:	0, 1, 2, 3, 4, 5, 6, 7, 8, 9.
+feature4:	0, 1.
+feature5:	0, 1, 2, 3, 4, 5, 6, 7, 8.
+feature6:	0, 1.
+feature7:	0, 1.
+feature8:	0, 1.
+feature9:	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.
+feature10:	0, 1.
+feature11:	0, 1, 2, 3.
+feature12:	0, 1, 2, 3.
+feature13:	0, 1, 2, 3.
+feature14:	0, 1, 2, 3, 4, 5, 6, 7, 8.
+feature15:	0, 1, 2, 3, 4, 5, 6, 7, 8.
+feature16:	0, 1, 2, 3.
+feature17:	0, 1, 2.
+feature18:	0, 1, 2, 3, 4.
+feature19:	0, 1, 2, 3, 4, 5, 6, 7, 8.
+feature20:	0, 1, 2, 3, 4, 5.
+feature21:	0, 1, 2, 3, 4, 5, 6.
+
+target:	0, 1.

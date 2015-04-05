@@ -1,0 +1,295 @@
+\documentclass[unicode,14pt]{extarticle}
+\usepackage[cp1251]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage[russian]{babel}
+\usepackage{theorem}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{indentfirst}
+
+% Параметры страницы
+\textheight=24cm
+\textwidth=16cm
+\oddsidemargin=0mm
+\topmargin=-1cm
+\parindent=24pt
+\footnotesep=3ex
+%\flushbottom
+\raggedbottom
+\tolerance=3000
+\renewcommand{\baselinestretch}{1.19} %для печати с большим интервалом
+
+% Абзацный отступ и пропорциональные ему отступы
+\parindent=24pt
+%\mathindent=24pt
+
+\makeatletter
+\theorembodyfont{\rmfamily\slshape}
+\theoremstyle{plain}
+% Шаманские притоптывания, чтобы ставить точку после номера теоремы
+\gdef\th@plain{\normalfont
+    \def\@begintheorem##1##2{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2.\;]}%
+    \def\@opargbegintheorem##1##2##3{%
+        \item[\hskip\labelsep\theorem@headerfont ##1\ ##2 (##3).\;]}%
+}
+\newtheorem{vkProblem}{Задача}%[section]
+\newtheorem{vkAxiom}{Аксиома}%[section]
+\newtheorem{vkTheorem}{Теорема}%[section]
+\newtheorem{vkLemma}[vkTheorem]{Лемма}
+\newtheorem{vkHyp}{Гипотеза}%[section]
+\newtheorem{vkCorr}{Следствие}
+\newtheorem{vkDef}{Определение}%[section]
+\theorembodyfont{\rmfamily}
+\newtheorem{vkExample}{Пример}%[section]
+\newtheorem{vkRemark}{Замечание}%[section]
+\newenvironment{vkProof}[1][.\;]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\hfill$\scriptstyle\blacksquare$\par\medskip}
+%\newcommand{\proof}[1][Доказательство.]{\smallskip\noindent{\em #1}}
+%\def\endproof{\hfill\par\medskip}
+%\renewcommand{\refname}{Литература}
+
+% Переопределение колонтитулов
+\def\MYheadfoot{
+\renewcommand{\@oddfoot}{}
+\renewcommand{\@oddhead}{\hfil-- \thepage\ --\hfil}
+\renewcommand{\@evenfoot}{}
+\renewcommand{\@evenhead}{\hfil-- \thepage\ --\hfil}
+} \MYheadfoot
+
+% Нумерацию переподчиним разделам
+\@addtoreset{equation}{section}
+%\def\theequation{\thesection.\arabic{equation}}
+
+% Оформление плавающих иллюстраций
+\def\@caption@left@right@skip{\leftskip=24pt\rightskip=24pt}
+\def\nocaptionskips{\def\@caption@left@right@skip{}}
+\renewcommand\@makecaption[2]{%
+    \vskip\abovecaptionskip
+    \sbox\@tempboxa{\footnotesize\textbf{#1.} #2}%
+    \ifdim\wd\@tempboxa >\hsize
+        {\@caption@left@right@skip\footnotesize\textbf{#1.} #2\par}
+    \else
+        \global\@minipagefalse
+        \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+}
+
+% Команды для формул
+\newcommand{\XX}{\mathbb{X}}
+%\newcommand{\XX}{U}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+%\newcommand{\vA}{A}
+%\newcommand{\va}{\tilde a}
+%\renewcommand{\AA}{A}
+%\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\bv}{\vec}
+
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\newcommand{\Q}{Q_\eps}
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+
+% Команды для текста
+\renewcommand{\em}{\it}
+\newcommand{\TODO}[1]{{%
+    \color{red}\small{#1}%
+    \marginpar{\raisebox{1ex}{\color{red}ToDo}}
+}}
+%\renewcommand{\TODO}[1]{}
+
+% Скромная нумерация
+\newcounter{vkItem}
+\renewcommand{\thevkItem}{\arabic{vkItem}}
+\newenvironment{vkItemize}{\setcounter{vkItem}{0}}{}
+\newcommand{\vkItem}{\par\refstepcounter{vkItem}\thevkItem.\enspace}%  \hspace{\me}
+
+% Перенос знака операции на следующую строку
+\newcommand\brop[1]{#1\discretionary{}{\hbox{$#1$}}{}}
+
+\makeatother
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+УДК 519.7:004.855.5
+
+\begin{center}
+
+А.\,И.\,Фрей
+
+\textbf{Комбинаторная оценка вероятности переобучения \\ на основе кластеризации \\ и покрытий множества алгоритмов}
+
+
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\abstract{
+%Получена новая комбинаторная оценка вероятности переобучения, учитывающая сходство алгоритмов.
+%Оценка основана на разложении множества алгоритмов на непересекающиеся подмножества (кластеры).
+%Оценка учитывает сходство алгоритмов внутри каждого кластера,
+%и расслоение алгоритмов по числу ошибок между разными кластерами.
+%}
+
+\thispagestyle{empty}
+
+%Повышение точности оценок обобщающей способности
+%уже более сорока лет остаётся открытой проблемой
+%в~теории статистического обучения~\cite{vapnik71convergence,boucheron05survey}.
+%Комбинаторный подход впервые позволил получить точные оценки
+%для некоторых модельных частных случаев~\cite{voron09dan,voron10pria}.
+%Более общие, но менее точные комбинаторные оценки вероятности переобучения,
+%основанные на~принципе порождающих и~запрещающих множеств,
+%были предложены в~\cite{voron11premi}.
+%Их~применение к~семействам конъюнкций пороговых решающих правил позволило улучшить
+%качество логических алгоритмов классификации при решении прикладных задач.
+%Однако применимость этих оценок ограничивалась семействами невысокой мощности,
+%обладающими специальным свойством связности.
+%Оценки, предлагаемые в~данной работе,
+%существенно расширяют границы применимости комбинаторного подхода.
+%Они~основаны на покрытии семейства множествами специального вида,
+%для которых точные оценки вероятности переобучения выписываются в~явном виде.
+
+Завышенность теоретических оценок обобщающей способности алгоритмов классификации
+остаётся открытой проблемой уже более сорока лет, начиная с работ В.\,Н.\,Вапника и~А.\,Я.\,Червоненкиса~\cite{vapnik71convergence}.
+На практике наиболее перспективным выглядит комбинаторный подход \cite{voron09dan},
+в рамках которого уже удалось добиться улучшения качества логических закономерностей \cite{voron11premi}.
+Данная работа направлена на дальнейшее улучшение качества комбинаторных оценок вероятности переобучения
+за счет учета сходства между алгоритмами с близкими векторами ошибок.
+
+Рассмотрим задачу классификации.
+Пусть $\XX=\bigl( x_1, \ldots, x_L)$ "--- генеральная выборка из~$L$ объектов,
+$A$ "--- некоторое множество алгоритмов классификации.
+Пусть $I \colon A \times \XX \rightarrow \{0, 1\}$ --- бинарная функция потерь.
+Для произвольной подвыборки $U \subseteq \XX$ определим
+\emph{число} и \emph{частоту} ошибок алгоритма~$a \in A$, соответственно, как
+$n(a, U) = \sum \limits_{x_i \in U}I(a, x_i)$ и
+$\nu(a, U) = n(a, U) / |U|$.
+\emph{Методом обучения} называют отображение вида $\mu \colon 2^A \times 2^\XX \rightarrow A$.
+Метод обучения ставит в соответствие множеству алгоритмов $A$ и обучающей выборке $X \subset \XX$ некоторый алгоритм $\mu (A, X)$.
+В данной работе рассматривается метод \emph{пессимистической минимизации эмпирического риска} (ПМЭР),
+действующий по правилу
+$\mu (A, X) \in \Argmax_{a \in A(X)} n(a, \XX)$
+где
+$A(X) \equiv \Argmin_{a\in A} n(a,\Xl), \;\;\; \forall X \subset \XX$.
+
+Пусть $\XXell$ "--- множество всех разбиений генеральной выборки~$\XX$
+на обучающую выборку~$\Xl$ длины~$\ell$ и~контрольную выборку~$\Xk$ длины $k=L-\ell$.
+Для разбиения $\XX = X \sqcup \X$ \emph{переобученностью} алгоритма $a = \mu (A, X)$
+называют уклонение частот его ошибок на контроле и на обучении
+$\delta(a, X) = \nu(a, \X) - \nu(a, X)$.
+Следуя \cite{voron09dan}, определим \emph{вероятность переобучения} $\Q(A, \XX)$ как долю разбиений $X \sqcup \X$, при которых
+переобученность $\delta(\mu (A, \XX), X)$ превышает заданный порог $\eps \in (0, 1]$:
+\begin{equation}
+    \label{def:probOverfit}
+    \Q(A, \XX) = \Prob[\delta(\mu (A, X), X) \geq \eps], \text { где } \Prob \equiv \frac{1}{\CLl}\sum_{X \in \XXell}.
+\end{equation}
+Здесь и~далее $[\textit{истина}]=1$, $[\textit{ложь}]=0$.
+
+Введем на $A$ отношение частичного порядка:
+$a < b$ означает, что $I(a, x) \leq I(b, x), \forall x \in \XX$ и $a \neq b$.
+Если $a < b$ и $\exists ! x \in \XX \text{ такой, что } a(x) \neq b(x)$, то будем говорить, что $a$ \emph{предшествует} $b$, и записывать $a \prec b$.
+%Здесь и далее $\rho(a_1, a_2) = \sum\limits_{x \in \XX} [a_1(x) \neq a_2(x)]$ "--- \emph{хэммингово расстояние} между алгоритмами $a_1$ и $a_2$.
+
+\begin{vkTheorem}
+\label{th:generalizedPZM}
+Пусть множество алгоритмов $A$ представлено в~виде разбиения на непересекающиеся подмножества
+$A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$, такие что внутри каждого $A_i$ алгоритмы допускают равное число ошибок на полной выборке.
+Пусть $\mu$ "--- ПМЭР. Для каждого $A_i$ рассмотрим \emph{порождающее} и \emph{запрещающее} множества $X_i$ и $X'_i$:
+\[
+    \begin{split}
+        X_i  & = \bigcap\limits_{a \in A_i} \{x \in \XX \colon \exists b \in A \colon a \prec b, I(a, x) < I(b, x)\}, \\
+        X'_i & = \bigcap\limits_{a \in A_i} \{x \in \XX \colon \exists b \in A \colon b < a,     I(b, x) < I(a, x)\}.
+    \end{split}
+\]
+Пусть, кроме этого, каждое подмножество вложено в объемлющее множество: $A_i \subset B_i$, $i = 1, \dots, t$.
+Тогда 
+\begin{equation}
+    \label{generalizedPZMtheorem}
+    Q_\eps(A, \XX) \leq \sum_{i = 1}^t P_i \, Q_{\eps_i}(B_i, \YY_i),
+\end{equation}
+где
+$P_i = \frac{C_{L_i}^{\ell_i}}{\CLl}$ "--- верхняя оценка на вероятность $\Prob[\mu X \in A_i]$, $\YY_i = \XX \backslash X_i \backslash \X_i$,
+$\eps_i = \frac{L_i}{\ell_i k_i} \frac{\ell \, k}{L} \eps + \big(1 - \frac{\ell \, L_i}{L \ell_i}\big) \frac{m_i}{k_i} - \frac{|X'_i|}{k_i}$,
+$L_i = L - |X_i| - |X'_i|$, $\ell_i = \ell - |X_i|$, $k_i = k - |X'_i|$,
+$m_i$ "--- число ошибок алгоритмов из $A_i$.
+\end{vkTheorem}
+Теорема \ref{th:generalizedPZM} обобщает метод порождающих и запрещающих множеств \cite{voron11premi}.
+Она позволяет вычислять оценку для семейств с существенно большим числом алгоритмов,
+т.к. сумма \eqref{generalizedPZMtheorem} содержит меньшее число слагаемых из-за кластеризации алгоритмов с близкими векторами ошибок.
+Отметим, что разбиение $A = A_1 \sqcup \dots \sqcup A_t$ и структуру объемлющих множеств $B_i$ можно выбрать произвольно.
+В частности, можно использовать объемлющие множества с известной точной оценкой вероятности переобучения.
+
+%Численный эксперимент на 11 задачах из репозитория UCI показал, что
+%оценка расслоения-сходства, вычисленная предложенным способом,
+%даёт верхние оценки частоты ошибок на контрольной выборке, завышенные лишь на 5~--~50\,\%
+%по сравнению с~фактической частотой ошибок на контроле.
+%На~тех же задачах завышенность оценок расслоения-связности из~\cite{voron10pria} составляет 17~--~63\,\%.
+%Наиболее точные из~PAC-Bayes оценок, предложенные в~недавней работе~\cite{jin2012pacbayes},
+%оказались завышены~в~2,5~--~10~раз.
+
+%Работа поддержана РФФИ (проект \No\,11-07-00480, \No\,12-07-33099\,-мол-а-вед) и~программой ОМН~РАН
+%<<Алгебраические и~комбинаторные методы математической кибернетики
+%и~информационные системы нового поколения>>.
+
+%\def\BibUrl#1{\\{\def~{\char126}\small\tt\url{http://#1}}}
+\def\BibUrl#1.{}
+\bibliographystyle{gost71u}
+%\bibliography{MachLearn}
+
+\def\BibAuthor#1{\emph{#1}}
+\def\BibTitle#1{#1}
+\def\BibUrl#1{{\small\url{#1}}}
+\def\BibHttp#1{{\small\url{http://#1}}}
+\def\BibFtp#1{{\small\url{ftp://#1}}}
+\def\typeBibItem{\small\sloppy}
+
+\begin{thebibliography}{1}
+
+\bibitem{vapnik71convergence}
+     Vapnik\;V.\,N., Chervonenkis\;A.\,Y.~(1971)
+     On the uniform convergence of relative frequencies of events to their probabilities.
+     \emph{Theory of Probability and Its Applications}, 16(2), 264--280.
+
+\bibitem{voron09dan}
+    \BibAuthor{Воронцов\;К.\,В.}
+    \BibTitle{Точные оценки вероятности переобучения}~//
+    Доклады РАН, 2009. "--- Т.\,429, \No\,1.  "--- С.\,15--18.
+
+\bibitem{voron11premi}
+    Vorontsov\;K.\,V., Ivahnenko\;A.\,A.~(2011)
+    Tight combinatorial generalization bounds for threshold conjunction rules.
+    \emph{4-th Int'l Conf. on Pattern Recognition and Machine Intelligence (PReMI'11)}.
+    Lecture Notes in Computer Science, Springer-Verlag, 66--73.
+
+\end{thebibliography}
+
+\end{document}

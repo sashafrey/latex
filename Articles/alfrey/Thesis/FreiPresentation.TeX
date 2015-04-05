@@ -1,0 +1,792 @@
+\documentclass[unicode]{beamer}
+\usepackage{pifont}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+\usepackage{color}
+%\usepackage[showframe=true]{geometry}
+\usepackage{changepage}
+
+\usetheme{Warsaw}%{Darmstadt}
+\usefonttheme[onlylarge]{structurebold}
+\setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{light-green}{rgb}{0.6,1.0,0.6}
+\definecolor{light-red}{rgb}{1.0,0.6,0.6}
+\definecolor{light-yellow}{rgb}{1.0,1.0,0.8}
+\definecolor{green}{rgb}{0.0,0.6,0.0}
+\definecolor{yellow}{rgb}{0.6,0.6,0.0}
+\definecolor{rred}{rgb}{1.0,0.5,0.4}
+\definecolor{ggreen}{rgb}{0.0,1.0,0.0}
+\newcommand{\fbx}[2]{\fcolorbox{#2}{light-#2}{\vphantom{o}\hspace{#1mm}}}
+%\newcommand{\a}[1]{\alert{#1}}
+\def\g#1{{\color{green}#1}}
+\def\r#1{{\color{red}#1}}
+\def\G#1{{\color{ggreen}#1}}
+\def\R#1{{\color{rred}#1}}
+\def\y#1{{\color{yellow}#1}}
+
+\newtheorem{vkAxiom}{Аксиома}
+\newtheorem{vkHyp}{Гипотеза}
+\newtheorem{vkTheorem}{Теорема}
+\newtheorem{vkLemma}{Лемма}
+\newtheorem{vkDef}{Определение}
+\newtheorem{vkProblem}{Задача}
+
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+\newcommand{\tsum}{\mathop{\textstyle\sum}\limits}
+\newcommand{\headline}{\hline\hstrut}
+
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\le}{\leqslant}
+
+\institute{Диссертация на соискание ученой степени \\
+кандидата физико-математических наук \\
+05.13.17 --- теоретические основы информатики \\
+\vspace{0.7cm}
+Научный руководитель:  д.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+%\title[Dense and Sparse Predictors Grid]{Overfitting Probability for Dense and Sparse Predictors Grid}
+\title[Теоретико-групповой подход к проблеме переобучения]{Теоретико-групповой подход\\в комбинаторной теории переобучения}
+\author[\hspace{-1.5mm}\hbox to 35mm{\insertframenumber\,/\,\inserttotalframenumber}\hfillФрей Александр Ильич]{Фрей Александр Ильич}
+%\author[Фрей Александр Ильич]{Фрей Александр Ильич}
+\date{ВЦ РАН, 19 декабря 2013}
+
+\begin{document}
+
+\begin{frame}[plain]
+\maketitle
+\end{frame}
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\X}{\bar X}
+\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\renewcommand{\P}{\textbf{P}}
+\newcommand{\E}{\textbf{E}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+\newcommand{\Q}{Q_\eps}
+
+%Основные замечания к твоей презентации(по памяти прямо сейчас, пока не забылось)
+%OK. Убрать слайд содержание
+%2.  Алгоритм - ассоциируется с булевым вектором. Повторять для слушателя.
+%OK.  Theorem(как минимум дважды было) - по-русски
+%4.  У всех теорем - автора, год.
+%5.  Слайд про предпосылки: Вапник-Червоненкис 1971, Воронцов 2000-какой-то год, и потом только твой результат.
+%6.  Раскраска слайдов - убрать.
+%7.  Слайд с сетями - заменить на перечисление по пунктам.
+%8.  Часть слайдов убрать(какие-то Воронцов предлагал вычеркнуть).
+%9.  Стрижов: некоторые слайды перегружены.
+%10.  Начиная с некоторой теоремы проговорить - далее все теоремы - результаты этой работы либо работы авторам с соавторами.
+%11.  Общее пожелание Рудакова: интерес падает по экспоненте, поэтому важно четко объяснить, что было до, и что станет в этой области с этой работой.
+
+
+%\begin{frame}[plain]{Содержание}
+    %\scriptsize
+    %[ToDo: убрать этот слайд из финальной версии презентации]
+%    \tableofcontents
+%\end{frame}
+
+\section{Проблема переобучения}
+\subsection{Задача оценивания вероятности переобучения}
+
+\begin{frame}[t]{Проблема переобучения}
+    $X = \{x_1,\ldots,x_\ell\}$ --- конечное множество объектов,
+
+    $A$ --- семейство алгоритмов классификации,
+
+    \medskip
+    $\mu$ "--- \emph{метод обучения}, $\mu(X) \in A$. Пример:
+
+    \medskip
+    $a = \arg\min\limits_{a\in A} R(a,X)$ --- минимизация эмпирического риска, \\
+    где $R(a, X) = \sum\limits_{i \in X} I(a, x_i)$ "--- эмпирический риск, \\
+    $I(a, x)$ "--- потери при классификации объекта $x$ алгоритмом $a$.
+
+    \bigskip
+    \textbf{Оценивание обобщающей способности:}
+
+    \begin{enumerate}
+    \item
+        Как ограничить потери $R(a,\X)$, где\\
+        $\X = \{x'_1,\ldots,x'_k\}$ "--- независимая контрольная выборка?
+    \item
+        Как строить методы обучения с высокой обобщающей способностью?
+        (т.е. с низкой ошибкой $R(a,\X)$).
+    \end{enumerate}
+
+\end{frame}
+
+\subsection{Проблема завышенности оценок}
+
+%\begin{frame}[t]{Принцип равномерной сходимости}
+%    \vspace{-4mm}
+%    \begin{block}{}
+%    Классический подход "--- принцип равномерной сходимости:
+%    \[
+%        \Prob_{\X} \Bigl(\;
+%            \sup_{a\in A}\: \bigl| P(a) - Err(a,X) \bigr| \geq \eps
+%        \Bigr)
+%        \leq \mathsf{GenBound} (\ell,k,A,\eps)
+%    \]
+%    где $P(a) = \Expect_{\X} Err(a,\X)$
+%    \quad [Вапник, Червоненкис, 1971].
+%    \end{block}
+%    \vspace{2mm}
+%    \textbf{Ключевая проблема:}
+%    \begin{itemize}
+%    \item Такие оценки могут быть завышены в ${}\sim 10^5 .. 10^{9}$ раз [1].
+%    \end{itemize}
+%
+%    \textbf{Подход к решению проблемы:}
+%    \begin{enumerate}
+%    \item изменить постановку задачи (левая часть);
+%    \item комбинаторный подход к выводу оценок (правая часть).
+%    \end{enumerate}
+%
+%    \bigskip
+% {\footnotesize   [1] Vorontsov~K.~V. Combinatorial probability and the tightness of generalization
+%  bounds //~PRIA.~--- 2008.~--- V.~18, no.~2.~--- P.~243--259. }
+%\end{frame}
+
+\begin{frame}[c]{Статистическая теория обучения по прецедентам, 1968 - 2012}
+\begin{enumerate}
+    {\small 
+    \item Теория равномерной сходимости [Вапник, Червоненкис, 1968] \\
+    Оценки зависят только от $L$ и $|A|$ и сильно завышены
+    \item Data-dependent bounds [Haussler, 1992] \\
+    Оценки зависят от распределения выборки и метода обучения
+    \item Rademacher complexity [Kolchinskii, 1998] \\
+    Учет расслоения семейства алгоритмов по числу ошибок
+    \item Shell bounds [Langford, 2002] \\
+    Учет сходства алгоритмов в семействе
+    \item PAC-Bayes bounds [McAllester, 1999; Langford, 2005] \\
+    Учет априорного распределения на множестве алгоритмов    
+    \item Комбинаторная теория переобучения [Воронцов, 2010] \\
+    Одновременный учет расслоения и сходства
+    }
+\end{enumerate}
+\end{frame}
+
+\subsection{Комбинаторная постановка задачи}
+
+\begin{frame}[t]{Бинарная матрица ошибок алгоритмов}
+    $\XX = \{x_1,\ldots,x_L\}$ --- конечная генеральная совокупность \rlap{объектов}
+
+    ${\AA} = \{a_1,\ldots,a_D\}$ --- конечное множество алгоритмов
+
+    \smallskip
+    ${I(a,x)}= [\text{алгоритм~$a$ ошибается на ~$x$}]$ --- индикатор ошибки
+
+    \medskip
+    \emph{Матрица ошибок} размера $L{\times}D$, все столбцы различны:
+
+    \smallskip
+    {\footnotesize
+        \begin{tabular}{l|cccccccc|l}
+              & $a_1$ & $a_2$ & $a_3$ & $\r{a_4}$ & $a_5$ & $a_6$ & $\cdots$ & $a_D$ &\\
+        \hline\hstrut
+                $x_1$ &   1   &   1   &   0   &  \textbf{\r0}  &   0   &   1   &   $\cdots$   &   1   & $X$ "--- наблюдаемая\\
+             $\ldots$ &   0   &   0   &   0   &  \textbf{\r0}  &   1   &   1   &   $\cdots$   &   1   & обучающая выборка\\
+             $x_\ell$ &   0   &   0   &   1   &  \textbf{\r0}  &   0   &   0   &   $\cdots$   &   0   & размера $\ell$\\
+        \hline\hstrut
+         $x_{\ell+1}$ &   0   &   0   &   0   &  \textbf{\r1}  &   1   &   1   &   $\cdots$   &   0   & $\X$ "--- скрытая\\
+             $\ldots$ &   0   &   0   &   0   &  \textbf{\r1}  &   0   &   0   &   $\cdots$   &   1   & контрольная выборка\\
+                $x_L$ &   0   &   1   &   1   &  \textbf{\r1}  &   1   &   1   &   $\cdots$   &   0   & размера $k=L-\ell$\\
+        \hline
+        \end{tabular}
+    }
+
+    \bigskip
+    $a\mapsto \bigl( I(a,x_1), \dots, I(a,x_L) \bigr)$ --- \emph{вектор ошибок} алгоритма $a$
+
+    \medskip
+    ${\nu(a,X)} = \frac1{|X|} \tsum_{x\in X} I(a,x)$
+    --- \emph{частота ошибок} на выборке $X\subset\XX$
+\end{frame}
+
+\begin{frame}[t]{Вероятность больших уклонений}
+    $\mu\colon X \mapsto a$ --- \emph{метод обучения}
+
+    $\nu \bigl( \mu X, X \bigr)$ --- \emph{частота ошибок алгоритма $a = \mu X$ на обучении}
+
+    $\nu \bigl( \mu X,\X \bigr)$ --- \emph{частота ошибок алгоритма $a = \mu X$ на контроле}
+
+    $\delta(\mu X, X) \equiv \nu \bigl( \mu X, \X \bigr) - \nu \bigl( \mu X, X \bigr)$ --- \emph{переобучение} $\mu$ на $X$ и $\X$
+
+    \begin{vkAxiom}[Ослабление i.i.d. гипотезы]
+        $\XX$ фиксировано; разбиения $\XX = X\sqcup \X$ "--- равновероятны, \\
+        \quad $X$ --- \emph{наблюдаемая} обучающая выборка \rlap{размера~$\ell$,}\\
+        \quad $\X$ --- \emph{скрытая} контрольная выборка \rlap{размера~$k$,\quad $L=\ell+k$}
+    \end{vkAxiom}
+
+    \begin{block}{\textbf{Определение.} \emph{Вероятность переобучения}}
+        \vskip-0ex
+        \[
+            \Q(\mu, \XX, A)
+            =
+            {\Prob}
+            \bigl[ \delta(\mu X,X) \geq \eps \bigr]
+            =
+            \frac1{C_L^\ell}
+                \sum_{X\subset\XX}
+            \bigl[ \delta(\mu X,X) \geq \eps \bigr]
+        \]
+    \end{block}
+\end{frame}
+
+\section{Комбинаторные оценки вероятности переобучения}
+\subsection{Оценки на основе разложения и покрытий}
+\begin{frame}{Разложение множества алгоритмов на подмножества}
+    Оценка Вапника-Червоненкиса, основанная на неравенстве \rlap{Буля:}
+        \[
+            \Q(\mu, \XX, A)
+            =
+            \Prob
+            \bigl[ \delta(\mu X, X) \geq \eps \bigr]
+            \leq
+            \sum_{a \in A} \Prob \bigl[ \delta(a, X) \geq \eps \bigr].
+        \]
+
+    \begin{vkLemma}[Фрей, 2012]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на подмножества.
+    Пусть метод обучения $\mu$ "--- пессимистическая минимизация эмпирического риска. Тогда
+    \[
+        \Q(\mu, \XX, A) \leq \sum_{i=1}^t Q_\eps(\mu, \XX, A_i).
+    \]
+    \end{vkLemma}
+\end{frame}
+
+\begin{frame}{Покрытие множества алгоритмов}
+    \vskip-1ex
+    \begin{vkLemma}[Толстихин, 2010]
+        Пусть $A$, $B$ "--- два множества алгоритмов, такие, что
+        $A \subset B$ и в~$B$ все алгоритмы имеют равное число ошибок на $\XX$.
+        Пусть метод обучения $\mu$ "--- пессимистическая минимизация эмпирического риска. Тогда
+        \[
+            \Q(\mu, \XX, A) \leq \Q(\mu, \XX, B).
+        \]
+    \end{vkLemma}
+
+    \vskip-1ex
+    \begin{vkTheorem}[Фрей, Толстихин, 2012]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на подмножества.
+    Пусть $A_i \subset B_i$, где все алгоритмы в~$B_i$ имеют равное число ошибок на $\XX$.
+    Пусть метод обучения $\mu$ "--- пессимистическая минимизация эмпирического риска. Тогда
+    \vskip-2ex    
+    \[
+        \Q(\mu, \XX, A) \leq \sum_{i=1}^t \Q(\mu, \XX, A_i) \leq \sum_{i=1}^t \Q(\mu, \XX, B_i).
+    \]
+    \end{vkTheorem}
+\end{frame}
+
+\begin{frame}{Учет расслоения алгоритмов по числу ошибок}
+
+%\vskip-4ex
+Пусть для каждого алгоритма $a$: % определено следующее:
+\begin{align*}
+        & X_a, X'_a \text{ "--- порождающее и запрещающее множества, } \\
+%        & u_i \equiv |X_i|, \text{ где } X_i \equiv \bigcap\limits_{a \in A_i} X_a - \text{ верхняя связность } A_i, \\
+%        & q_i \equiv |X'_i|, \text { где } X'_i \equiv \bigcap\limits_{a \in A_i} X'_a - \text { неполноценность } A_i, \\
+        & \YY_a = \XX \backslash X_a \backslash X'_a - \text { множество нейтральных объектов, } \\
+        & u_a = |X_a|, \;\; q_a = |X'_a| \text{ "--- верхняя связность и неполноценность,} \\      
+        & \eps_a = \frac{L_a}{\ell_a k_a} \frac{\ell \, k}{L} \eps + \big(1 - \frac{\ell \, L_a}{L \ell_a}\big) \frac{m_a}{k_a} - \frac{|X'_a|}{k_a}, \\
+  %      & Q_\eps(\mu, \YY_i, B_i) = \frac{1}{C_{L_i}^{\ell_i}} \sum_{Y \in [\YY_i]^{\ell_i}} [\max_{a \in B_i}\delta(a, Y) \geq \eps], \\
+        & L_a = L - u_a - q_a, \;\; \ell_a = \ell - u_a, \;\; k_a = k - q_a, \;\; m_a = n(a, \XX).
+\end{align*}
+\vskip-2ex
+\begin{vkTheorem}[Воронцов, Ивахненко, Решетняк, 2010]
+        Для любых $\XX$, $A$, пессимистического МЭР $\mu$ и $\eps\in(0,1)$
+        \vskip-1.5ex
+        \[
+            \Q(\mu, \XX, A)
+            \leq
+            \sum_{a\in A}
+            P_a
+            Q_{\eps_a}(\mu, \YY_a, a),
+        \]
+    где $P_a = C_{L - u_a - q_a}^{\ell - u_a}\slash{\CLl}$ "--- оценка величины $\Prob[\mu X = a]$.
+%    $u_a$ "--- верхняя связность, $q_a$ "--- неполноценность алгоритма $a$.
+\end{vkTheorem}
+\end{frame}
+
+\begin{frame}{Учет расслоения алгоритмов по числу ошибок}
+\vskip-1ex
+Пусть для каждого элемента разложения $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ определены:
+\begin{align*}
+%        & u_a = |X_a|, q_a = |X'_a| \text{ "--- верхняя связность и неполноценность $a$}, \\
+%        & X_a, X'_a \text{ "--- порождающее и запрещающее множества [2]}, \\
+        & u_i \equiv |X_i| - \text{ верхняя связность } A_i, \text{ где } X_i \equiv \bigcap\limits_{a \in A_i} X_a, \\
+        & q_i \equiv |X'_i|  - \text { неполноценность } A_i, \text { где } X'_i \equiv \bigcap\limits_{a \in A_i} X'_a, \\
+        & \YY_i = \XX \backslash X_i \backslash X'_i - \text { множество нейтральных объектов } A_i, \\
+%        & \eps_i = \frac{L_i}{\ell_i k_i} \frac{\ell \, k}{L} \eps + \big(1 - \frac{\ell \, L_i}{L \ell_i}\big) \frac{m_i}{k_i} - \frac{|X'_i|}{k_i}, \\
+%        & Q_\eps(\mu, \YY_i, B_i) = \frac{1}{C_{L_i}^{\ell_i}} \sum_{Y \in [\YY_i]^{\ell_i}} [\max_{a \in B_i}\delta(a, Y) \geq \eps], \\
+        & L_i = L - u_i - q_i, \;\; \ell_i = \ell - u_i, \;\; k_i = k - q_i. \\
+ %       & m_i - \text{ число ошибок алгоритмов из } A_i.
+\end{align*}
+\vskip-5ex
+\begin{vkTheorem}[Фрей, Толстихин, 2012]
+Для любых $\XX$, $A$, пессимистического МЭР $\mu$ и $\eps\in(0,1)$
+\vskip-2ex
+\[
+    \Q(\mu, \XX, A) \leq \alert{\sum_{i = 1}^t P_i} \, Q_{\eps_i}(\mu, \YY_i, B_i),
+\]
+\vskip-2ex
+где $P_i = C_{L - u_i - q_i}^{\ell - u_i}\slash{\CLl}$ "--- оценка величины $\Prob[\mu X \in A_i]$.
+%$u_i$ "--- верхняя связность, $q_i$ "--- неполноценность подмножества $A_i$.
+\end{vkTheorem}
+\end{frame}
+
+%\begin{frame}[plain]{Обозначения, не определенные на прошлом слайде}
+%\vskip-4ex
+%\begin{align*}
+%        & u_a = |X_a|, q_a = |X'_a| \text{ "--- верхняя связность и неполноценность $a$}, \\
+%        & X_a, X'_a \text{ "--- порождающее и запрещающее множества [2]}, \\
+%        & u_i \equiv |X_i|, \text{ где } X_i \equiv \bigcap\limits_{a \in A_i} X_a - \text{ верхняя связность } A_i, \\
+%        & q_i \equiv |X'_i|, \text { где } X'_i \equiv \bigcap\limits_{a \in A_i} X'_a - \text { неполноценность } A_i, \\
+%        & \YY_i = \XX \backslash X_i \backslash X'_i - \text { множество нейтральных объектов } A_i, \\
+%        & \eps_i = \frac{L_i}{\ell_i k_i} \frac{\ell \, k}{L} \eps + \big(1 - \frac{\ell \, L_i}{L \ell_i}\big) \frac{m_i}{k_i} - \frac{|X'_i|}{k_i}, \\
+%        & Q_\eps(\mu, \YY_i, B_i) = \frac{1}{C_{L_i}^{\ell_i}} \sum_{Y \in [\YY_i]^{\ell_i}} [\max_{a \in B_i}\delta(a, Y) \geq \eps], \\
+%        & L_i = L - u_i - q_i, \;\; \ell_i = \ell - u_i, \;\; k_i = k - q_i, \\
+%        & m_i - \text{ число ошибок алгоритмов из } A_i.
+%\end{align*}
+%\vskip-1ex
+% {\footnotesize   [2] Vorontsov~K.~V. Exact combinatorial bounds on the probability of overfitting for empirical
+%risk minimization // Pattern Recognition and Image Analysis. — 2010. — V.~20, no.~3. —
+%P.~269–285. }
+%\end{frame}
+
+\subsection{Теоретико-групповой метод орбит}
+
+\begin{frame}{Рандомизированный метод обучения}
+        Вероятность переобучения детерминированного метода:
+        \[
+            \begin{aligned}
+            \Q(\mu, \XX, A) & = \P \, [ \delta ( \mu \Xl, \Xl ) \geq \epsilon ]
+            = \P \sum_{a \in A} \, {[\mu \Xl = a]} [ \delta ( a, \Xl ) \geq \epsilon ].
+            \end{aligned}
+        \]
+
+        Рандомизированный метод минимизации эмпирического риска (РМЭР) равновероятно
+        выбирает алгоритм из множества
+        \[
+            A(X) \equiv \Argmin_{a \in A} n(a, \Xl).
+        \]
+
+\begin{Def}[Вероятность переобучения РМЭР]
+        \[
+            Q_\epsilon(\XX, A) = \E \sum_{a \in A}  {\frac{[a \in A(X)]}{|A(X)|}} [\delta(a, X) \geq \epsilon]
+            %\text{ где } \E \equiv \frac{1}{\CLl} \sum_{X \in \XXell}.
+        \]
+\end{Def}
+\end{frame}
+
+\begin{frame}{Перестановки объектов}
+$S_L$ "--- группа перестановок объектов выборки ${\XX = \{x_1,\ldots,x_L\}}$.
+
+\begin{itemize}
+\item действие перестановки~$\pi \in S_L$ на~подмножество объектов:
+\[\pi X \equiv \bigl\{ \pi x \colon x\in X \bigr\};\]
+\item действие перестановки~$\pi \in S_L$ на~алгоритм:
+\[\pi a
+  %  = \bigl( I(\pi a, x_i) \bigr){}_{i=1}^L
+    \equiv \bigl( I(a, \pi^{-1}x_i) \bigr){}_{i=1}^L;\]
+\item действие перестановки~$\pi \in S_L$ на~множество алгоритмов:
+\[\pi A \equiv \bigl\{ \pi a \colon a\in A \bigr\}.\]
+\end{itemize}
+    \vskip-2ex
+    \begin{Def}[Группа симметрий]
+    \emph{Группой симметрий} $\Sym(A)$ множества алгоритмов $A$
+    назовем его стационарную подгруппу:
+    \[
+        \Sym(A) = \{\pi \in S_L \colon \pi A = A\}.
+    \]
+    \end{Def}
+\end{frame}
+
+\begin{frame}{Орбиты алгоритмов}
+
+\begin{itemize}
+    \item Орбитой элемента $m$ множества $M$, на котором действует группа $G$, называется подмножество
+    $Gm = \{gm \colon g \in G\}$.
+    \item Две орбиты либо не пересекаются, либо совпадают.
+    \item Разбиение на орбиты: $M = G m_1 \sqcup G m_2 \sqcup \dots \sqcup G m_k$.
+    \vskip2ex
+%    \item Группа $\Sym(A)$ \emph{действует} на множестве алгоритмов $A$.
+    \item $\Omega(A)$ "--- множества орбит $\Sym(A)$, $\omega \in \Omega(A)$ "--- орбита.
+\end{itemize}
+
+\begin{vkLemma}[Фрей, 2009]
+    Пусть $\pi \in \Sym(A)$. Тогда
+    \[
+        \Q(a, \XX, A) = \Q(\pi a, \XX, A),
+    \]
+    где $\Q(a, \XX, A) \equiv \E \frac{[a \in A(X)]}{|A(X)|} [ \delta ( a, \Xl ) \geq \epsilon]$
+    "--- вклад алгоритма $a$ в вероятность переобучения.
+\end{vkLemma}
+
+\end{frame}
+
+\begin{frame}{Разложение вероятности переобучение по орбитам}
+\begin{vkTheorem}[Фрей, 2009]
+Пусть $\Omega(A)$ "--- множество орбит $\Sym(A)$ на $A$. Тогда
+\[
+            \Q(\XX, A) =
+                \sum_{\omega \in \Omega(A)}\!\! |\omega| \,
+                \E \frac{[a_\omega \in A(X)]}{|A(X)|}
+                \left[ \delta(a_\omega, \Xl) \geq \epsilon \right].
+\]
+\vskip-2ex
+где $a_\omega$ "--- произвольный представитель орбиты $\omega \in \Omega(A)$.
+\end{vkTheorem}
+\begin{vkTheorem}[Толстихин, Фрей, 2010]
+Пусть $\Omega(\XX)$ "--- множество орбит $\Sym(A)$ на $\XXell$. Тогда
+\[
+    \Q(\XX, A) = \frac{1}{C_L^\ell} \sum \limits_{\tau \in \Omega(\XX)}\frac{ |\tau|}{|A(X_\tau)|} \sum_{a \in A(X_\tau)} [\delta(a, X_\tau) \geq \epsilon],
+\]
+\vskip-2ex
+где $X_\tau$ "--- произвольный представитель орбиты $\tau \in \Omega(\XX)$.
+
+\end{vkTheorem}
+\end{frame}
+
+\subsection{Неулучшаемые оценки для модельных семейств}
+
+\begin{frame}{Неулучшаемые оценки для модельных семейств}
+\begin{itemize}
+    \item монотонная цепь (Ботов, Фрей, 2009);
+    \item унимодальная цепь (Ботов, Фрей, 2009);
+    \item пучок монотонных цепей (Ботов, Фрей, 2010);
+    \item монотонная сеть (Ботов, Фрей, 2010);
+    \item унимодальная сеть (Ботов, Фрей, 2010);
+    \item разреженная монотонная сеть (Фрей, 2011);
+    \item разреженная унимодальная сеть (Фрей, 2011);
+    \item хэммингов шар (Толстихин, 2010);
+    \item центральный слой хэммингова шара (Толстихин, 2010);
+    \item центральный слой интервала булева куба (Фрей, 2013).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Слой интервала булева куба}
+    % Аппроксимирующие семейства (Толстихин, Фрей). Слой интервала - подробно (сл слайд)
+
+    Пусть объекты из $\XX$ разделены на три множества:
+    \begin{itemize}
+        \item надежно классифицируемые объекты $X_0$,
+        \item ошибочно классифицируемые объекты $X_1$,
+        \item пограничные объекты $X_r$.
+    \end{itemize}
+        \[
+            {\overbrace{\fbx{17}{green}}^{\textstyle \g{X_{0}}}}\!
+            {\underbrace{\fbx{4}{yellow}}_{\textstyle \y{X_{r}}}}\!
+            {\overbrace{\fbx{10}{red}}^{\textstyle \r{X_{1}}}}
+    \]
+
+    \emph{Слоем интервала булева куба} будем называть максимальное по включению множество алгоритмов $B$, такое, что
+    \begin{itemize}
+        \item ни один алгоритм из $B$ не ошибается на $X_0$,
+        \item все алгоритмы из $B$ ошибаются на всех объектах из $X_1$,
+        \item все алгоритмы из $B$ допускают ровно $\rho$ ошибок на $X_r$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Слой интервала булева куба}
+Пусть $\XX = X_0 \sqcup X_1 \sqcup X_r$.
+Обозначим $|X_r| = r$ и $|X_1| = m$, $\rho$ "--- целочисленный параметр, $\rho \leq r$.
+\begin{vkTheorem}[Фрей, 2013]
+Вероятность переобучения пессимистического метода минимизации эмпирического риска для слоя интервала булева куба:
+\[
+    \Q(\XX, \hat B_{r,\rho}^{m}) =
+        \frac 1{\CLl}
+            \sum_{i = 0}^{\min(m, \ell)} \sum_{j = 0}^{\min(r, \ell - i)}
+                C_m^i C_r^j C_{L - m - r}^{\ell - i - j} \Big[\delta(i, j) \geq \eps\Big],
+\]
+где $\delta(i, j) = \frac{m + \rho - t(i,j)}{k} - \frac{t(i,j)}{\ell}$
+и $t(i,j) = i + \max(0, \rho - r - j)$.
+\end{vkTheorem}
+
+\end{frame}
+
+\section{Вычислительные эксперименты}
+
+\begin{frame}{Описание задач}
+\vspace{-0.5cm}
+\begin{table}[h]
+    \centering
+    \begin{tabular}[t]{||c|c|c||c|c|c||}
+    \hline
+    Задача&\#Объектов&\#Признаков\\
+\hline
+    Sonar      & 208   & 60 \\
+    Glass      & 214   &  9 \\
+    Liver dis. & 345   &  6 \\
+    Ionosphere & 351   & 34 \\
+    Wdbc       & 569   & 30 \\
+    Australian & 690   &  6 \\
+    Pima       & 768   &  8 \\
+    Faults     & 1941  & 27 \\
+    Statlog    & 2310  & 19 \\
+    Wine       & 4898  & 11 \\
+    Waveform   & 5000  & 21 \\
+    Pageblocks & 5473  & 10 \\
+    Optdigits  & 5620  & 64 \\
+    Pendigits  & 10992 & 16 \\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\subsection{Экспериментальная проверка новой оценки}
+
+\begin{frame}
+
+\begin{itemize}
+    \item {\bf \alert{ВЧ:}} Вапник-Червоненкис, 1971; Leon Bottou, 1994:
+    \[
+        \Q(\mu, \XX, A(m))
+        \leq
+        %\sum_{a \in A(m)} \Prob \bigl[ \delta(a, X) \geq \eps \bigr] =
+        %\sum_{a \in A(m)} \Hyper{L}{n(a)}{\ell}{s_a(\eps)},
+        \sum_{a \in A(m)} \Q(\mu, \XX, a),
+    \]
+    \vskip-2ex
+    по нижним слоям $A(m) = \{a \in A \colon n(a, \XX) \leq m\}$;
+    
+    \item {\bf \alert{ВИР:}} Воронцов, Ивахненко, Решетняк, 2010:
+%        \begin{equation}
+%                \Q(\mu, \XX, A(m))
+%                \leq
+%                \sum_{a\in A(m)}
+%                \frac{C_{L- u(a)- q(a)}^{\ell- u(a)}}{C_L^\ell}
+%                \Hyper{L- u(a)- q(a)}{m- q(a)}{\ell-u(a)}{\eps};
+%        \end{equation}
+        \[
+            \Q(\mu, \XX, A(m))
+            \leq
+            \sum_{a\in A(m)}
+            P_a
+            Q_{\eps_a}(\mu, \YY_a, a),
+        \]
+    \item {\bf \alert{ФТ:}} Фрей, Толстихин, 2013. \\
+%    Пусть $A(m) = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ и $A_i \subset B_i$. Тогда
+    \vskip-2ex
+    \[
+        Q_\eps(\mu, \XX, A(m)) \leq \sum_{i = 1}^t P_i \, Q_{\eps_i}(\mu, \YY_i, B_i).
+    \]
+    \item {\bf \alert{МК:}} Оценка по методу Монте-Карло
+    \vskip-2ex
+        \[
+            \Q(\mu, \XX, A(m))
+            =
+            \frac1{N}
+                \sum_{i = 1}^N
+            \bigl[ \delta(\mu X_i, X_i) \geq \eps \bigr]
+        \]    
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Экспериментальная проверка полученной оценки}
+\vspace{-0.5cm}
+    \begin{table}[t]
+      \centering
+        \begin{tabular}[t]{||l||r|r|r|r|r||}
+        \hline
+        &
+        \multicolumn{3}{|c|}{Комбинаторные оценки}
+        &
+        \\
+        \hline
+            Задача&
+            {\bf \alert{ВЧ-1971}}&
+            {\bf \alert{ВИР-2010}} &
+            {\bf \alert{ФТ-2013}} &
+            {\bf \alert{МК}}  \\
+        \hline
+            glass		& 0.191	& 0.127	& 0.106	& 0.067	\\ %& 1.268	& 0.740 \\
+            Liver dis.	& 0.249	& 0.192	& 0.161	& 0.046	\\ %& 1.207	& 1.067 \\
+            Ionosphere	& 0.138	& 0.099	& 0.084	& 0.042	\\ %& 1.219	& 1.149 \\
+            Australian	& 0.130	& 0.101	& 0.086	& 0.023 \\ %& 1.145	& 0.678 \\
+            pima		& 0.151	& 0.117	& 0.098 & 0.021	\\ %& 0.971	& 0.749 \\
+            faults		& 0.091	& 0.070	& 0.060	& 0.008	\\ %& 1.110	& 1.054 \\
+            statlog		& 0.072	& 0.060	& 0.051	& 0.008	\\ %& 1.102	& 0.746 \\
+            wine		& 0.061	& 0.047	& 0.040	& 0.003	\\ %& 0.776	& 0.637 \\
+            waveform	& 0.043	& 0.033	& 0.023	& 0.003	\\ %& 0.561	& 0.354 \\
+            pageblocks	& 0.030	& 0.022	& 0.018	& 0.003	\\ %& 0.739	& 0.186 \\
+            Optdigits	& 0.043	& 0.034	& 0.026	& 0.003	\\ %& 1.068	& 0.604 \\
+        \hline
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+
+\subsection{Логические алгоритмы классификации}
+
+\begin{frame}{Логические алгоритмы классификации}
+%\vspace{-0.4cm}
+Критерий оптимизации логических закономерностей:
+\begin{itemize}[]
+    \item ComBoost-A: без поправок на переобучение;
+    \item ComBoost-B: с~поправками по комбинаторным формулам;
+    \item ComBoost-C: с~поправками по методу Монте-Карло.
+\end{itemize}
+%\vspace{-0.8cm}
+
+Средний процент ошибок на обучающей и тестовой выборке по различным задачам и методам контроля переобучения:
+
+{
+  \centering
+  \footnotesize
+  \tabcolsep=5pt
+    \begin{tabular}[t]{|l|r|r|r|r|r|r|}
+    \headline
+           & \multicolumn{2}{c|}{ComBoost-A}  & \multicolumn{2}{c|}{ComBoost-B} & \multicolumn{2}{c|}{ComBoost-C}\\
+    \headline
+    задача     & обуч. & тест & обуч. & тест & обуч. & тест \\
+    \headline
+    australian  &6.2    &\textbf{13.8} &9.9    &14.9     &6.8    &14.0  \\
+    echo-card   &0.1    &2.4  &0.2    &\textbf{0.9}    &0.1    &2.3    \\
+    german         &12.9   &26.0 &18.3   &27.6    &13.1   &\textbf{25.4}\\
+    heart dis.      &7.6    &19.3 &11.1   &\textbf{18.5}  &8.0    &18.9\\
+    hepatitis      &1.8    &21.4 &7.8    &\textbf{18.0}    &3.0    &19.9\\
+    labor         &0.5    &10.9  &1.1    &11.9    &0.6    &\textbf{8.9}\\
+    liver         &8.3    &32.3 &33.0   &42.7  &11.3   &\textbf{31.4} \\
+    \hline
+    \end{tabular}
+    \par % для центрированя
+}
+
+\end{frame}
+
+\begin{frame}[t]{Зависимость ошибки от количества правил в голосовании}
+
+Зависимость частоты ошибок на тестовой выборке от числа правил в классификаторе. Задача Echo
+Cardiogram.
+
+\centering {
+    \includegraphics[height=54mm]{Pictures/ErrRateOfLength-png.eps}
+}
+
+\end{frame}
+
+\subsection{Кривые обучения логистической регрессии}
+
+\begin{frame}{Кривые обучения логистической регрессии}
+
+Пример: задача Australian.
+Зависимость частоты ошибок от длины обучающей выборки. 
+<<ERM test error>> "--- комбинаторная оценка, вычисленная по обучающей выборке.
+
+\centering {
+    \includegraphics[height=54mm]{Pictures/Australian.eps}
+}
+
+\end{frame}
+
+\begin{frame}[plain]{Результаты, выносимые на защиту:}
+\begin{enumerate}
+    \item Получена общая оценка вероятности переобучения,
+        основанная на разложении и покрытии множества алгоритмов однослойными подмножествами.
+    \item Теоретико-групповой метод орбит применен для вывода оценок
+        вероятности переобучения рандомизированного метода минимизации эмпирического риска.
+    \item Получены неулучшаемые оценки вероятности переобучения для модельных семейств алгоритмов.
+    \item Экспериментальные результаты подтверждают высокую точность новой оценки.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[plain]{Публикации:}
+
+{
+\scriptsize
+\begin{itemize}
+    \item
+    Фрей~А.~И. Точные оценки вероятности переобучения для симметричных семейств
+      алгоритмов //~ММРО-14.~--- М.:~МАКС Пресс, 2009.~---
+    \item
+    Фрей~А.~И. Точные оценки вероятности переобучения для симметричных семейств
+      алгоритмов //~Труды 52-й научной конференции МФТИ.~---
+    М.:~МФТИ, 2009.~---
+    {\cyr\CYRS.}~106--109.
+    \item {\bf
+    Frei~A.~I. Accurate estimates of the generalization ability for symmetric set
+      of predictors and randomized learning algorithms //~Pattern Recognition and
+      Image Analysis.~---
+     2010.~---
+     V.~20, no.~3.~---
+    P.~241–250.}
+    \item
+    Фрей~А.~И. Вероятность переобучения плотных и~разреженных многомерных~сеток
+      алгоритмов //~Межд. конф. ИОИ-8.~---
+    М.:~МАКС Пресс, 2010.~---
+    {\cyr\CYRS.}~87--90.
+    \item
+    Фрей~А.~И. Метод порождающих и запрещающих множеств для рандомизированного
+      метода минимизации эмпирического риска //~ММРО-15.~---
+     М.:~МАКС Пресс, 2011.~---
+    {\cyr\CYRS.}~60--63.
+    \item
+    Фрей~А.~И., Ивахненко~А.~А., Решетняк~И.~М. Применение комбинаторных оценок
+      вероятности переобучения в~простом голосовании пороговых конъюнкций //~Межд.
+      конф. ИОИ-9.~---
+    М.:~МАКС Пресс, 2012.~---
+    {\cyr\CYRS.}~86--89.
+    \item
+    Фрей~А.~И., Толстихин~И.~О. Комбинаторные оценки вероятности переобучения на
+      основе кластеризации и покрытий множества алгоритмов //~Machine learning and
+      data analysis.~---
+    2013.~---
+     \CYRT. 1(6).~---
+    {\cyr\CYRS.}~751--767.
+    \item
+    Vorontsov~K., Frey~A., Sokolov~E. Computable combinatorial overfitting
+      bounds //~Machine learning and data analysis.~---
+    2013.~--- V. 1(6).~--- P.~724--733.
+\end{itemize}
+}
+
+\end{frame}
+
+\begin{frame}[plain]{Замечания:}
+\begin{enumerate}
+\item Бинарная функция потерь
+%\item Математические неточности в тексте диссертации
+\item Расшифровка аббревиатур (PAC Bayes, VC-оценка, SLT, SC-оценка)
+\item Границы применимости в терминах длины выборки
+\item Учет несбалансированности классов
+\item Асимптотические оценки комбинаторных формул
+\item Замечание о равномерности всех рассмотренных разреженных сетей
+\end{enumerate}
+\end{frame}
+
+\end{document}

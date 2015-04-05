@@ -1,0 +1,647 @@
+\documentclass{beamer}
+\usepackage{pifont}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amssymb,amsfonts,amsmath,graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+\usepackage{color}
+%\usepackage[showframe=true]{geometry}
+\usepackage{changepage}
+
+\usetheme{Warsaw}
+
+\institute{Московский физико-технический институт \\
+(Государственный университет)\\
+Кафедра <<Интеллектуальные Системы>> (ВЦ РАН) \\
+\vspace{0.7cm}
+Научный руководитель:  д.ф.-м.н. Воронцов Константин Вячеславович \\
+
+}
+%\title[Dense and Sparse Predictors Grid]{Overfitting Probability for Dense and Sparse Predictors Grid}
+\title[Теоретико-групповой подход к проблеме переобучения]{Теоретико-групповой подход в комбинаторной теории оценок обобщающей способности}
+
+\author{Фрей Александр Ильич}
+\date{25 апреля 2013}
+
+\begin{document}
+
+\maketitle
+
+%\thanks{Работа поддержана РФФИ (проект \No\,08-07-00422) и~программой ОМН~РАН
+%    <<Алгебраические и~комбинаторные методы математической кибернетики
+%    и~информационные системы нового поколения>>.}
+
+%===============================================================================
+
+\newcommand{\Expect}{\mathsf{E}}
+\newtheorem{Th}{Теорема}
+\newtheorem{Def}{Определение}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\X}{\bar X}
+\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\renewcommand{\P}{\textbf{P}}
+\newcommand{\E}{\textbf{E}}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+\newcommand{\Q}{Q_\eps}
+
+\begin{frame}
+	\frametitle{Теоретико-групповой подход к проблеме переобучения}
+
+    \textbf{2010 - 2012}
+    \begin{itemize}
+        \item[\ding{51}] предложен рандомизированный метод обучения (РМЭР);
+        \item[\ding{51}] разработан теоретико-групповой метод оценки вероятности переобучения РМЭР для модельных семейств;
+        \item[\ding{51}] получен метод порождающих и запрещающих множеств для РМЭР;
+        \item[\ding{51}] предложена рандомизация на множестве алгоритмов как модель отсутствия связности;
+        \item[\ding{51}] предложена рандомизация на целевых метках и доказана теорема о декомпозиции профиля расслоения-связности;
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Публикации и выступления 2010-2012}
+    \begin{itemize}
+        \small{
+        \item 2009, ММРО, Фрей\;А.\,И., Точные оценки вероятности переобучения для симметричных семейств алгоритмов
+        \item \alert{\textbf{2010, PRIA, Фрей\;А.\,И., Точные оценки вероятности переобучения для симметричных семейств алгоритмов и рандомизированных методов обучения}}
+        \item 2010, ИОИ, Фрей\;А.\,И., Вероятность переобучения плотных и~разреженных многомерных~сеток алгоритмов
+        \item 2011, ММРО, Фрей\;А.\,И., Метод порождающих и~запрещающих множеств для~рандомизированного метода минимизации эмпирического~риска
+        \item 2012, EURO Conference on Operational Research, Frey A., Geometrical properties of connected search spaces for binary classification problem
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Теоретико-групповой подход к проблеме переобучения}
+
+    \textbf{2012-2013}
+    \begin{itemize}
+        \item[\ding{51}] получены новые экспериментальные результаты о переобучения логических закономерностей;
+        \item[\ding{51}] предложена новая общая оценка вероятности переобучения, учитывающая сходство алгоритмов;
+        \item[\ding{51}] проведено сравнение комбинаторных оценках с последними оценками PAC-bayes подхода (на примере логистической регрессии)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Публикации и выступления 2012-2013}
+    \begin{itemize}
+        \small{
+        \item 2012, ИОИ, Фрей~А.\,И., Ивахненко~А.\,А, Решетняк~И.\,М., Применение комбинаторных оценок вероятности переобучения в~простом голосовании конъюнкций
+        \item (на стадии подготовки) Фрей\;А.\,И, Толстихин И.О., Учет сходства алгоритмов в комбинаторной теории оценок обобщающей способности
+        \item  (на стадии подготовки) Соколов Е., Фрей\;А.\,И., Применение комбинаторных оценок вероятности переобучения при настройке логистической регрессии.
+        \item  (на стадии подготовки) Фрей\;А.\,И, Решетняк\;И.\,М., Учет верхней связности в комбинаторных оценках вероятности переобучения.
+        \item  (на стадии подготовки) K.V.Vorontsov, E.Sokolov, N. Zhivotovskiy, A.Frei., Combinatorial generalization bounds. (in Springer?)
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Комбинаторный подход к проблеме переобучения}
+    \begin{itemize}
+        \item Строки таблицы $\{x_1\, \dots\, x_\ell, x_{\ell + 1}, x_L\}$ "--- объекты полной выборки
+        \item Столбцы $\{a_1\, \dots\, a_D\}$\, "--- векторы ошибок алгоритмов
+    \end{itemize}
+    \begin{center}
+    \vskip-2ex
+    \begin{tabular}[t]{|c|llllll|}
+    \hline
+          & $a_1$ & $a_2$ & \dots & \textbf{$a_d$} & \dots & $a_D$ \\
+    \hline
+    $x_1$ & 0 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 1 \\
+    $\dots$ & 1 & 1 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    $x_\ell$ & 0 & 0 & \dots & \textcolor{green}{\textbf{0}} & \dots & 0 \\
+    \hline
+    $x_{\ell + 1}$ & 1 & 1 & \dots & \textcolor{red}{\textbf{1}} & \dots & 1 \\
+    $\dots$ & 1 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    $x_L$ & 0 & 0 & \dots & \textcolor{red}{\textbf{1}} & \dots & 0 \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    \begin{itemize}
+        %\item $\{x_1, x_2, x_3\}$ "--- наблюдаемая обучающая подвыборка
+        %\item $\{x_4, x_5, x_6\}$ "--- скрытая контрольная подвыборка
+        \item Метод обучения "--- минимизация эмпирического риска
+        \item Цель: получить точные, вычислительно-эффективные оценки вероятности переобучения.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Определения}
+
+    $\XX = \{x_1,\ldots,x_L\}$ "--- конечное множество объектов,
+
+    $A$ --- множество алгоритмов,
+
+    $\XX=X \sqcup \X$ "--- разбиение $\XX$ на обучение и контроль,
+
+    $\nu(a, X) = \frac1 \ell \sum \limits_{x_i \in X} I(a(x_i), y_i)$ --- доля ошибок $a$ на $X$,
+
+    $\delta(a, X) = \nu(a, \X) - \nu(a, X)$ --- \emph{переобученность $a$ на $X$},
+
+    $\mu X = \argmin_{a \in A} \nu(a, X)$ --- минимизация эмпирического риска,
+
+    Вероятность переобучения (ВП):
+    \[
+        Q_\eps = \frac 1{\CLl}\sum_{X \sqcup \bar X}[\delta(\mu X, X) \geq \eps].
+    \]
+
+    \alert{ВП рандомизированной минимизации эмпирического риска:}
+    \[
+        Q_\eps = \frac 1{\CLl}\sum_{X \sqcup \bar X}\sum_{a \in A(X)}\frac{[\delta(a, X) \geq \eps]}{|A(X)|}, \text{ где } A(X) = \Argmin_{a \in A} \nu(a, X).
+    \]
+\end{frame}
+
+\begin{frame}
+    \frametitle{Методы вывода формул для вероятности переобучения}
+    \begin{enumerate}
+      \item Метод производящих и запрещающих объектов
+      \begin{itemize}
+        \item Монотонная цепочка и сетка
+      \end{itemize}
+      \item Блочная оценка
+      \begin{itemize}
+        \item Пара алгоритмов
+      \end{itemize}
+      \item Рекуррентное вычисление вероятности переобучения по заданной матрице ошибок
+      \begin{itemize}
+        \item Теоретический инструмент для доказательства универсальных оценок
+      \end{itemize}
+      \item Гипотеза $t$-слоев и метод $\beta$-многочленов
+      \begin{itemize}
+        \item Унимодальные цепочки и монотонные сети (точно)
+        \item Унимодальные сети (приближенно)
+      \end{itemize}
+      \item \alert{Метод разбиения множества алгоритмов на орбиты}
+      \begin{itemize}
+        \item $[$А. Фрей$]$, Пучок монотонных цепочек
+        \item $[$А. Фрей$]$, Полный слой, полный куб алгоритмов
+        \item $[$И. Толстихин$]$, Шар алгоритмов и центральный слой
+        \item $[$А. Фрей$]$, Монотонные и унимодальные сети (точно)
+      \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Группа симметрий множества алгоритмов}
+        Граф смежности двумерной унимодальной сетки:
+        \vspace{-0.3cm}
+        \begin{figure}[t]
+            \centering {
+                \hspace{1cm}
+                \includegraphics[width=68mm]{OrbitExample2.eps}
+                \vskip-3.5ex
+            }
+        \end{figure}
+    \begin{itemize}
+    \item $S_L$ "--- группа всех перестановок объектов выборки,
+    \item $S_L$ действует множестве всех алгоритмов $2^\AA$,
+    \item $\Sym(A) = \{\pi \in S_L \colon \pi A = A\} \subset S_L$.
+    \item Орбита алгоритма $a$ это $\{\pi a \colon \pi \in \Sym(A)\}\subset A$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Равный вклад алгоритмов одной орбиты}
+    \begin{itemize}
+        \item Вероятность переобучения "--- сумма вкладов алгоритмов:
+        \[
+        \begin{aligned}
+            & Q_\eps = \sum_{a \in A} Q_\eps(a), \text{ где } \\
+            & Q_\eps(a) = \frac 1{\CLl}\sum_{X \sqcup \bar X} \frac {[ \delta ( a, \Xl ) \geq \epsilon ]}{|A(X)|};
+        \end{aligned}
+        \]
+        \item Алгоритмы одной орбиты дают равный вклад:
+        \[
+            Q_\mu(\epsilon, a, A) = Q_\mu(\epsilon, \pi a, A), \text { где } \pi \in \Sym(A)
+        \]
+        \item Обозначим $\Omega(A)$ "--- множество орбит $\Sym(A)$ на $A$;
+        \item Вероятность переобучения с учетом структуры множества алгоритмов:
+        \begin{equation}
+            Q_\eps =
+                %\frac 1{C_L^\ell}
+                \sum_{\omega \in \Omega(A)}\!\! |\omega| Q_\eps(a_\omega).
+        \end{equation}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{РМЭР: метод порождающих и запрещающих множеств}
+
+    ММРО-2011, Фрей А.
+
+    ''Метод порождающих и~запрещающих множеств для~рандомизированного метода минимизации эмпирического~риска''.
+
+    \begin{theorem}
+    Введем множество $\aleph = \{ A(X) \; \colon \; X \in \XXell \}$.
+
+    Пусть для каждого $\alpha \in \aleph$ существуют порождающее и запрещающее множества $X$ и $X'$, такие что:
+    \[
+        \bigl[ A(X){=} \alpha \bigr]
+        =
+        \bigl[  X_\alpha\subseteq  X \bigr]
+        \bigl[ X'_\alpha\subseteq \X \bigr],
+        \quad
+        \forall X\in \XXell.
+    \]
+    Тогда ВП записывается в виде:
+    \[
+        Q_\eps(A) = \sum_{a \in A} \sum_{\alpha \in \aleph} \frac {[a \in \alpha]}{|\alpha|}
+            \frac{\Binom{L_\alpha}{\ell_\alpha}}{\CLl}
+            H_{L_\alpha}^{\ell_\alpha, m^a_\alpha} (s^a_\alpha(\eps)).
+    \]
+    \end{theorem}
+\end{frame}
+
+\begin{frame}
+\frametitle{Модель семейства без расслоения и без связности}
+
+\vspace{-1cm}
+    \begin{figure}[t]
+        \label{fig:MonotonicSets}
+        \begin {multicols}{2}
+        \centering
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{RandomSlice.eps}
+        \hfill
+        \medskip
+        \hfill
+        \includegraphics[width=51mm,height=40mm]{Q(RandomSlice).eps}
+        \hfill
+        \end {multicols}
+    \end{figure}
+\vspace{-1cm}
+
+\begin{itemize}
+        \item Пусть $A_m^n$ "--- множество из $n$ алгоритмов, допускающих по $m$ ошибок. Векторы ошибок независимы.
+\end{itemize}
+
+\begin{Th}[Вероятность переобучения для $A_m^n$]
+    Пусть $\mu$ "--- рандомизированный МЭР. Тогда
+    \[\bar Q_\eps(A_m^n) = 1 - \left(1 - Q_\eps(A_m^1) \right)^n\]
+\end{Th}
+
+\end{frame}
+
+\begin{frame}[t]{Декомпозиция профиля расслоения-связности}
+EURO-2012, 25th Conference on Operational Research.
+
+''Geometrical properties of connected search spaces for binary classification problem''.
+
+    \begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width = 54mm]{sc-exp-png.eps}
+    \end{centering}
+    \caption{Профиль расслоения-связности для семейства линейных классификаторов в $\mathbb R^p$.
+    $p = 5$, $L = 300$, $|R| = 2 \cdot 10^5$.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[t]{Численный эксперимент}
+ИОИ-2012, А.Ивахненко, А.Фрей.
+
+''Применение комбинаторных оценок вероятности переобучения в голосовании пороговых конъюнкций.''
+
+\centering {
+    \includegraphics[height=44mm]{ErrRateOfLength-png.eps}
+
+    \footnotesize
+    Зависимость частоты ошибок на тестовой выборке от числа правил в классификаторе. Задача Echo
+    Cardiogram.
+}
+\end{frame}
+
+%\begin{frame}
+%    \frametitle{Расслоение и связность в комбинаторном подходе}
+%    Матрицы ошибок: строки --- объекты, столбцы --- алгоритмы;
+%    лучший алгоритм одинаков во всех четырёх семействах.
+%
+%    \begin{figure}[h]
+%    \begin{centering}
+%        \includegraphics[width = 72mm]{four_experiments.eps}
+%    \end{centering}
+%    \end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%    \frametitle{\small{Результаты эксперимента (при }$\ell = k = 100, \eps = 0.05, |A|=10^4$\small{)}}
+%    \vspace{-1cm}
+%    \begin{figure}[h]
+%    \begin{centering}
+%        \includegraphics[width = 115mm]{four_experiments_results.eps}
+%    \end{centering}
+%    \end{figure}
+%\end{frame}
+
+\begin{frame}
+    \frametitle{Верхняя оценка вероятности переобучения}
+    \begin{Theorem}[Воронцов, Решетняк, Ивахненко, 2010]
+    Для любого монотонного метода $\mu$, любых $\XX$, $A$ и $\eps \in(0, 1)$
+    \[
+        Q_\eps(\mu, \XX) \leq \sum_{a \in A} \frac{C_{L-u-q}^{\ell - u}}{\CLl} \Hyper{L-u-q}{\ell - u}{m-q}{\frac{\ell}{L} (m-\eps k)},
+    \]
+    где $u$ --- верхняя связность алгоритма $a$,
+
+    $q$ --- неполноценность алгоритма $a$,
+
+    $m = m(a, \XX)$ --- число ошибок алгоритма $a$.
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Сходство алгоритмов - пример 1}
+
+    Множество $A = (a_1, a_2)$ состоит из двух алгоритмов,
+
+    оба алгоритма допускают по $m$ ошибок на полной выборке,
+
+    хэммингово расстояние $\rho(a_1, a_2) = d$ заранее фиксированно.
+
+    \begin{figure}[h]
+        \centering
+         \includegraphics[height=48mm]{pair.eps}
+        \caption{Зависимость средней переобученности $\bar \delta = E_X \delta(\mu X, X)$ от $d$.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Сходство алгоритмов - пример 2}
+    $B_r^m$ "--- центральный слой шара (компактное множество),
+
+    $R_n^m$ "--- алгоритмы с $m$ ошибками; ошибки расположены случайно.
+
+    \begin{table}[h!]
+      \label{tab:RBcomparison}
+      \begin{center}
+        \begin{tabular}[t]{|c|c|c|c|}
+        \hline
+        $r$ & $|B_r^m|$ & $|R_n^m|$ & $\bar \delta$ \\
+        \hline
+        2 & 401 & 2 & 0.079 \\
+        4 & 35.501 & 7 & 0.160 \\
+        6 & 1.221.101 & 39 & 0.240 \\
+        8 & 20.413.001 & 378 & 0.319 \\
+        \hline
+        \end{tabular}
+      \end{center}
+      \caption{Сравнение $|R_n^m|$ и $|B_r^m|$ при $L=50$, $\ell=25$, $m=10$}
+    \end{table}
+
+    \textbf{Задача: построить оценку, учитывающую сходство алгоритмов!}
+\end{frame}
+
+\begin{frame}
+    \frametitle{''Ингредиенты'' новой оценки:}
+
+    \begin{enumerate}
+        \item разбиение множества алгоритмов на кластеры;
+        \item расширение кластера до слоя шара;
+        \item учёт расслоения;
+        \item эвристика: учёт размера каждого кластера.
+    \end{enumerate}
+
+    \begin{Theorem}[Фрей, Толстихин]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на кластеры с равным числом ошибок.
+    Пусть $d_i = \sup\limits_{a, b \in A_i} \rho(a, b)$ "--- хэммингов диаметр кластера $A_i$.
+    Тогда
+    \begin{align*}
+        & Q_\eps(A) \leq \sum_{i=1}^t Q_\eps(A_t) \leq \sum_{i=1}^t Q_\eps(B_{\lfloor d_i / 2 \rfloor}^m), \text{ где } \\
+        & Q_\eps(B^m_r) = H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor) \cdot [m \geq \eps k].
+    \end{align*}
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+    \frametitle{''Ингредиенты'' новой оценки:}
+
+    \begin{enumerate}
+        \item \alert{разбиение множества алгоритмов на кластеры;}
+        \item расширение кластера до слоя шара;
+        \item учёт расслоения;
+        \item эвристика: учёт размера каждого кластера.
+    \end{enumerate}
+
+    \begin{Theorem}[Фрей, Толстихин]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на кластеры с равным числом ошибок.
+    Пусть $d_i = \sup\limits_{a, b \in A_t} \rho(a, b)$ "--- хэммингов диаметр кластера $A_t$.
+    Тогда
+    \begin{align*}
+        & Q_\eps(A) \alert{\leq} \sum_{i=1}^t Q_\eps(A_t) \leq \sum_{i=1}^t Q_\eps(B_{\lfloor d_i / 2 \rfloor}^m), \text{ где } \\
+        & Q_\eps(B^m_r) = H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor) \cdot [m \geq \eps k].
+    \end{align*}
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+    \frametitle{''Ингредиенты'' новой оценки:}
+
+    \begin{enumerate}
+        \item разбиение множества алгоритмов на кластеры;
+        \item \alert{расширение кластера до слоя шара;}
+        \item учёт расслоения;
+        \item эвристика: учёт размера каждого кластера.
+    \end{enumerate}
+
+    \begin{Theorem}[Фрей, Толстихин]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на кластеры с равным числом ошибок.
+    Пусть $d_i = \sup\limits_{a, b \in A_i} \rho(a, b)$ "--- хэммингов диаметр кластера $A_i$.
+    Тогда
+    \begin{align*}
+        & Q_\eps(A) \leq \sum_{i=1}^t Q_\eps(A_t) \alert{ \leq} \sum_{i=1}^t Q_\eps(B_{\lfloor d_i / 2 \rfloor}^m), \text{ где } \\
+        & Q_\eps(B^m_r) = H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor) \cdot [m \geq \eps k].
+    \end{align*}
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+    \frametitle{''Ингредиенты'' новой оценки:}
+
+    \begin{enumerate}
+        \item разбиение множества алгоритмов на кластеры;
+        \item расширение кластера до слоя шара;
+        \item \alert{учёт расслоения;}
+        \item эвристика: учёт размера каждого кластера;
+    \end{enumerate}
+
+    \begin{Theorem}[Фрей, Толстихин]
+    Пусть $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$ "--- разложение $A$ на кластеры с равным числом ошибок.
+    Пусть $d_i = \sup\limits_{a, b \in A_i} \rho(a, b)$ "--- хэммингов диаметр кластера $A_i$,
+    \alert{$q_i$ "--- неполноценность кластера $A_i$}.
+    Тогда
+    \begin{align*}
+        & Q_\eps(A) \leq \sum_{i=1}^t \alert{\frac{C_{L-q_i}^\ell}{\CLl}} Q_\eps(A_t) \leq
+                         \sum_{i=1}^t \alert{\frac{C_{L-q_i}^\ell}{\CLl}} Q_\eps(B_{\lfloor d_i / 2 \rfloor}^m), \text{ где } \\
+        & Q_\eps(B^m_r) = H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor) \cdot [m \geq \eps k].
+    \end{align*}
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+    \frametitle{''Ингредиенты'' новой оценки:}
+
+    \begin{enumerate}
+        \item разбиение множества алгоритмов на кластеры;
+        \item расширение кластера до слоя шара;
+        \item учёт расслоения;
+        \item эвристика: \alert{учёт размера каждого кластера;}
+    \end{enumerate}
+
+    \begin{Theorem}[Толстихин, Фрей 2012]
+        Пусть $B$ "--- множество алгоритмов с равным числом ошибок на полной выборке.
+        Тогда среднюю ВП по всем подмножествам $A' \subset B$ фиксированной мощности $d = |A'|$ даётся выражением:
+        \begin{align*}
+            \bar{Q}_{\eps}(B, d) =& \frac{1}{C_{|B|}^d} \sum_{\substack{A'\subset B:\\ |A'| = d}} \Q(A') = \\
+                                 =& 1 -
+                \frac 1{\CLl}
+                    \sum\limits_{\tau \in \Omega(\XXell)}
+                        |\tau|\frac{C^d_{N_\eps(B, X_\tau)}}{C^d_{|B|}}.
+        \end{align*}
+    \end{Theorem}
+\end{frame}
+
+\begin{frame}
+\frametitle{Точность новой оценки вероятности переобучения}
+\begin{enumerate}
+    \item Оценки $Q$ и $Q_s$ "--- без учёта сходства,
+    \item Оценки $Q'$ и $Q'_s$ "--- с учётом сходства, но без учета мощности кластеров $A_i$,
+    \item Оценки $Q''$ и $Q''_s$ "--- с учётом сходства и мощности кластеров $A_i$.
+\end{enumerate}
+
+\begin{adjustwidth}{-0.35cm}{}
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \tabcolsep=5pt
+    \begin{tabular}[t]{||l|l||r||r|r|r||r|r|r||}
+    \hline
+           & & & \multicolumn{3}{c||}{Без расслоения}  & \multicolumn{3}{c||}{С расслоением} \\
+    \hline
+    %задача     & 0 & Q & Q' & Q'' & Q_s & Q'_s & Q''_s \\
+    задача & метрика   &  $Q_{cv}$ & $Q$ & $Q'$ & $Q''$ & $Q_s$ & $Q'_s$ & $Q''_s$ \\
+    \hline
+    % echo-card   & 0.027 & 0.210 & 0.195 & 0.172 & 0.172 & 0.153 & 0.135 \\
+    % german      & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx \\
+    % heart dis.  & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx \\
+    % hepatitis   & 0.020 & 0.129 & 0.121 & 0.106 & 0.119 & 0.110 & 0.097 \\
+    % labor       & 0.047 & 0.283 & 0.251 & 0.240 & 0.253 & 0.224 & 0.211 \\
+    % liver       & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx & x.xxx \\
+
+    echo-card  & переобуч.      & 0.033 & 0.246 & 0.204 & 0.185 & 0.216 & \textbf{0.172} & \textbf{0.154} \\
+               & корреляция     & 1.000 & 0.619 & 0.601 & 0.500 & 0.813 & \textbf{0.840} & \textbf{0.835} \\
+    \hline
+    hepatitis  & переобуч.      & 0.028 & 0.190 & 0.193 & \textbf{0.165} & 0.170 & 0.167 & \textbf{0.149} \\
+               & корреляция     & 1.000 & 0.787 & 0.755 & 0.752 & \textbf{0.792} & 0.768 & \textbf{0.818} \\
+    \hline
+    heart dis. & переобуч.      & 0.013 & 0.132 & 0.107 & \textbf{0.081} & 0.124 & 0.108 & \textbf{0.085} \\
+               & корреляция     & 1.000 & 0.716 & \textbf{0.729} & 0.681 & 0.722 & \textbf{0.728} & 0.714 \\
+    \hline
+    labor      & переобуч.      & 0.066 & 0.405 & 0.347 & 0.333 & 0.367 & \textbf{0.328} & \textbf{0.311} \\
+               & корреляция     & 1.000 & 0.644 & 0.622 & 0.636 & \textbf{0.678} & \textbf{0.661} & 0.659 \\
+    \hline
+    \end{tabular}
+\end{table}
+\end{adjustwidth}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Использование оценок для отбора конъюнкций}
+    \begin{table}[h]
+      \centering
+      \footnotesize
+      \tabcolsep=5pt
+        \begin{tabular}[t]{||l|l||r|r||r|r|r||r|r|r||}
+        \hline
+               & & & & \multicolumn{3}{c||}{Без расслоения}  & \multicolumn{3}{c||}{С расслоением} \\
+        \hline
+        %задача     & 0 & Q & Q' & Q'' & Q_s & Q'_s & Q''_s \\
+        задача & выборка   & $Orig$ &  $Q_{cv}$ & $Q$ & $Q'$ & $Q''$ & $Q_s$ & $Q'_s$ & $Q''_s$ \\
+        \hline
+        echo-card  & обучение & 0.1 & 0.1 & 0.7 & 0.5 & 0.3 & 0.2 & 0.2 & 0.3 \\
+                   & контроль & 2.6 & 2.5 & 4.0 & 3.8 & 3.6 &\textbf{ 1.0 } & \textbf{1.0} & \textbf{1.0} \\
+        \hline
+        hepatitis  & обучение & 3.5 & 3.8 & 8.2 & 7.6 & 7.6 & 7.8 & 8.1 & 7.3 \\
+                   & контроль & 19.2 & 18.5 & \textbf{18.0} & 19.0 & 19.2 & \textbf{18.1} & 18.5 & 18.7 \\
+        \hline
+        heart dis. & обучение &  8.2 & 11.1 & 10.8 & 11.2 & 10.6 & 10.6 & 10.8 & 10.1 \\
+                   & контроль & \textbf{18.7} & \textbf{18.7} & \textbf{18.7} & 18.9 & 18.8 & \textbf{18.7} & 18.8 & 18.8 \\
+        \hline
+        labor      & обучение & 0.5 & 0.9 & 1.7 & 1.8 & 1.8 & 1.5 & 1.5 & 1.0 \\
+                   & контроль & 11.2 & 9.3 & 12.3 & 12.8 & 12.7 & 11.3 & \textbf{10.8} & \textbf{10.6} \\
+        \hline
+        \end{tabular}
+      \caption{Средняя частота ошибок (в~процентах) на обучающей и тестовой выборке
+        по различным задачам и различным методом контроля переобучения. Столбец $Orig$
+        получен для не-модифицированного критерия информативности.}
+      \label{tab:ComBoostResults}
+    \end{table}
+\end{frame}
+
+\begin{frame} 
+    \frametitle{Сравнение с PAC-bayes оценками}
+    \begin{table}[h]
+      \centering
+      \footnotesize
+      \vspace{-1cm}
+%      \tabcolsep=5pt
+        \begin{tabular}[t]{||l||r|r|r|r|r|r|r||}
+        \hline
+            Задача&Переобуч.&МСС&Комб.&PAC DI&PAC DD(*) \\
+        \hline            
+            faults      & 0.014 & 0.012 & 0.071 & 1.136 & 1.136 \\
+            glass       & 0.069 & 0.111 & 0.093 & 1.085 & 0.722 \\
+            Ionosphere  & 0.145 & 0.075 & 0.048 & 1.146 & 1.071 \\
+            Liver dis.  & 0.022 & 0.079 & 0.221 & 1.151 & 1.088 \\
+            Optdigits   & 0.008 & 0.005 & 0.235 & 1.083 & 0.690 \\
+            pageblocks  & 0.003 & 0.005 & 0.107 & 0.436 & 0.198 \\
+            pima        & 0.004 & 0.033 & 0.127 & 0.806 & 0.753 \\
+            Sonar       & 0.328 & 0.133 & 0.134 & 1.343 & 1.343 \\
+            statlog     & 0.006 & 0.012 & 0.251 & 1.126 & 0.873 \\
+            waveform    & 0.005 & 0.005 & 0.213 & 0.412 & 0.352 \\
+            Wdbc        & 0.060 & 0.045 & 0.014 & 1.199 & 0.823 \\
+        \hline            
+            Сред.завыш. & 1.000 & 1.914 & 18.39 & 86.70 & 65.76 \\
+        \hline                    
+        \end{tabular}
+      \caption{Среднее уклонение частоты ошибок между контрольной и обучающей выборкой (10x кросс-валидация), 
+      и различные оценки вероятности переобучения для логистической регрессии.}
+      \label{tab:PACBayesComparison}
+    \end{table}
+    (*) Dimensionality Dependent PAC-Bayes Margin Bound. Chi Jin, Liwei Wang. NIPS-2012.
+\end{frame}
+
+
+
+\begin{frame}{Результаты выносимые на защиту:}
+    \begin{itemize}
+        \item РМЭР и метод орбит для вывода оценок переобучения;
+        \item общая оценка вероятности переобучения, учитывающая сходство алгоритмов семейства с помощью кластеризации;
+        \item применение комбинаторных оценок вероятности переобучения в~простом голосовании конъюнкций;
+        \item экспериментальный модуль для сэмплирования семейств линейных классификаторов;
+        \item экспериментальное сравнение комбинаторных оценок с оценками PAC Bayes (для логистической регрессии).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Не выносим на защиту:}
+    \begin{itemize}
+        \item метод порождающих и запрещающих множеств для РМЭР;
+        \item другие рандомизации (на метках целевых классов и независимые перестановки на векторах ошибок);
+        \item учет верхней связности в комбинаторных оценках вероятности переобучения;
+    \end{itemize}
+\end{frame}
+
+\end{document}

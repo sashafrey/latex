@@ -1,0 +1,210 @@
+\documentclass{article}
+
+\usepackage{colt11e}
+\usepackage[round,comma]{natbib}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage{graphicx}
+\usepackage[all]{xy}
+\usepackage[ruled,section]{algorithm}
+\usepackage[noend]{algorithmic}
+\bibliographystyle{plainnat}
+\let\cite\citep
+
+\makeatletter
+\def\cL{{\mathscr L}}
+\def\cB{{\mathscr B}}
+\def\cK{{\mathscr K}}
+\def\cR{{\mathscr R}}
+\def\cN{{\mathcal N}}
+\def\cM{{\mathcal M}}
+\def\RC{{\mathcal R}}
+\def\fF{\mathfrak{F}}
+\def\fI{\mathfrak{I}}
+\def\fM{\mathfrak{M}}
+\def\AA{A}
+\def\RR{\mathbb{R}}
+\def\NN{\mathbb{N}}
+\def\ZZ{\mathbb{Z}}
+\def\DD{\mathbb{D}}
+\def\LL{\mathbb{L}}
+\def\YY{\mathbb{Y}}
+\def\XX{\mathbb{X}}
+\newcommand{\XXX}{{\mathscr X}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\x}{\bar x}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\lim}{\mathop{\operator@font lim}\limits}
+\renewcommand{\limsup}{\mathop{\operator@font lim\,sup}\limits}
+\renewcommand{\liminf}{\mathop{\operator@font lim\,inf}\limits}
+\renewcommand{\max}{\mathop{\operator@font max}\limits}
+\renewcommand{\min}{\mathop{\operator@font min}\limits}
+\renewcommand{\sup}{\mathop{\operator@font sup}\limits}
+\renewcommand{\inf}{\mathop{\operator@font inf}\limits}
+\newcommand{\argmin}{\mathop{\operator@font arg\,min}\limits}
+\newcommand{\argmax}{\mathop{\operator@font arg\,max}\limits}
+\newcommand{\Arg}{\mathop{\rm Arg}\limits}
+\newcommand{\Argmin}{\mathop{\rm Arg\,min}\limits}
+\newcommand{\Argmax}{\mathop{\rm Arg\,max}\limits}
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\conv}{\mathrm{conv}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\VCdim}{\mathop{\mathrm{VCdim}}\nolimits}
+\newcommand{\scal}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\eqdef}{\equiv}
+\def\CC_#1^#2{\tbinom{#1}{#2}}
+%\def\CC_#1^#2{C_{#1}^{#2}}
+\providecommand{\Prob}{\mathsf{P}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\Expect}{\mathsf{E}}
+\newcommand{\Var}{\mathsf{D}}
+\newcommand{\bin}{\mathop{\rm bin}\nolimits}
+\newcommand{\Bin}{\mathop{\rm Bin}\nolimits}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,\:#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+% for algorithms
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\REMARK}[1]{\item[]\textsl{#1}}
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\EXIT}{\STATE\textbf{exit}}
+\newcommand{\vkID}[1]{\text{\sf #1}}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\textbf{Procedure} \vkID{#1}}
+
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}
+\newcommand{\TODO}[1]{\par\smallskip\noindent\fbox{\parbox{150mm}{\textsf{\textbf{~~TO DO:} #1}}}\par\smallskip}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Author's hacking for SLANTED THEOREMS -- may be removed
+\makeatletter
+\def\@begintheorem#1#2{\trivlist
+   \item[\hskip \labelsep{\bfseries #1\ #2}]\slshape}
+\def\@opargbegintheorem#1#2#3{\trivlist
+      \item[\hskip \labelsep{\bfseries #1\ #2\ (#3)}]\slshape}
+\def\@endtheorem{\endtrivlist}
+\renewcommand{\emph}[1]{\textit{#1}}
+\makeatother
+% The END of "Author's hacking"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{remark}[theorem]{Remark}
+\newenvironment{proofsketch}{\noindent{\bf Proof sketch:}}{\qed\medskip}
+
+\begin{document}
+
+\begin{table}[t]
+    \def\r#1{\textbf{#1}}
+    \caption{Experimental results on 6 real data sets from UCI Machine Learning Repository.
+        For each pair $\langle$task, algorithm$\rangle$
+        an~average testing error obtained from 10-fold cross validation is~given, in~percents.
+        For each task four best results are bold-emphasized.
+        Algorithms 1--7 are baseline rule learners.
+        Our~algorithms:
+        WV~---~Weighted Voting,\;
+        DL~---~Decision List,\;
+        CB~---~Committee Boosting,\;
+        SC~---~using heuristic modified by SC-bound,\;
+        MC~---~using heuristic modified by Monte-Carlo estimation of overfitting.
+    }
+    \label{tab:Experiment}
+    \medskip\centering
+    \begin{tabular}{|r|l||c|c|c|c|c|c|}
+        \hline
+        && \multicolumn{6}{c|}{tasks} \\
+        \cline{3-8}
+        & \raisebox{1.2ex}{algorithms}
+                & australian  & echo-card  & heart dis.   & ~hepatitis~   & ~~~labor~~~   & ~~~liver~~~  \\
+        \hline
+        1& RIPPER$-$opt &15.5&\r{2.9}&19.7&20.7&18.0&32.7\\
+        \hline
+        2& RIPPER$+$opt &15.2&5.5&20.1&23.2&18.0&\r{31.3}\\
+        \hline
+        3& C4.5 (Tree) &14.2&5.5&20.8&18.8&14.7&37.7\\
+        \hline
+        4& C4.5 (Rules)&15.5&6.8&20.0&18.8&14.7&37.5\\
+        \hline
+        5& C5.0       &\r{14.0}&4.3&21.8&20.1&18.4&31.9\\
+        \hline
+        6& SLIPPER    &15.7&4.3&19.4&\r{17.4}&\r{12.3}&32.2\\
+        \hline
+        7& LR         &14.8&4.3&19.9&18.8&14.2&32.0\\
+        \hline
+        \hline
+        8& WV         &14.9&4.3&20.1&19.0&14.0&32.3\\
+        \hline
+        9& DL         &15.1&4.5&20.5&19.5&14.7&35.8\\
+        \hline
+        10& CB        &\r{13.8}&\r{2.4}&\r{19.3}&21.4&\r{10.9}&32.3 \\
+        \hline
+        \hline
+        11& \r{WV$+$MC}      &\r{13.9}&3.0&19.5&\r{18.3}&13.2&\r{30.7}\\
+        \hline
+        12& \r{DL$+$MC}      &14.5&3.5&19.8&18.7&13.8&32.8\\
+        \hline
+        13& \r{CB$+$MC}      &\r{14.0}&\r{2.3}&\r{18.9}&19.9&\r{8.9}&\r{31.4}\\
+        \hline
+        \hline
+        14& \r{WV$+$SC}     &14.1&3.2&\r{19.3}&\r{18.1}&13.4&\r{30.2}\\
+        \hline
+        15& \r{DL$+$SC}     &14.4&3.6&19.5&18.6&13.6&32.3\\
+        \hline
+        16&  \r{CB$+$SC}     &14.9&\r{0.9}&\r{18.5}&\r{18.0}&\r{11.9}&42.7\\
+        \hline
+    \end{tabular}
+\end{table}
+
+\paragraph{Experiment.}
+We use state-of-the art algorithms
+C4.5~\cite{quinlan96bagging},
+C5.0~\cite{quinlan93programs},
+\mbox{RIPPER}~\cite{cohen95fast}, and
+\mbox{SLIPPER}~\cite{cohen99simple}
+as~baseline rule learners.
+Our~rule learning engine is~based on breadth-first search as~features selection strategy.
+Fisher's exact test~\cite{martin97exact} is~used as~heuristic~$H$.
+To~build compositions of rules we use three algorithms.
+Logistic Regression~(LR) is a~linear classifier that aggregates rules learned independently.
+Weighted Voting~(WV) is a~boosting-like ensemble of rules, similar to~\mbox{SLIPPER},
+which trains each next rule on~reweighted training set.
+Decision List~(DL) is~a~greedy algorithm,
+which trains each next rule on~training objects not covered by all previous rules.
+Committee Boosting~(CB) is again a~boosting-like ensemble of rules where all rules contribute with the same weight. 
+In learning phase Committee Boosting differs from WV by means of ensuring rules diversity: 
+to learn each rule it selects train subsample based on object's margins instead of reweighting objects.
+
+There are two modifications of~heuristic~$H'(p,n)$.
+The~SC-modification uses SC-bound on the probability of~overfitting~$Q_\eps$ as~described above.
+The~MC-modification uses the Monte-Carlo estimation of~$Q_\eps$
+via 100~random partitions $\XX = X\sqcup\X$.
+For both modifications we set $\ell=k$.
+
+In all experiments with CB we used a different sampling technique than we used for DL and WV.
+While in DL and WV setting we used theorem \ref{th:thetaE=thetaS} and sample low layers of SC-graph,
+for CB we only used classifiers generated by our greedy base rule learner.
+
+Table~\ref{tab:Experiment} shows that
+initially our algorithms WV, DL and CB are comparable to the baseline.
+WV~outperforms DL, which corresponds to the results of other authors.
+Both SC- and MC- modifications reduce overfitting significantly
+and always outperform their respective initial versions.
+The~difference between SC- and MC- modifications is not significant.
+Then, a~moderate looseness of~the SC-bound does not reduce %prevent
+its practical usefulness as~a~rule selection criterion.
+
+\end{document}

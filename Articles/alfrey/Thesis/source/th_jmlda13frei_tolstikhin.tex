@@ -1,0 +1,544 @@
+\documentclass[12pt]{article}
+
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{color}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{indentfirst}
+
+
+\textheight=26cm
+\textwidth=17cm
+\oddsidemargin=0mm
+\topmargin=-20mm
+\parindent=24pt
+\tolerance=500
+%\renewcommand{\baselinestretch}{1.3} %для печати с большим интервалом
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\XX}{\mathbb{X}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\Xl}{X}
+\newcommand{\Xk}{\bar X}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\renewcommand{\AA}{\mathbb{A}}
+\newcommand{\fA}{\mathfrak{A}}
+\newcommand{\Argmax}{\mathop{\rm Argmax}\limits}
+\newcommand{\Argmin}{\mathop{\rm Argmin}\limits}
+\newcommand{\Sym}{\mathop{\rm Sym}\limits}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\varepsilon}
+\def\brop#1{#1\discretionary{}{\hbox{$#1$}}{}} % перенос знака операции на следующую строку
+\renewcommand{\em}{\it}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\Expect}{\mathbb{E}}
+%\newcommand{\Prob}{\mathbb{P}}
+
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\Bhypergeom}[5]{{#1}_{#2}^{#4,#3}\bigl(#5\bigr)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\BHyper}[4]{\Bhypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+%\newcommand{\Binom}[2]{\binom{#1}{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+
+\newcommand{\Q}{Q_\eps}
+\def\LR{\text{LR}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\newcommand{\mur}[3]{\mu({#1}, {#2}, {#3})}
+\newcommand{\todo}{\textcolor{red}{[ToDo]} }
+
+\theoremstyle{plain}
+\newtheorem{Theorem}{Теорема}
+\newtheorem{Lemma}[Theorem]{Лемма}
+\newtheorem{State}[Theorem]{Утверждение}
+\theoremstyle{definition}
+\newtheorem{Def}{Определение}
+\newtheorem{Definition}[Def]{Определение}
+\newtheorem{Corollary}{Следствие}
+\newtheorem{Hypothesis}{Гипотеза}
+\newtheorem{Task}{Задача}
+\newtheorem{Example}{Пример}
+\newtheorem{Experiment}{Эксперимент}
+\newtheorem{rem}{Замечание}
+
+\newcommand{\vkEndProof}{\hfill$\scriptstyle\blacksquare$\par\medskip}
+\newenvironment{vkProof}[1][. ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+\newenvironment{vkProofShort}[1][ ]%
+    {\par\noindent{\bf Доказательство#1}}%
+    {\vkEndProof}
+
+% Проглотить следующий пробел
+\makeatletter
+\def\gobblespace{\@ifnextchar\ {\hspace{-1ex}}\relax}
+\makeatother
+% Вставка замечания рецензента
+\newcommand\REVIEWERNOTE[1]{{%
+    \itshape\bfseries%\color{red}%
+    \marginpar{%\raisebox{-1ex}{%\color{red}%
+        $\checkmark$%\!_{\themmroReviewerNote}
+    }%}%
+    \{#1\}
+}\gobblespace}
+
+% Для таблиц - невидимая вертикальная линейка немного расширяет заголовок
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+\newcommand{\headline}{\hline\hstrut}
+
+\begin{document}
+
+\begin{center}
+{\Large \bf Комбинаторные оценки вероятности переобучения \\ на основе кластеризации множества алгоритмов}
+
+\vspace{0.2cm}
+
+{\bf Фрей А. И., Толстихин И.О.}
+
+\end{center}
+
+\abstract {
+В данной работе предлагается новая комбинаторная оценка вероятности переобучения, учитывающая сходство алгоритмов.
+Оценка основана на разложении множества алгоритмов на непересекающиеся подмножества (кластеры).
+Итоговая оценка учитывает сходство алгоритмов внутри каждого кластера,
+и расслоение алгоритмов по числу ошибок между разными кластерами.
+Для оценки вероятности переобучения каждого кластера предлагается теоретико-групповой подход,
+основанный на учете симметрий.
+На примере задач из репозитория UCI показано, что предлагаемый метод в ряде случаев дает менее завышенную оценку вероятности переобучения
+по сравнению с известными ранее комбинаторными оценками.
+}
+
+%\tableofcontents
+
+%\newpage
+
+\section{Введение}
+
+Решение задач классификации и~прогнозирования можно рассматривать как задачу выбора по~неполной информации.
+Качество алгоритма, выбранного по конечной обучающей выборке объектов, часто оказывается значительно хуже на независимой контрольной выборке.
+В таких случаях говорят, что произошло \emph{переобучение} алгоритма \cite{vapnik74rus, vapnik98stat}.
+%В противном случае, когда переобучение мало, говорят о высокой \emph{обобщающей способности} алгоритма.
+
+В комбинаторной теории оценок обобщающей способности \cite{voron09dan}
+\emph{вероятностью переобучения} называют долю разбиений генеральной выборки на обучающую и контрольную подвыборки фиксированной длины,
+при которых произошло переобучение. В \cite{voron09pria} показано, что вероятность переобучения зависит
+от \emph{профиля расслоения} множества алгоритмов и от \emph{сходства алгоритмов} между собой.
+
+В данной работе связь между сходством алгоритмов и вероятностью переобучения будет изучена с помощью теоретико-группового подхода \cite{frey09mmro, frey10pria, tolstihin10ioi}.
+Чтобы устранить эффект расслоения в первую очередь будут рассмотрены модельные семейства,
+в которых все алгоритмы допускают равное число ошибок на полной выборке.
+На основе полученных результатов будет предложена новая верхняя оценка вероятности переобучения,
+основанная на кластеризации алгоритмов с~близкими векторами ошибок.
+Затем данная оценка обобщается на семейства с расслоением алгоритмов по числу ошибок.
+%Также доказаны оценки, одновременно учитывающие оба эффекта: и сходство, и расслоение.
+На примере 11 задач из репозитория UCI будет показано, что предлагаемый подход в ряде случаев уточняет все известные оценки вероятности переобучения.
+
+\section{Определения}
+
+Пусть задана генеральная выборка $\XX=\bigl( x_1, \ldots, x_L)$, состоящая из~$L$ объектов.
+Произвольный алгоритм классификации, примененный к~данной выборке, порождает бинарный вектор
+ошибок $a \equiv \bigl( I(a, x_i) \bigr){}_{i=1}^L$,
+где $I(a, x_i) \in \{0, 1\}$ "--- бинарный индикатор ошибки алгоритма $a$ на~объекте $x_i$.
+В~дальнейшем генеральная выборка $\XX$ предполагается фиксированной,
+поэтому алгоритмы будут отождествляться с~векторами их~ошибок на~выборке $\XX$.
+
+Для произвольной подвыборки $U \subseteq \XX$
+\emph{число} и \emph{частота} ошибок алгоритма~$a$ обозначаются, соответственно, через
+$n(a, U) = \sum \limits_{x_i \in U}I(a, x_i)$ и
+$\nu(a, U) = n(a, U) / |U|$.
+
+Пусть $\XXell$ "--- множество всех разбиений генеральной выборки~$\XX$
+на обучающую выборку~$\Xl$ длины~$\ell$ и~контрольную выборку~$\Xk$ длины $k=L-\ell$.
+\emph{Методом обучения} называют отображение $\mu$, которое произвольной
+обучающей выборке $X \in \XXell$ ставит в соответствие некоторый алгоритм $a = \mu(A, X)$ из заранее фиксированного множества $A \subset \AA$,
+где $\AA = \{0, 1\}^L$ "--- множество всех возможных бинарных векторов ошибок.
+%Будем использовать сокращенное обозначение $\mu X$ вместо $\mu(A, X)$ в тех случаях, когда из контекста понятно, о каком множестве алгоритмов идёт речь.
+
+Частоту ошибок $n(a, \Xl)$ алгоритма $a$ на~обучающей выборке $X$ часто называют \emph{эмпирическим риском}.
+\emph{Минимизация эмпирического риска} (МЭР) "--- это такой метод обучения,
+что для любой обучающей выборки $X$ выбранный алгоритм $a = \mu(A, X)$
+допускает наименьшее число ошибок на обучающей выборке $X$.
+Таким образом, для всех $\Xl \in \XXell$ должно быть выполнено $\mu(A, X) \in A(\Xl)$, где
+\begin{equation}
+\label{eqERM-A(X).sym}
+    A(X) \equiv \Argmin_{a\in A} n(a,\Xl).
+\end{equation}
+
+Для произвольного разбиения $X \sqcup \X = \XX$ \emph{переобученностью} алгоритма $a = \mu(A, X)$
+называют уклонение частот его ошибок на контроле и на обучении
+$\delta(a, X) = \nu(a, \X) - \nu(a, X)$.
+
+Следуя слабой вероятностной аксиоматике \cite{voron09pria}, будем считать, что на множестве $\XXell$
+всех $C_L^\ell$ разбиений $X \sqcup \X$ введено равномерное распределение вероятностей.
+Тогда вероятность переобучения $\Q(A)$ определяется как доля разбиений, при которых переобученность
+превышает заданный порог $\eps \in (0, 1]$:
+\begin{equation}
+    \label{def:probOverfit}
+    \Q(A) = \Prob[\delta(\mu(A, X), X) \geq \eps],
+\end{equation}
+где $\Prob[\phi\,] \equiv \frac{1}{\CLl}\sum\limits_{X \in \XXell} \phi(X)$, $\phi$ "--- произвольный предикат на множестве разбиений~$\XXell$,
+а квадратные скобки соответствуют нотации Айверсона \cite{knuth98concrete},
+переводящей логическое выражение в~число $0$ или $1$ по~правилам~$[\text{истина}] = 1$, $[\text{ложь}] = 1$.
+
+\section{Эффект сходства}
+
+\section{Центральный слой хэммингова шара}
+
+Для исследования вероятности переобучения центрального слоя хэммингова шара
+применим теоретико-групповой подход \cite{frey09mmro, frey10pria, tolstihin10ioi}.
+
+Пусть $S_L$ "--- симметрическая группа из~L элементов, действующая на~множестве
+объектов генеральной выборки перестановками $S_L = \{ \pi \colon \XX \rightarrow \XX\}$.
+Для каждого $\pi \in S_L$ действие на~произвольную выборку $\Xl \in \XXell$
+определено поэлементным действием отображения $\pi \colon \XX \rightarrow \XX$
+на каждый объект выборки $\Xl$: $ \pi \Xl \brop= \{ \pi x \colon x \in \Xl\}$.
+Это отображение не~меняет числа объектов: $|\Xl| = |\pi \Xl|$, поэтому можно
+говорить о~действии $\pi$ на~множестве разбиений генеральной выборки на~обучение и~контроль
+фиксированной длины $\pi : \XXell \rightarrow \XXell$.
+
+Действие $S_L$ на~множестве всех алгоритмов $\AA = \{0, 1\}^L$ определено перестановкой координат векторов
+ошибок алгоритмов: $(\pi a)(x_i)= a(\pi^{-1}x_i)$.
+Это действие продолжается
+до действия на~системе всех подмножеств $\AA$ по~правилу
+$\pi A = \{\pi a \colon a\in A\}$.
+В дальнейшем будет использоваться единое обозначение $\pi$ для описанных выше действий группы $S_L$.
+
+\begin{Def}
+    \label{def:symmetryGroup}
+    \emph{Группой симметрий} $\Sym(A)$ множества алгоритмов $A \subset \AA$
+    называют его стационарную подгруппу:
+    \[
+        \Sym(A) = \{\pi \in S_L \colon \pi A = A\}.
+    \]
+\end{Def}
+
+\emph{Орбитой} элемента $m$ множества $M$, на~котором действует группа $G$,
+называется подмножество $Gm = \{g m \colon g \in G\} \subseteq M$.
+Орбиты двух элементов $m_1$ и~$m_2$ либо не~пересекаются, либо совпадают.
+Это позволяет говорить о разбиении множества $M$ на~непересекающиеся орбиты:
+$M = G m_1 \sqcup \ldots \sqcup G m_k$.
+
+\emph{Рандомизированный метод минимизации эмпирического риска} \cite{frey09mmro, frey10pria}
+выбирает произвольный алгоритм из~множества~$A(X)$ случайно и~равновероятно.
+Определение вероятности переобучения \eqref{def:probOverfit} приходится соответствующим образом модифицировать,
+усреднив переобученность по~множеству $A(X)$:
+\begin{equation}
+\label{QepsRERM.sym}
+    \Q(A)
+    =
+    \frac 1 \CLl\sum_{X \in \XXell}
+    \frac1{|A(X)|} \sum_{a\in A(X)}
+    \bigl[
+        \delta(a,X) \geq \eps
+    \bigr].
+\end{equation}
+В \cite{frey09mmro, frey10pria} рассматривались орбиты действия группы симметрии на множестве алгоритмов.
+%и доказывалась теорема о равном вкладе алгоритмов одной орбиты в вероятность переобучения
+%рандомизированного метода минимизации эмпирического риска.
+Для анализа вероятности переобучения $\Q(B_r^m)$ будет удобнее следовать \cite{tolstihin10ioi}
+и рассмотреть действие группы симметрий на множестве $\XXell$ всех разбиений выборки на обучение и контроль.
+Обозначим орбиты этого действия через $\Omega(\XXell)$.
+Произвольного представителя орбиты $\tau \in \Omega(\XXell)$ обозначим через $\Xl_\tau$.
+
+\begin{Lemma}
+Пусть для некоторой функции $f \colon 2^\AA \times \XXell \rightarrow \RR$ для всех $A \subset \AA$, $X~\in~\XXell$ и всех $\pi \in \Sym(A)$ выполнено условие
+$f(A, X) = f(A, \pi X)$. Тогда справедливо следующее разложение:
+\[
+    \sum_{X \in \XXell} f(A, X) = \sum_{\tau \in \Omega(\XXell)} |\tau| f(A, X_\tau).
+\]
+\end{Lemma}
+\begin{vkProofShort} с очевидностью следует из группировки равных слагаемых.\end{vkProofShort}
+
+Нас интересует, какие функции удовлетворяют условию $f(A, X) = f(A, \pi X)$.
+
+Из приведенных выше теорем следует, что $\frac 1{|A(X)|} \sum\limits_{a \in A(X)}[\delta(a, X) \geq \eps]$ является симметричной функцией третьего рода,
+а следовательно вероятность переобучения можно факторизовать по действию группы симметрий на множестве разбиений выборки:
+\begin{equation}
+\label{eq:factorization}
+ \Q(A) =
+    \sum_{\tau \in \Omega(\XXell)} \frac {|\tau|}{|A(X_\tau)|} \sum\limits_{a \in A(X_\tau)}[\delta(a, X_\tau) \geq \eps].
+\end{equation}
+
+Данную формулу можно упростить для случая,
+когда все алгоритмы из $A$ имеют равное число ошибок на полной выборке.
+
+\begin{Theorem}
+\label{crl:easyFormula}
+Пусть все $a \in A$ имеют равное число ошибок на полной выборке.
+Тогда вероятность переобучения рандомизированного метода минимизации эмпирического риска записывается в виде
+\begin{equation}
+\label{eq:easyFormula}
+    \Q(A)
+    =
+    \frac1{C_L^\ell} \sum_{\tau \in \Omega(\XXell)}
+    %\textbf{E}
+    |\tau| \left[\min_{a \in A} n(a, X_\tau) \leq \frac \ell L(m - \epsilon k)\right].
+\end{equation}
+\end{Theorem}
+
+\begin{vkProof}
+Заметим, что все алгоритмы из $A(X_\tau)$ имеют одинаковое переобучение.
+Это следует из двух утверждений: во-первых, все алгоритмы из $A$ имеют равное число ошибок на полной выборке,
+во-вторых, все алгоритмы из $A(X_\tau)$ имеют равное число ошибок на обучении.
+Значит \eqref{eq:factorization} можно упростить следующим образом:
+\[
+    \Q(A)
+    =
+    \frac1{C_L^\ell} \sum_{\tau \in \Omega(\XXell)}
+    |\tau| \left[\delta(a', X_\tau) \geq \eps\right],
+\]
+где $a'$ "--- произвольный алгоритм из $A(X_\tau)$.
+Из $a' \in A(X_\tau)$ следует, что $n(a', X_\tau) = \min\limits_{a \in A}n(a, X)$.
+Подставляя это выражение в определение уклонения частоты $\delta(a, X)$ и проводя элементарные выкладки, получаем \eqref{eq:easyFormula}.
+\end{vkProof}
+
+Вернемся к выводу формулы вероятности переобучения для центрального слоя хэммингова шара $B_r^m$ с центром в $a_0$.
+Первым делом нам нужно узнать строение группы симметрий данного множества.
+Для этого обозначим через $X^m = \{x \in \XX \colon a_0(x) = 1\}$ множество объектов, на которых ошибается алгоритм $a_0$,
+и $X^{L-m} = \{x \in \XX \colon a_0(x) = 0\}$ "--- множество объектов, на которых $a_0$ не ошибается.
+\begin{Lemma}\cite{tolstihin10ioi}
+\label{lem:ballSyms}
+Группа $S_m \times S_{L-m}$, где $S_m$ и $S_{L_m}$ "--- симметрические группы перестановок,
+действующие на множествах $X^m$ и $X^{L-m}$, соответственно, является подгруппой группы
+симметрий множества алгоритмов $B_{r}^m$.
+\end{Lemma}
+
+\begin{Lemma}
+\label{lem:ballOrbitSize}
+Орбиты $\tau \in \Omega(\XXell)$ индексированы параметром $i = |\Xl \cap X^m|$.
+Мощность орбиты $\tau_i$ записывается в виде $|\tau_i| = C_L^\ell h_L^{\ell, m}(i)$,
+где $\hyper{L}{m}{\ell}{i} = C_m^t C_{L-m}^{\ell - i} / \CLl$ "--- функция плотности гипергеометрического распределения.
+\end{Lemma}
+
+\begin{vkProof}
+Первое утверждение леммы непосредственно следует из структуры подгруппы симметрий,
+полученной в лемме \ref{lem:ballSyms}.
+Мощность орбиты $\tau_i$ определяется числом способов выбрать $i$ объектов из $X^m$ и
+$\ell - i$ объектов из $X^{L-m}$. Таким образом $|\tau_i| = C_L^\ell h_L^{\ell, m}(i)$.
+\end{vkProof}
+
+\begin{Theorem}
+\label{thBallSclice}
+Вероятность переобучения рандомизированного метода минимизации эмпирического риска для $m$-го слоя хэммингова шара $B_r^m$ радиуса $r$
+при $r \leq 2 m$ и $n(a_0, \XX) = m$ записывается в виде
+\begin{equation}
+    \label{eq:ballSclice}
+    \Q(B_r^m)
+    \leq
+        H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor) \cdot [m \geq \eps k],
+\end{equation}
+где $s_d(\epsilon) = \frac \ell L (m - \epsilon k)$,
+$H_{L}^{\ell, m}(s)$ "--- функция гипергеометрического распределения.
+\end{Theorem}
+
+\begin{vkProof}
+Воспользовавшись теоремой \ref{crl:easyFormula}, получим
+\[
+    \Q(A)
+    =
+    \sum_{i=0}^{m}
+    h_L^{\ell, m}(i) \left[\min_{a \in A} n(a, X_i) \leq \frac \ell L(m - \epsilon k)\right].
+\]
+Напомним, что по определению $i = |\Xl \cap X^m|$. Пусть $r' = \big\lfloor \frac r 2 \big\rfloor$.
+Тогда
+\[
+    \min_{a \in A} n(a, X_i) =
+    \begin{cases}
+        & 0, \text{ при } i \leq r', \\
+        & i - r', \text{ при } i > r'.
+    \end{cases}
+\]
+Следовательно,
+\[
+    \Q(A)
+    =
+%    \sum_{i=0}^{\lfloor s_d(\epsilon)\rfloor + r'} h_L^{\ell, m}(i) =
+    \begin{cases}
+        & 0, \text{ при } m < \eps k, \\
+        & H_L^{\ell, m}(s_d(\epsilon) + \big\lfloor r/2 \big\rfloor), \text{ при } m \geq \eps k,
+    \end{cases}
+\]
+где $s_d(\epsilon) = \frac \ell L (m - \epsilon k)$.
+\end{vkProof}
+
+%Из этой формулы подтверждает результаты примера \ref{exCentralBallSlice}, в которых медиана распределения переобученности возрастала линейно по радиусу шара.
+
+Полученные выше результаты позволяют сформулировать в общем виде оценку вероятности переобучения, учитывающую сходство алгоритмов.
+\begin{Theorem}
+\label{th:decompToBallSclice}
+Пусть множество алгоритмов представлено в~виде разбиения на непересекающиеся подмножества $A = A_1 \sqcup A_2 \sqcup \dots \sqcup A_t$, причем внутри каждого подмножества $A_i$ алгоритмы допускают равное число ошибок.
+Пусть каждое множество $A_i$ вложено в центральный слой хэммингова шара $B_{r_i}^{m_i}$. Тогда
+\begin{equation}
+\label{eq:decompToBallSlice}
+    \Q(A) \leq \sum_{i = 1}^t \Q(B_{r_i}^{m_i}) = \sum_{i = 1}^t \Big\{ H_L^{\ell, m_i}(s(\epsilon) + \big\lfloor r_i/2 \big\rfloor) \cdot [m_i \geq \eps k] \Big\},
+\end{equation}
+где $s(\epsilon) = \frac \ell L (m_i - \epsilon k)$.
+\end{Theorem}
+\begin{vkProofShort} следует из лемм \ref{lem:qDecomp}, \ref{le:LayerGr} и формулы \eqref{eq:ballSclice}.
+\end{vkProofShort}
+
+\section{Учёт расслоения}
+Оценка \eqref{eq:decompToBallSlice} учитывает сходство, но не расслоение алгоритмов по числу ошибок.
+
+Полученные выше результаты позволяют уточнить оценку \eqref{eq:decompToBallSlice}.
+\begin{Theorem}
+В условиях теоремы \ref{th:decompToBallSclice}, определений \eqref{standardPZM} и \eqref{klasterPZM} для порождающих и запрещающих множеств
+справедлива следующая оценка вероятности переобучения:
+\begin{equation}
+\label{eq:decompToBallSlicePZM}
+    \Q(A) \leq
+          \sum_{i = 1}^t
+             \frac{C_{L_i}^{\ell_i}}{\CLl}
+             Q'_{\eps'}(B_{r_i}^{m'_i})
+          =
+          \sum_{i = 1}^t
+          \Big\{
+             \frac{C_{L_i}^{\ell_i}}{\CLl}
+             H_{L_i}^{\ell_i, m'_i}(s(\epsilon) + \big\lfloor r_i/2 \big\rfloor)
+             \cdot
+             [m_i \geq \eps k]
+          \Big\},
+\end{equation}
+где $s(\epsilon) = \frac \ell L (m_i - \epsilon k)$, $L_i = L - |X_i| - |X'_i|$, $\ell_i = \ell - |X_i|$, $m'_i = m_i - |X'_i|$.
+\end{Theorem}
+\begin{vkProofShort}
+следует из теоремы \ref{th:generalizedPZM}, леммы \ref{lemmaKlasterPZM} и формулы \eqref{eq:ballSclice}.
+\end{vkProofShort}
+Главное отличие \eqref{eq:decompToBallSlicePZM}
+от полученной ранее оценки \eqref{eq:decompToBallSlice} "--- в коэффициенте~$\frac{\Binom{L_i}{\ell_i}}{\CLl}$,
+экспоненциально убывающем с ростом суммарной мощности порождающего и запрещающего множеств.
+
+\section{Локальная окрестность малой мощности}
+
+\section{Эксперимент}
+
+\section{Выводы}
+В данной работе предложена новая оценка вероятности переобучения, учитывающая расстояния между векторами ошибок алгоритмов.
+Оценка основана на разложении множества алгоритмов на кластеры, т.е. на непересекающиеся подмножества, состоящие из алгоритмов с похожими векторами ошибок.
+Для каждого такого кластера применяется верхняя оценка вероятности переобучения, учитывающая хэммингов диаметр кластера и его мощность.
+По аналогии с уже существующими оценками расслоения-связности доказана новая оценка, одновременно учитывающая и эффект расслоения по числу ошибок, и эффект сходства алгоритмов.
+Вывод данной оценки существенно опирается на теоретико-групповой подход.
+%В отличие от хорошо исследованного действия группы симметрий на множестве алгоритмов,
+%в данное работе изучено действие группы симметрии на множестве разбиений выборки на обучение и контроль.
+
+Эффективность полученных оценок продемонстрирована на примере 11 задач из репозитория UCI.
+Показано, что предлагаемый метод в ряде случаев даёт более точную оценку переобучения по сравнению с уже известным оценками.
+
+\newpage
+
+Работа поддержана РФФИ (проект \No\,11-07-00480, \No\,12-07-33099\,-мол-а-вед) и~программой ОМН~РАН
+<<Алгебраические и~комбинаторные методы математической кибернетики
+и~информационные системы нового поколения>>.
+
+
+\def\BibAuthor#1{\emph{#1}}
+\def\BibTitle#1{#1}
+\def\BibUrl#1{{\small\url{#1}}}
+\def\BibHttp#1{{\small\url{http://#1}}}
+\def\BibFtp#1{{\small\url{ftp://#1}}}
+\def\typeBibItem{\small\sloppy}
+
+\begin{thebibliography}{1}
+\bibitem{vapnik74rus}
+    \BibAuthor{Вапник\;В.\,Н., Червоненкис\;А.\,Я.}
+    \BibTitle{Теория распознавания  образов}. "---
+    М.:~Наука, 1974.
+\bibitem{vapnik98stat}
+    \BibAuthor{Vapnik~V.}
+    \BibTitle{Statistical Learning Theory}. "---
+    New York: Wiley, 1998.
+\bibitem{voron09dan}
+    \BibAuthor{Воронцов\;К.\,В.}
+    \BibTitle{Точные оценки вероятности переобучения}~//
+    Доклады РАН, 2009. "--- Т.\,429, \No\,1.  "--- С.\,15--18.
+%\bibitem{voron09mmro}
+%    \BibAuthor{Воронцов\;К.\,В.}
+%    \BibTitle{Комбинаторный подход к~проблеме переобучения}~//
+%    Всеросс. конф. ММРО-14 "--- М.:~МАКС Пресс, 2009. "---  \mbox{С.\,18--21}.
+\bibitem{voron09pria}
+    \BibAuthor{Vorontsov\;K.\,V.}
+    Splitting and Similarity Phenomena in the Sets of Classifiers and Their Effect on the Probability of Overfitting~//
+    {Pattern Recognition and Image Analysis.} ~---
+    2009.~---
+    Vol.\,19, No.\,3.~---
+    Pp.\,412--420.
+\bibitem{voron10pria}
+    \BibAuthor{Vorontsov\;K.\,V.}
+    Exact combinatorial bounds on the probability of overfitting for empirical risk minimization~//
+    {Pattern Recognition and Image Analysis.} ~---
+    2010.~---
+    Vol.\,20, No.\,3.~---
+    Pp.\,269--285.
+\bibitem{voron10roai}
+    \BibAuthor{Vorontsov\;K.\,V., Ivahnenko\;A.\,A., Reshetnyak\;I.\,M.}
+    \BibTitle{Generalization bound based on the splitting and connectivity graph of the set of classifiers}~//
+    Pattern Recognition and Image Analysis: new information technologies (PRIA-10),
+    St.~Petersburg, Russian Federation, December 5--12, 2010.
+\bibitem{frey10ioi}
+    \BibAuthor{Фрей\;А.\,И.}
+    \BibTitle{Вероятность переобучения плотных и~разреженных многомерных~сеток алгоритмов}~//
+    Междунар. конф. ИОИ-8 "--- М.:~МАКС Пресс, 2010.  "---  \mbox{С.\,87--90}.
+\bibitem{voron11premi}
+    \BibAuthor{Vorontsov\;K.\,V., Ivahnenko\;A.\,A.}
+    \BibTitle{Tight Combinatorial Generalization Bounds for Threshold Conjunction Rules}~//
+    4-th International Conference on Pattern Recognition and Machine Intelligence,
+    June~27 -- July~1, 2011.
+    Lecture Notes in Computer Science. Springer-Verlag, 2011.~--- Pp. 66--73.
+\bibitem{frey12ioi}
+    \BibAuthor{Фрей~А.\,И., Ивахненко~А.\,А, Решетняк~И.\,М.}
+    \BibTitle{Применение комбинаторных оценок вероятности переобучения в~простом голосовании конъюнкций}~//
+    Междунар. конф. ИОИ-9 "--- М.:~МАКС Пресс, 2012.  "---  \mbox{С.\,86-89}.
+\bibitem{bax97similarity}
+    \BibAuthor{E.\,Bax.}
+    \BibTitle{Similar Classifiers and VC Error Bounds}~//
+    Tech. Rep. CalTech-CS-TR97-14: 1997.
+\bibitem{frey09mmro}
+    \BibAuthor{Фрей\;А.\,И.}
+    \BibTitle{Точные оценки вероятности переобучения для симметричных семейств алгоритмов}~//
+    Всеросс. конф. ММРО-14 "--- М.:~МАКС Пресс, 2009.  "---  \mbox{С.\,66--69}.
+\bibitem{frey10pria}
+    \BibAuthor{Фрей\;А.\,И.}
+    \BibTitle{Точные оценки вероятности переобучения для симметричных семейств алгоритмов и рандомизированных методов обучения}~//
+    Pattern Recognition and Image Analysis. "--- 2010.
+\bibitem{tolstihin10ioi}
+    \BibAuthor{Толстихин\;И.\,О.}
+    \BibTitle{Вероятность переобучения плотных и разреженных семейств алгоритмов}~//
+    Междунар. конф. ИОИ-8 "--- М.:~МАКС Пресс, 2010.  "---  \mbox{С.\,83--86}.
+\bibitem{knuth98concrete}
+    \BibAuthor{Грэхем\;Р., Кнут\;Д., Паташник\;О.}
+    \BibTitle{Конкретная математика}. "---
+    М.:~Мир, 1998.
+\bibitem{esokolov12ioi}
+    \BibAuthor{Соколов\;Е.\,А., Воронцов\;К.\,В.}
+    \BibTitle{Минимизация вероятности переобучения для композиций линейных классификаторов малой размерности}~//
+    Междунар. конф. ИОИ-9 "--- М.:~Торус Пресс, 2012. "--- \mbox{С.\,82--85}.
+\bibitem{jin2012pacbayes}
+     Jin\;C., Wang\;L.~(2012)
+     Dimensionality Dependent PAC-Bayes Margin Bound.
+     \emph{In Advances in Neural Information Processing Systems}, 25, 1043--1051.
+\bibitem{ucirepository}
+    \BibAuthor{K.\,Bache, M.\,Lichman.}
+    \BibTitle {UCI} Machine Learning Repository~//
+    University of California, Irvine, School of Information and Computer Sciences. "--- 2013.
+    %http://archive.ics.uci.edu/ml.
+
+%\bibitem{botov09mmro}
+%    \BibAuthor{Ботов\;П.\,В.}
+%    \BibTitle{Точные оценки вероятности переобучения для монотонных и~унимодальных семейств алгоритмов}~//
+%    Всеросс. конф. ММРО-14 "--- М.:~МАКС Пресс, 2009.  "---  \mbox{С.\,7--10}.
+\end{thebibliography}
+
+
+\end{document}

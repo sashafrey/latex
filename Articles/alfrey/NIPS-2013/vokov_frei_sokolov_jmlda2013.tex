@@ -1,0 +1,792 @@
+\documentclass[12pt,twoside]{article}
+\usepackage{jmlda}
+%\NOREVIEWERNOTES
+
+\usepackage{multicol}
+\graphicspath{{./eps//}}
+\captionsetup{belowskip=4pt,aboveskip=4pt}
+
+\def\XX{\mathbb{X}}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\def\eps{\epsilon}
+\newcommand{\Arg}{\mathop{\rm Arg}\limits}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,\:#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+\def\LR{\text{LR}}
+
+\title
+    %[Образец оформления статьи для публикации] % Краткое название; не нужно, если полное название влезает в~колонтитул
+    {Computable combinatorial overfitting bounds}
+\author
+    %[Автор~И.\,О. и др.] % список авторов для колонтитула; не нужен, если основной список влезает в колонтитул
+    {Vorontsov~K.\,V., Frey~A.\,I., Sokolov~E.\,A.} % основной список авторов, выводимый в оглавление
+    [Vorontsov~K.\,V.$^1$, Frey~A.\,I.$^2$, Sokolov~E.\,A.$^3$] % список авторов, выводимый в заголовок; не нужен, если он не отличается от основного
+\thanks
+    %{Работа поддержана РФФИ (проект \No\,11-07-00480, \No\,12-07-33099\,-мол-а-вед) и~программой ОМН~РАН
+    % <<Алгебраические и~комбинаторные методы математической кибернетики
+    % и~информационные системы нового поколения>>.}
+    {This work was supported by the Russian Foundation for Basic Research
+(project no.\,11-07-00480, no.\,12-07-33099\,-mol-a-ved)
+and by the program ``Algebraic and Combinatorial Methods in
+Mathematical Cybernetics and New Generation Information Systems''
+of the Department of Mathematical Sciences of the Russian Academy of Sciences.}
+
+\email
+    {voron@forecsys.ru, oleksandr.frei@gmail.com, sokolov.evg@gmail.com}
+\organization
+    {$^1$Dorodnitsyn Computing Centre, Russian Academy of Sciences; $^2$Moscow Institute of Physics and Technology; $^3$Moscow State University}
+\abstract
+    {In this paper we study computable combinatorial data dependent generalization bounds.
+This approach is~based on simplified probabilistic assumptions: we assume that
+the instance space is finite, the labeling function is deterministic, and the loss function is binary.
+We~use a~random walk across a~set of~linear classifiers with low error rate to compute the bound efficiently.
+We provide experimental evidence to confirm that this approach leads to practical overfitting bounds in classification tasks.}
+\titleRus
+    {Вычислимые комбинаторные оценки вероятности переобучения}
+\authorRus
+    {Воронцов~К.\,В.$^1$, Фрей~А.\,И.$^2$, Соколов~Е.\,А.$^3$}
+\organizationRus
+    {$^1$Москва, Вычислительный Центр РАН; $^2$Московский Физико-Технический Институт; $^3$Московский Государственный Университет}
+\abstractRus
+    {В данной статье изучаются комбинаторные оценки обобщающей способности, вычислимые по обучающей выборке.
+     Эти оценки основаны на упрощенной вероятностной модели, в которой рассматривается лишь конечная генеральная совокупность объектов и бинарная функция потерь.
+     Для линейных классификаторов предлагается новый эффективный метод вычисления комбинаторных оценок, 
+     использующий случайные блужданий по множеству классификаторов с низким числом ошибок.
+     В заключении приводится экспериментальное обоснование предлагаемого метода.}
+\begin{document}
+\English
+\maketitle
+\linenumbers
+\section{Introduction}
+
+Accurate bounding of overfitting is an active area of research starting with the pioneer work~\cite{vapnik71convergence}.
+A~widely adapted approach is based on a probabilistic framework,
+where an instance space $\XX$ (usually of an infinite cardinality)
+is equipped with an unknown probability distribution.
+Consider an observed i.i.d. sample $X = \{x_1, \dots, x_\ell\}$ from $\XX$,
+a set $A$ of all feasible classifiers (for example, all linear classifiers in the original feature space),
+and a learning algorithm $\mu$ which selects a specific classifier $a = \mu X$ from the $A$ based on the observed sample $X$.
+The goal of generalization bounds is to predict an average performance of the classifier $a$ on the whole~$\XX$.
+Most generalization bounds are derived from various concentration inequalities~\cite{lugosi03concentration}
+and take into account the dimensionality~of~$A$
+(such as VC-dimension, fat-shattering dimension, etc.),
+properties of the learning algorithm $\mu$
+(such as the local properties of empirical risk minimization~\cite{koltchinskii06rademacher}),
+and information drawn from the observed sample~$X$
+(such as the normalized margin in margin-based bounds~\cite{koltchinskii02margin, koltchinskii03convex}).
+Generalization bounds can be useful in structural risk minimization and in model selection,
+and we hope that some time in the future they could replace costly cross-validation procedures.
+
+Despite recent significant improvements~\cite{boucheron05survey}, there is still a big gap between theory and practice.
+Even the latest PAC-Bayesian bounds~\cite{jin2012pacbayes} vastly overestimate overfitting, especially when the cardinality of an instance space is small.
+Another difficulty is~that intermediate bounds
+are usually expressed in terms of unobservable quantities
+%(such as the probability distribution $\Prob$),
+and that makes impossible to measure and compare factors of overestimation.
+Finally, many papers lack experimental evaluation.
+As a result, from practical perspective the existing bounds are not well suitable
+for prediction and control of overfitting.
+
+We believe that a simplified probabilistic framework is~quite sufficient for obtaining practical overfitting bounds.
+In this paper we assume that the instance space $\XX$ is finite,
+and for each object $x \in \XX$ and classifier $a \in A$ there exists a deterministic binary loss $I(a, x) \in \{0, 1\}$
+associated with classification of $x$ as $a(x)$.
+We~assume that all partitions of the set $\XX$ into
+an observed training sample~$X$ of size~$\ell$
+and a hidden test sample $\X=\XX\setminus X$ of size~$k$
+can occur with equal probability.
+Then the overfitting probability can be defined by a~purely combinatorial formula~\cite{voron09overfitting}:
+\begin{equation}
+    \label{eq:QEps}
+    Q_\eps (\mu, \XX)
+    =
+    \Prob%{\CC_L^\ell}^{-1} \sum_{X\in\XXell}
+    \bigl[
+        \nu(\mu(X), \X) - \nu(\mu(X),X)  \geq \eps
+    \bigr],
+\end{equation}
+where
+%$L = \ell+k = |\XX| $ is the total number of objects,
+$\mu$~is~a~learning algorithm,
+%$\XXell$ stands for a set of all subsamples $X\subset\XX$ of a given size~$\ell$,\;
+$\nu(a, X)$ is an error rate of a classifier $a \in A$ on a sample~$X$,
+and the square brackets denote a transformation of a~logical value into a numerical one:
+%according to Iverson's convention:
+$[\textit{true}]=1$, $[\textit{false}]=0$. %~\cite{knuth98concrete-eng}.
+A definition similar to \eqref{eq:QEps} first appears in the~\cite{haussler94predicting} for a specific case of $k = 1$
+and then in~\cite{bax97similar} (this time for an arbitrary $k$, but with significant notation differences).
+This definition closely resembles the procedure of complete cross-validation,
+which is known to provide sharp estimates of performance of a learning algorithm
+on data yet unknown during learning phase.
+
+Definition \eqref{eq:QEps} is not guarantied to be an upper bound for new objects beyond $\XX$
+(not even up to some probability).  % if we allow bound to fail with some small probability
+In this paper we do not discuss how to mitigate this problem.
+We just assume that the lack of guaranties is acceptable,
+in the same way as people normally accept results of a fare $10$-fold cross-validation in experimental evaluations.
+
+Within \eqref{eq:QEps} we use an empirical risk minimization
+$\mu X = \arg\min_{a \in A} \nu(a, X)$ as a learning algorithm.
+This requires an explicit representation of the set of classifiers~$A$,
+which might be of enormous cardinality ($10^9$ and higher) in real applications.
+In this paper we study a special case of linear classifiers
+and present an efficient algorithm that samples a small set of  classifiers (up~to~$10^4$)
+to recover accurate overfitting bound \eqref{eq:QEps}.
+Also note that a direct computation of \eqref{eq:QEps} is intractable
+because it involves a sum across all $\CC_{\ell+k}^\ell$ subsets $X \subset \XX$.
+For empirical risk minimization we use efficient upper bounds on \eqref{eq:QEps},
+obtained in~\cite{voron11premi}, and compare them with Monte-Carlo estimate of \eqref{eq:QEps}.
+
+We study overfitting of logistic regression in experiments on 15~datasets from the UCI repository~\cite{blake98uci}.
+The results confirm that our approach provides sharp estimates of overfitting,
+which correlate with the actual overfitting,
+recovers a correct shape of the learning curves,
+and outperform the state-of-art PAC-bayesian bounds.
+
+The rest of this paper is organized as follows.
+Section 2 contains a brief review of combinatorial bounds on \eqref{eq:QEps}.
+Section 3 describes our algorithm of sampling a representative set of linear classifiers.
+We provide experimental results in Section 4, and conclude in Section 5.
+
+\section{Background}
+\label{sec:Defs}
+
+Let $\XX=\{x_1,\ldots,x_L\}$  be a finite instance space and
+$A$ be a set of classifiers.
+By~$I\colon A\times X \to \{0,1\}$ denote a~binary loss function such that
+$I(a,x)=1$ if a~classifier~$a$ produces an~error on an~object~$x$.
+For~further consideration there is no need to specify what is ``classifier''.
+Particularly, a regression function can also be a~``classifier''
+if a~binary loss function is~used.
+
+The~binary vector $(a_i)\equiv\bigl(I(a,x_i)\bigr){}_{i=1}^L$
+of size~$L$ is called an \emph{error vector} of the classifier~$a$.
+Assume that all classifiers from~$A$ have pairwise different error vectors.
+The number of errors of a~classifier~$a$ on a~sample $X\subseteq\XX$
+is defined as $n(a,X) = \sum_{x\in X} I(a,X)$.
+%Denote $n(a)=n(a,\XX)$ for short.
+The~error rate is defined as
+$\nu(a,X) = \frac1{|X|} n(a,X)$.
+The subset $A_m = \{a \in A \colon n(a, \XX) = m\}$ is called \emph{$m$-layer} of classifiers.
+
+A \emph{learning algorithm} is a mapping ${\mu\colon 2^\XX \to A}$
+that takes a~training sample~$X\subseteq\XX$  and gives a classifier ${\mu X \in A}$.
+The learning algorithm $\mu$ is called \emph{empirical risk minimization} (ERM) whenever for all $X \in \XX$ it satisfies $\mu X \in A(X)$, where
+\[
+	 A(X) \equiv \Arg\min_{a\in A} n(a,X).
+\]
+The choice of a classifier that minimizes empirical risk may be ambiguous
+because of discreteness of the function $n(a,X)$.
+ERM algorithm $\mu$ is said to be \emph{pessimistic} if
+\[
+    \mu X \in \Arg\max_{a\in A(X)} n(a,\X).
+\]
+The~pessimistic ERM cannot be implemented in~practice
+because it looks into a~hidden part of~data~$\X$ unknown at the~learning stage.
+Nevertheless, pessimistic ERM is a~very useful theoretical concept
+because it gives tight upper bounds of overfitting probability for any~ERM.
+
+\paragraph{Permutational probability.}
+By $\XXell$ denote a set of all
+$\CC_L^\ell = \tfrac{L!}{\ell!(L-\ell)!}$
+samples $X\subset\XX$ of size~$\ell$.
+%Assume that all partitions of the set $\XX$ into an observed training sample~$X$ of size~$\ell$
+%and a hidden test sample $\X=\XX\setminus X$ of size~$k=L-\ell$
+%can occur with equal probability.
+Define a~probability operator~$\Prob$ and an~expectation operator~$\Expect$
+for a~predicate $\phi \colon \XXell \rightarrow \{0, 1\}$
+and a~real function $\psi \colon \XXell \rightarrow \RR$:
+\[
+    \Prob \phi = {\CC_L^\ell}^{-1} \sum_{X \in \XXell} \phi(X),
+    \qquad
+    \Expect \psi = {\CC_L^\ell}^{-1} \sum_{X \in \XXell} \psi(X).
+\]
+
+If~the \emph{discrepancy}
+$\delta(a, X) = \nu(a,\X) - \nu(a, X)$
+is~greater than a~given nonnegative threshold~$\eps$,
+then the classifier~$a=\mu X$ is said to be \emph{overfitted}.
+Our goal is to estimate the \emph{probability of overfitting}:
+\[
+    Q_\eps (\mu, \XX)
+    =
+    \Prob\bigl[
+        \delta(\mu, X) \geq \eps
+        %\nu(\mu X,\X) - \nu(\mu X, X) \geq \eps
+    \bigr].
+%    =
+%    {\CC_L^\ell}^{-1} \sum_{X\in\XXell}
+%    \bigl[
+%        \delta(\mu,X) \geq \eps
+%    \bigr].
+\]
+where
+$\delta(\mu, X) = \delta(\mu X, X)$ for short.
+
+The \emph{inversion} of an~upper bound $Q_\eps \leq \eta(\eps)$  is an inequality
+$\nu(\mu X,\X) - \nu(\mu X, X) \leq \eps(\eta)$
+that holds with probability at least $1-\eta$, where $\eps(\eta)$
+is the inverse function for $\eta(\eps)$.
+The \emph{median of an upper bound} $Q_\eps \leq \eta(\eps)$  is the inversion at~$\eta = 1/2$.
+
+Average train and test errors are defined as follows:
+\begin{gather}
+    \label{eq:avgTrainNu}
+    \nu_\ell(\mu, \XX) = \Expect\nu(\mu X, X);
+\\
+    \label{eq:avgTestNu}
+    \bar \nu_\ell(\mu, \XX) = \Expect\nu(\mu X, \X).
+\end{gather}
+
+\paragraph{Hypergeometric distribution.}
+For a~classifier~$a$ such that $m=n(a,\XX)$
+the probability to~have $s$~errors on a~sample~$X$
+is~given by a~hypergeometric function:
+\[
+    \Prob[ n(a,X)=s ]
+    = {\CC_m^s \CC_{L-m}^{\ell-s}} {\CC_L^\ell}^{-1}
+    \equiv
+    \hyper{L}{m}{\ell}{s},
+\]
+where
+argument~$s$ runs from~${s_0 = \max\{0,m-k\}}$ to ${s_1 = \min\{m,\ell\}}$,
+and parameter~$m$ takes values $0,\ldots,L$.
+It is assumed that
+$\CC_m^s = \hyper{L}{m}{\ell}{s} = 0$
+for all other integers $m,s$.
+
+Define the hypergeometric cumulative distribution function (left tail of the distribution):
+%\begin{equation}
+%\label{eqHypergeometric}
+\[
+    \Hyper{L}{m}{\ell}{z}
+    =
+    \sum\limits_{s=s_0}^{\lfloor z \rfloor}
+    \hyper{L}{m}{\ell}{s}.
+\]
+%\end{equation}
+
+Consider a~set $A=\{a\}$ containing a~fixed classifier so that $\mu X = a$ for any $X$.
+Then the probability of overfitting~$Q_\eps$ transforms into
+the probability of~large deviation between error rates on two samples~$X,\X$.
+If~the number of errors $n(a,\XX)$ is~known, then an~exact $Q_\eps$ bound can be obtained.
+
+\begin{Theorem}[FC-bound~\cite{voron11premi}]
+\label{thOneAlg}
+    For a~fixed classifier~$a$ such that ${m=n(a,\XX)}$,
+    any set $\XX$,
+    and any $\eps\in [0,1]$
+    the probability of~overfitting is~given by the left tail of the hypergeometric distribution:
+    \begin{equation}
+    \label{eq:OCbound}
+        Q_\eps(a, \XX)
+        %\Prbig[ \delta(a,X) \geq \eps ]
+        =
+        \Hyper{L}{m}{\ell}{ \tfrac{\ell}{L} (m-\eps k) }.
+    \end{equation}
+\end{Theorem}
+
+The hypergeometric distribution plays a fundamental role for combinatorial bounds.
+Together with union bound \eqref{eq:OCbound} provides an upper estimate of $Q_\eps(\mu, \XX)$ that holds for any learning algorithm $\mu$.
+\begin{Theorem}[VC-type bound~\cite{voron11premi}]
+\label{thOneAlg2}
+    For any set $\XX$,
+    any learning algorithm~$\mu$,
+    and any $\eps\in [0,1]$
+    the probability of overfitting is bounded by the sum of FC-bounds over the set~$A$:
+    \begin{equation}
+    \label{eq:VCbound}
+        Q_\eps(\mu, \XX)
+        %Q_\eps(A, \XX)
+        \leq
+        \Prob\bigl[
+        \max_{a \in A}\delta(a, X) \geq \eps
+        \bigr]
+        \leq
+        \sum_{a\in A}
+        \Hyper{L}{m}{\ell}{ \tfrac{\ell}{L} (m-\eps k) },
+        \quad
+        m = n(a,\XX).
+    \end{equation}
+\end{Theorem}
+There are two reasons for looseness of~\eqref{eq:VCbound}.
+First, most classifiers in $A$ are bad and
+should have vanishing probability to be obtained as a result of learning.
+Nevertheless, the uniform deviation bound ignores the learning algorithm~$\mu$.
+Second, similar classifiers share their contribution, which is ignored by union bound.
+Better bound should account for actual learning algorithm and similarity between classifiers.
+
+\paragraph{Splitting and connectivity bounds}
+Define an order relation on classifiers $a\leq b$ as a natural order over their error vectors:
+$a_i \leq b_i$ for all $i=1,\ldots,L$.
+Define a~metric on classifiers as a Hamming distance between error vectors:
+$\rho(a,b) = \sum_{i=1}^L |a_i-b_i|$.
+
+\begin{Theorem}[SC-bound~\cite{voron11premi}]
+\label{th:SC-bound}
+    If learning algorithm~$\mu$ is pessimistic ERM, then for any $\eps\in[0,1]$
+    the probability of overfitting is bounded by the weighted sum of FC-bounds over the set~$A$:
+    \begin{equation}
+    \label{eq:SC-bound}
+        Q_\eps(\mu,\XX)
+        \leq
+        \sum_{a\in A}
+            {\CC_{L-q-r}^{\ell-q}}{\CC_{L}^{\ell}}^{-1}
+            \Hyper{L-q-r}{m-r}{\ell-q}{\tfrac\ell L (m - \eps k)},
+    \end{equation}
+    where $m = n(a,\XX)$,
+    $q = q(a)$ is upper connectivity and $r = r(a)$ is~inferiority of a~classifier $a$:
+    \begin{align*}
+        q(a) &= \#\{b \in A \colon a < b \text{ and } \rho(a, b) = 1\};
+    \\
+        r(a) &= \#\{x \in \XX \colon I(a, x) = 1 \text { and } \exists b \in A, \text { such that } b \leq a \text{ and } I(x, b) = 0\};
+    \end{align*}
+    where for any set $S$ notation $\#S$ stands for cardinality of $S$.
+\end{Theorem}
+SC-bound \eqref{eq:SC-bound} turns into VC-type bound \eqref{eq:VCbound} when all $q(a)$ and $r(a)$ are set to zeros.
+
+The weight
+$P_a = {\CC_{L-q-r}^{\ell-q}} {\CC_{L}^{\ell}}^{-1}$
+in~sum~\eqref{eq:SC-bound}
+is an upper bound on the probability
+$\Prob[\mu X= a]$
+to~get a given classifier~$a$ as a result of learning.
+This~quantity decreases exponentially as the connectivity~$q(a)$ or the inferiority~$r(a)$ increase.
+This implies that approximate calculation of $Q_\eps(\mu, \XX)$ requires knowledge not about the full set $A$,
+but only about few bottom layers of $A$.
+This fact motivates an algorithm presented in the next section.
+
+\section{Sampling linear classifiers}
+One has to deal with the set of all classifiers $A$
+to calculate bounds \eqref{eq:VCbound}, \eqref{eq:SC-bound},
+or to estimate $Q_\eps (\mu, \XX)$ directly from definition \eqref{eq:QEps}.
+In this section we describe an efficient algorithm which samples a small set of classifiers (about~$10^4$)
+sufficient to recover accurate overfitting bound.
+
+Consider binary classification problem with labels $y_i \in \{-1, +1\}$,
+$i = 1,\dots,L$ assigned to objects $x_i \in \XX \subset \RR^d$, respectively.
+Consider a set of unbiased linear classifiers $a(x; w) = \sign \langle w, x \rangle$
+where $w \in \RR^d$ is a real vector of weights.
+We say that a pair of classifiers $(w_1, w_2)$ are \emph{neighbors}
+if their classification differs only by one object: $x \in \XX$
+such that
+$\sign(\langle w_1, x \rangle) \cdot \sign(\langle w_2, x \rangle) = -1$.
+
+Our immediate goal is to find all or some of neighbors of a given classifier $w_0$.
+Then we will use this procedure to organize random walk on the graph $G = (A, E)$
+where vertices correspond to classifiers in $A$, and edges connect neighbor classifiers.
+
+\paragraph{Finding neighbor classifiers along specific direction.}
+\emph{Dual transformation} $D$ maps a~point ${x \in \RR^d}$ into hyperplane
+${D(x) = \{w \in \RR^d \colon \langle w, x \rangle = 0\}}$,
+and maps a hyperplane
+${h = \{x \in \RR^d \colon \langle w, x \rangle = 0\}}$
+into point $D(h) = w$.
+Applying dual transformation $D$ to finite set of points ${\XX \subset \RR^d}$
+produces a set of hyperplanes ${\HH \equiv \{D(x_i)\}_{i=1}^{L}}$.
+Each hyperplane ${h_i \in \HH}$ divides~$\RR^d$ into two half-spaces
+\begin{align*}
+    h_i^+ &= \{w \in \RR^d \colon \sign \langle w, x_i \rangle = y_i\};
+    \\
+    h_i^- &= \{w \in \RR^d \colon \sign \langle w, x_i \rangle = -y_i\}.
+\end{align*}
+These half-spaces $h_i^+$ and $h_i^-$
+correspond to linear classifiers giving correct and incorrect answer
+on $x_i$ respectively.
+So to find all classifiers with given error vector $I = (I_i)_{i = 1}^{L}$,
+$I_i \in \{+, -\}$ where ``+'' corresponds to correct answer and ``$-$'' corresponds
+to incorrect,
+we just find the intersection of half-spaces $\bigcap_{i = 1}^{L} h_i^{I_i}$.
+This intersection contains all linear classifiers with error vector $I$ (and only them).
+So a set of hyperplanes $\HH$ dissects $\RR^d$ into convex polytopes called \emph{cells},
+and the partition itself is called \emph{an arrangement of hyperplanes}~\cite{agarwal98arrangements}.
+It can be shown that finding neighbors of classifier $w_0 \in \RR^d$ is equivalent to finding cells
+adjacent to the cell of $w_0$ in arrangement $\HH$.
+
+In order to find a neighbor of the classifier $w_0$ we select an arbitrary vector $u \in \RR^d$
+and consider a parametric set of classifiers $\{w_0 + t u \colon t \geq 0\}$.
+This set corresponds to a ray in the space of classifiers which starts from $w_0$ and goes along the direction of $u$.
+An intersection of this ray with hyperplane $h_i \in \HH$ is defined by condition $\langle w_0 + t u, x_i\rangle = 0$,
+e.g. for $t_i = - \frac{\langle w_0, x_i\rangle}{\langle u, x_i\rangle}$.
+Let $t_{(1)}$ and $t_{(2)}$ be the first and the second smallest positive values from $\{t_i\}$, $i = 1, \dots, L$.
+Whenever $t_{(1)} \neq t_{(2)}$ we conclude that $w' = w_0 + \frac{1}{2}(t_{(1)} + t_{(2)}) u$ defines
+an adjacent classifier along direction $u$.
+
+\paragraph{Random walk on classifiers graph.}
+Techniques of random walk~\cite{avrachenkov10restarts, ribeiro10multidimensional, lee12backtrack}
+provide common approach to sample vertices from huge graphs.
+They are based on stationary distributions of Markov chains
+and have nice properties when the sample is large.
+Our goal is to get a small sample sufficient to estimate overfitting from~\eqref{eq:QEps},
+\eqref{eq:VCbound} or \eqref{eq:SC-bound}.
+In this paragraph we discuss how to organize such random walk on $A$
+based on procedure that finds a random neighbor for $w \in A$.
+
+\begin{algorithm}[t]
+\caption{Random walk on classifiers graph}
+\label{alg:walking}
+\begin{algorithmic}[1]
+\REQUIRE starting point $w_0$; sample $\XX \subset \RR^d$; integer parameters $N$, $m$, $n$; float parameter $p \in (0, 1]$;
+\ENSURE set of classifiers $A$ with unique error vectors.
+
+\STATE Initialize concurrent random walk: $v_i = w_0$, $i = 1, \dots, N$;
+\STATE Create set $A := \emptyset$;
+\WHILE{$A.size() < n$}
+    \FORALL{$i \in 1, \dots, N$}
+        \STATE Find neighbor $v'_i$ of $v_i$ along random direction $u \in \RR^d$;
+        \IF{$n(v'_i, \XX) > n(v_i, \XX)$}
+            \STATE with probability $(1 - p)$ \textbf{continue};
+        \ELSIF{$n(v'_i, \XX) > n(w_0, \XX) + m$}
+            \STATE \textbf{continue};
+        \ENDIF
+        \STATE $v_i = v'_i$;
+        \STATE A.add($v_i$);
+    \ENDFOR
+\ENDWHILE
+\RETURN $A$
+\end{algorithmic}
+\end{algorithm}
+
+Our algorithm is given in listing \ref{alg:walking}.
+It is controlled by the desired number of classifiers $n$,
+maximal number of layer $m$,
+the number of concurrent walks $N$,
+and the probability $p$ of transition towards classifier with higher number of errors.
+The computational complexity of this algorithm is $O(L d n)$.
+
+\begin{figure}[t]
+\centering
+\begin{multicols}{2}
+    \hfill
+    \includegraphics[width=0.9\linewidth]{RW_maps_pTransition_1.eps}
+    \hfill
+    \caption{Map of hamming distances between classifiers (top chart)
+        and error profile (bottom chart) produced by a~simple random walk}
+    \label{fig:rwMappingSimple}
+    \hfill
+    \includegraphics[width=0.9\linewidth]{RW_maps_pTransition_05.eps}
+    \hfill
+    \caption{Map of hamming distances between classifiers (top chart)
+        and error profile (bottom chart) produced by random walk where a step to
+        upper vertex is made with probability $0.5$}
+    \label{fig:rwMappingPTransition}
+\end{multicols}
+\end{figure}
+
+To explain the necessity of the parameter~$p$
+we presents the results of the simplest random walk with~$n = 2000$ iterations
+on fig.~\ref{fig:rwMappingSimple}.
+The bottom chart displays the number of errors $n(v_i, \XX)$ as a function of step.
+The upper chart displays a color map of pairwise hamming distances $\rho(v_i, v_j)$
+between sampled vertices~$v_i$ and~$v_j$.
+As a starting point we used a classifier learned by logistic regression.
+It is natural to expect that it has relatively small number of errors which drifts upwards along random walk.
+This effect is undesired, because classifiers with high number of errors have too small chance to be selected by learning algorithm.
+
+Fig. \ref{fig:rwMappingPTransition} presents similar result for updated random walk
+where a step to upper vertex is made with probability $p = 0.5$.
+This enforces random walk to stay within the lower layers of the graph.
+
+\section{Experiment}
+\label{sec:Experiment}
+
+The goal of our experiment on the benchmark datasets is twofold.
+First, we check whether combinatorial functionals
+$Q_\eps(\mu,\XX)$ \eqref{eq:QEps} and
+$\bar\nu_\ell(\mu,\XX)$ \eqref{eq:avgTestNu}
+together with algorithm \ref{alg:walking}
+provide an accurate estimates of the overfitting on the hold-out testing sample.
+Second, we compare direct Monte-Carlo estimates of overfitting based on functional \eqref{eq:QEps} with
+VC-type bound \eqref{eq:VCbound}, SC-bound \eqref{eq:SC-bound},
+and with recent PAC-bayesian DD-margin and DI-margin bounds proposed in~\cite{jin2012pacbayes}.
+
+\begin{table}[h]
+\caption{Description of datasets}
+\label{tab:datasets}
+    \centering
+    \begin{tabular}[t]{||c|c|c||c|c|c||}
+    \hline
+    Dataset&\#Examples&\#Features&Dataset&\#Examples&\#Features \\
+\hline
+    Sonar      & 208   & 60 & Statlog    & 2310  & 19 \\
+    Glass      & 214   &  9 & Wine       & 4898  & 11 \\
+    Liver dis. & 345   &  6 & Waveform   & 5000  & 21 \\
+    Ionosphere & 351   & 34 & Pageblocks & 5473  & 10 \\
+    Wdbc       & 569   & 30 & Optdigits  & 5620  & 64 \\
+    Australian & 690   &  6 & Pendigits  & 10992 & 16 \\
+    Pima       & 768   &  8 & Letter     & 20000 & 16 \\
+    Faults     & 1941  & 27 &            &       &    \\
+\hline
+\end{tabular}
+\end{table}
+
+We use 15 datasets from the UCI repository~\cite{blake98uci}.
+If the dataset is a multiclass problem, we manually group the data into two classes since we study binary classification problem.
+For preprocessing we eliminate objects with one or more missing features and normalize all features into $[0, 1]$ interval.
+A~description of the datasets is given in Table~\ref{tab:datasets} with number of examples after elimination.
+
+In all experiments we split the original dataset $\XX$ into a training sample $\XX_L$ and a testing sample~$\XX_K$.
+The training sample $\XX_L$ is used to train a logistic regression and calculate overfitting bounds.
+Then we compare predictions of the bounds with the actual error rate on $\XX_K$.
+
+\begin{figure}[t]
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.30\textwidth]{Sonar.eps} &
+        \includegraphics[width=0.30\textwidth]{glass.eps} &
+        \includegraphics[width=0.30\textwidth]{Liver_Disorders.eps} \\
+        Sonar &
+        Glass &
+        Liver Dis. \\
+        \includegraphics[width=0.30\textwidth]{Ionosphere.eps} &
+        \includegraphics[width=0.30\textwidth]{Wdbc.eps} &
+        \includegraphics[width=0.30\textwidth]{Australian.eps} \\
+        Ionosphere &
+        Wdbc &
+        Australian \\
+        \includegraphics[width=0.30\textwidth]{pima.eps} &
+        \includegraphics[width=0.30\textwidth]{faults.eps} &
+        \includegraphics[width=0.30\textwidth]{statlog.eps} \\
+        Pima &
+        Faults &
+        Statlog \\
+        \includegraphics[width=0.30\textwidth]{wine.eps} &
+        \includegraphics[width=0.30\textwidth]{waveform.eps} &
+        \includegraphics[width=0.30\textwidth]{pageblocks.eps} \\
+        Wine &
+        Waveform &
+        Pageblocks \\
+        \includegraphics[width=0.30\textwidth]{Optdigits.eps} &
+        \includegraphics[width=0.30\textwidth]{pendigits.eps} &
+        \includegraphics[width=0.30\textwidth]{Letter.eps} \\
+        Optdigits &
+        Pendigits &
+        Letter \\
+    \end{tabular}
+    \caption{Learning curves of logistic regression and ERM.
+        The error ratio of logistic regression is estimated by Monte-Carlo method on splits
+        of the original dataset~$\XX = \XX_L \cup \XX_K$.
+        The error ratio of ERM is estimated on splits of the training set~$\XX_L = X_\ell \cup X_k$.}
+    \label{fig:LearningCurves}
+\end{figure}
+
+
+In the first experiment we build learning curves of logistic regression,
+where $L$ runs from 5\% to 95\% of the original dataset size with 5\% steps.
+For each~$L$ we generate~$M = 100$ splits ${\XX = \XX_L^i \cup \XX_K^i}$,\; ${i = 1, \dots, M}$
+and use them to get Monte-Carlo estimates
+of train error rate~$\nu_L(\mu_\LR, \XX)$ from~\eqref{eq:avgTrainNu}
+and test error rate~$\bar \nu_L(\mu_\LR, \XX)$ from~\eqref{eq:avgTestNu}
+for logistic regression learning algorithm~$\mu_\LR$:
+\[
+    \hat \nu_L(\mu_\LR, \XX)
+    =
+    \frac{1}{M} \sum_{i = 1}^{M} \nu(\mu_\LR \XX_L^i, \XX_L^i),
+    \qquad
+    \hat{\bar \nu}_L(\mu_\LR, \XX)
+    =
+    \frac{1}{M} \sum_{i = 1}^{M} \nu(\mu_\LR \XX_L^i, \XX_K^i).
+\]
+
+After that for each training sample~$\XX_L$ we sample classifiers
+and estimate an average ERM errors:
+train error $\nu_\ell(\mu, \XX_L)$
+and test error $\bar \nu_\ell(\mu, \XX_L)$,
+where $\mu$ is ERM learning algorithm.
+To sample classifiers on $\XX_L$ we launch algorithm \ref{alg:walking}
+with parameters $n=8\,192$, $N = 64$, $m = 15$, $p = 0.8$,
+and use classifier~$\mu_\LR \XX_L$ as a starting point.
+To estimate $\nu_\ell(\mu, \XX_L)$ and $\bar \nu_\ell(\mu, \XX_L)$ we again compute Monte-Carlo type
+estimates of definitions \eqref{eq:avgTrainNu} and \eqref{eq:avgTestNu}
+by randomly generating $M' = 4\,096$ splits $\XX_L = X_\ell^j \cup X_k^j$,
+$j = 1, \dots, M'$, at constant ratio $\frac{\ell}{L} = 0.8$:
+\[
+    \hat \nu_\ell(\mu, \XX_L)
+    =
+    \frac{1}{M'} \sum_{j = 1}^{M} \nu(\mu X_\ell^j, X_\ell^j),
+    \qquad
+    \hat{\bar \nu}_\ell(\mu, \XX_L)
+    =
+    \frac{1}{M'} \sum_{j = 1}^{M} \nu(\mu X_\ell^j, X_k^j).
+\]
+These estimates are then averaged over all partitions~$\XX = \XX_L^i \cup \XX_K^i$.
+
+The four values (the actual train and test errors of logistic regression
+$\nu_L(\mu_\LR, \XX)$ and $\bar \nu_L(\mu_\LR, \XX)$,
+ERM train error $\nu_\ell(\mu, \XX_L)$, and ERM test error $\bar \nu_\ell(\mu, \XX_L)$)
+are charted as a functions of a training sample size ratio, see Figure \ref{fig:LearningCurves},
+sorted according to sizes of datasets, from the smallest to the largest.
+Note that ERM test error might be either below or above
+actual test error rate of logistic regression
+because~$\mu$ and~$\mu_\LR$ are quite different learning algorithms.
+However, from charts we conclude that $\bar \nu_\ell(\mu, \XX_L)$,
+estimated only based on $\XX_L$, provides reasonably good estimate
+of actual test error rate $\bar \nu_L(\mu_\LR, \XX)$
+and of the learning curve on test sample $\XX_K$.
+
+Now we turn to comparison of different overfitting bounds.
+For each dataset we use 5-fold cross validation and average the results over 20 runs (for a total 100 runs).
+As before, we use training sample~$\XX_L$ to learn logistic regression,
+run algorithm \ref{alg:walking}, and
+estimate $\nu_\ell(\mu, \XX_L)$ and $\bar \nu_\ell(\mu, \XX_L)$
+based on $4\,096$ randomly generated splits $\XX_L = X_\ell^j \cup X_k^j$.
+In addition, we use $\XX_L$ to estimate overfitting
+$\bar \nu_\ell(\mu, \XX_L) - \nu_\ell(\mu, \XX_L)$
+by medians of VC-type bound \eqref{eq:VCbound} and SC-bound \eqref{eq:SC-bound},
+and to calculate DD-margin and DI-margin bounds from~\cite{jin2012pacbayes}.
+The results are presented in Table \ref{tab:compareToPacBayes}.
+Note that while all combinatorial bounds estimate overfitting, PAC DI and PAC DD are upper bounds on the test error.
+
+Our key observation is that $\delta_\ell(\mu) \equiv \bar \nu_\ell(\mu, \XX_L) - \nu_\ell(\mu, \XX_L)$
+is in the order of magnitude sharper than any of the other bounds.
+It works well for all datasets except Sonar~(which is the smallest dataset in our selection).
+Across combinatorial bounds the SC-bound outperform VC-type bound, but still vastly overestimates the target quantity $\delta_\ell(\mu)$.
+All combinatorial bounds provide tighter estimates on overfitting and test error rate than PAC-Bayesian bounds.
+
+Note that the VC-bound is estimated by a small subset of~$A$ obtained from a~random walk.
+This is a~``localized'' VC-bound.
+The usual VC-bound estimated from VC-dimension~$d$ of a~whole set~$A$ should be greater than~1 on all datasets.
+
+\begin{table}[t]
+      \caption{Comparison between real overfitting and various overfitting bounds.
+        TrainErr stands for $\nu_L(\mu_\LR, \XX)$,
+        TestErr for $\bar \nu_L(\mu_\LR, \XX)$,
+        Overfit is their difference, %for $\bar \nu_L(\mu_\LR, \XX) - \nu_L(\mu_\LR, \XX)$
+        $\delta_\ell(\mu) \equiv \bar \nu_\ell(\mu, \XX_L) - \nu_\ell(\mu, \XX_L)$.}
+      \label{tab:compareToPacBayes}
+      \centering
+        \begin{tabular}[t]{||l||r|r|r||r|r|r|r|r|r||}
+        \hline
+        &
+        \multicolumn{4}{|c|}{Monte-Carlo estimates}&
+        \multicolumn{4}{|c|}{Generalization bounds} \\
+        \hline
+            Task&
+            TrainErr &
+            TestErr &
+            Overfit &
+            $\delta_\ell(\mu)$&
+            VC&
+            SC&
+            PAC DI&
+            PAC DD \\
+        \hline
+            Sonar       & 0.000 & 0.271 & 0.271 & 0.095 & 0.185 & 0.119 & 1.287 & 1.287 \\
+            Glass       & 0.046 & 0.075 & 0.029 & 0.078 & 0.211 & 0.140 & 1.126 & 0.738 \\
+            Liver dis.  & 0.299 & 0.314 & 0.015 & 0.060 & 0.261 & 0.209 & 1.207 & 1.067 \\
+            Ionosphere  & 0.049 & 0.125 & 0.077 & 0.052 & 0.150 & 0.112 & 1.219 & 1.153 \\
+            Wdbc        & 0.001 & 0.056 & 0.055 & 0.032 & 0.071 & 0.043 & 1.174 & 0.705 \\
+            Australian  & 0.122 & 0.136 & 0.013 & 0.030 & 0.137 & 0.110 & 1.146 & 0.678 \\
+            Pima        & 0.220 & 0.227 & 0.007 & 0.028 & 0.159 & 0.127 & 0.971 & 0.749 \\
+            Faults      & 0.198 & 0.210 & 0.012 & 0.010 & 0.108 & 0.087 & 1.110 & 1.061 \\
+            Statlog     & 0.138 & 0.142 & 0.005 & 0.010 & 0.096 & 0.082 & 1.102 & 0.747 \\
+            Wine        & 0.248 & 0.250 & 0.002 & 0.004 & 0.134 & 0.109 & 0.776 & 0.637 \\
+            Waveform    & 0.103 & 0.105 & 0.002 & 0.004 & 0.099 & 0.079 & 0.561 & 0.354 \\
+            Pageblocks  & 0.050 & 0.050 & 0.001 & 0.004 & 0.073 & 0.057 & 0.737 & 0.186 \\
+            Optdigits   & 0.115 & 0.121 & 0.006 & 0.004 & 0.102 & 0.084 & 1.068 & 0.604 \\
+            Pendigits   & 0.160 & 0.161 & 0.001 & 0.002 & 0.127 & 0.103 & 0.774 & 0.432 \\
+            Letter      & 0.274 & 0.274 & 0.001 & 0.001 & 0.165 & 0.137 & 0.818 & 0.636 \\
+        \hline
+        \end{tabular}
+    \end{table}
+
+\section{Conclusion}
+In this paper we present new random walk technique for efficient calculation of
+combinatorial data-dependent generalization bounds.
+Although combinatorial bounds are obtained for empirical risk minimization under binary loss,
+we~show that they provide sharp overfitting estimates for logistic regression.
+Our~bounds recover correct shape of the learning curves for logistic regression,
+correlate well with the actual overfitting,
+and outperform  both classical VC-bound and recent state-of-the-art PAC-Bayesian bounds
+in~experiments on 15~datasets from the UCI repository.
+
+\begin{thebibliography}{00}
+\bibitem{agarwal98arrangements}
+    \BibAuthor{Agarwal\;P.\,K., Sharir\;P.}
+    \BibTitle{Arrangements and their applications}~//
+    In Handbook of Computational Geometry,\,pp. 49--119, 1998.
+
+\bibitem{blake98uci}
+    \BibAuthor{Asuncion\;A, Newman\;D.\,J.}
+    \BibTitle{UCI Machine Learning Repository}~//
+    University of California, Irvine, School of Information and Computer Sciences, 2007.
+
+\bibitem{avrachenkov10restarts}
+    \BibAuthor{Avrachenkov\;K., Ribeiro\;B., Towsley\;D.~(2010)}
+    \BibTitle{Improving random walk estimation accuracy with uniform restarts}~//
+    Proc. of WAW 2010.
+
+\bibitem{bax97similar}
+    \BibAuthor{Bax\;E.}
+    \BibTitle{Similar classifiers and VC error bounds}, 1997.
+
+\bibitem{boucheron05survey}
+    \BibAuthor{Boucheron\;S., Bousquet\;O., Lugosi\;G.}
+    \BibTitle{Theory of classification: A survey of some recent advances}~//
+    ESAIM: probability and statistics, vol.\,9(1), pp.\,323--375, 2005.
+
+\bibitem{haussler94predicting}
+    \BibAuthor{Haussler\;D., Littlestone\;N., Warmuth\;M.\,K.}
+    \BibTitle{Predicting $\{0, 1\}$-functions on randomly drawn points}~//
+    Information and Computation, vol.\,115(2), pp.\,248--292, 1994.
+
+\bibitem{jin2012pacbayes}
+    \BibAuthor{Jin\;C., Wang\;L.}
+    \BibTitle{Dimensionality Dependent PAC-Bayes Margin Bound}~//
+    In Advances in Neural Information Processing Systems, vol.\,25, pp.\,1043--1051, 2012.
+
+\bibitem{koltchinskii06rademacher}
+    \BibAuthor{Koltchinskii\;V.}
+    \BibTitle{Local Rademacher complexities and oracle inequalities in risk minimization (with discussion)}~//
+    The Annals of Statistics, vol.\,34, pp.\,2593-2706, 2006.
+
+\bibitem{koltchinskii02margin}
+    \BibAuthor{Koltchinskii\;V., Panchenko\;D.}
+    \BibTitle{Empirical margin distributions and bounding the generalization error of combined classifiers}~//
+    The Annals of Statistics, vol.\,30(1), pp.\,1-50, 2002.
+
+\bibitem{koltchinskii03convex}
+    \BibAuthor{Koltchinskii\;V., Panchenko\;D.}
+    \BibTitle{Bounding the generalization error of convex combinations of classifiers: balancing the dimensionality and the margins}~//
+    The Annals of Applied Probability, vol.\,13(1), pp.\,213-252, 2003.
+
+\bibitem{lee12backtrack}
+    \BibAuthor{Lee\;C., Xu\;X., Eun\;D.}
+    \BibTitle{Beyond Random Walk and Metropolis-Hastings Samplers: Why You Should Not Backtrack for Unbiased Graph Sampling}~//
+    ACM SIGMETRICS Performance Evaluation Review, vol.\,40(1), pp.\,319--330, 2012.
+
+\bibitem{lugosi03concentration}
+    \BibAuthor{Lugosi\;G.}
+    \BibTitle{On concentration-of-measure inequalities}~//
+    Machine Learning Summer School, Australian National University, Canberra, 2003.
+
+\bibitem{ribeiro10multidimensional}
+    \BibAuthor{Ribeiro\;B., Towsley\;D.}
+    \BibTitle{Estimating and sampling graphs with multidimensional random walks}~//
+    10th Conf. on Internet Measurement, pp.\,390--403, 2010.
+
+\bibitem{vapnik71convergence}
+    \BibAuthor{Vapnik\;V.\,N., Chervonenkis\;A.\,Y.}
+    \BibTitle{On the uniform convergence of relative frequencies of events to their probabilities}~//
+    Theory of Probability and Its Applications, vol.\,16(2), pp.\,264--280, 1971.
+
+\bibitem{voron09overfitting}
+    \BibAuthor{Vorontsov\;K.\,V.}
+    \BibTitle{Splitting and similarity phenomena in the sets of classifiers and their effect on the probability of overfitting}~//
+    Pattern Recognition and Image Analysis, vol.\,19(3), pp.\,412--420, 2009.
+
+\bibitem{voron11premi}
+    \BibAuthor{Vorontsov\;K.\,V., Ivahnenko\;A.\,A.}
+    \BibTitle{Tight combinatorial generalization bounds for threshold conjunction rules.}~//
+    4-th Int'l Conf. on Pattern Recognition and Machine Intelligence (PReMI'11).
+    Lecture Notes in Computer Science, Springer-Verlag, pp.\,66--73, 2011.
+
+\end{thebibliography}
+
+% Решение Программного Комитета:
+%\ACCEPTNOTE
+%\AMENDNOTE
+%\REJECTNOTE
+\end{document}

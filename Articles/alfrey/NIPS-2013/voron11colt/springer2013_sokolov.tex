@@ -1,0 +1,779 @@
+\documentclass{article}
+
+\usepackage{colt11e}
+\usepackage[round,comma]{natbib}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage{graphicx}
+\usepackage[all]{xy}
+\usepackage[ruled,section]{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{array}
+\bibliographystyle{plainnat}
+\let\cite\citep
+
+\makeatletter
+\def\cL{{\mathscr L}}
+\def\cB{{\mathscr B}}
+\def\cK{{\mathscr K}}
+\def\cR{{\mathscr R}}
+\def\cN{{\mathcal N}}
+\def\cM{{\mathcal M}}
+\def\RC{{\mathcal R}}
+\def\fF{\mathfrak{F}}
+\def\fI{\mathfrak{I}}
+\def\fM{\mathfrak{M}}
+\def\AA{A}
+\def\RR{\mathbb{R}}
+\def\NN{\mathbb{N}}
+\def\ZZ{\mathbb{Z}}
+\def\DD{\mathbb{D}}
+\def\LL{\mathbb{L}}
+\def\YY{\mathbb{Y}}
+\def\XX{\mathbb{X}}
+\def\WW{\mathbb{W}}
+\def\HH{\mathbb{H}}
+\newcommand{\XXX}{{\mathscr X}}
+\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\x}{\bar x}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\lim}{\mathop{\operator@font lim}\limits}
+\renewcommand{\limsup}{\mathop{\operator@font lim\,sup}\limits}
+\renewcommand{\liminf}{\mathop{\operator@font lim\,inf}\limits}
+\renewcommand{\max}{\mathop{\operator@font max}\limits}
+\renewcommand{\min}{\mathop{\operator@font min}\limits}
+\renewcommand{\sup}{\mathop{\operator@font sup}\limits}
+\renewcommand{\inf}{\mathop{\operator@font inf}\limits}
+\newcommand{\argmin}{\mathop{\operator@font arg\,min}\limits}
+\newcommand{\argmax}{\mathop{\operator@font arg\,max}\limits}
+\newcommand{\Arg}{\mathop{\rm Arg}\limits}
+\newcommand{\Argmin}{\mathop{\rm Arg\,min}\limits}
+\newcommand{\Argmax}{\mathop{\rm Arg\,max}\limits}
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
+\newcommand{\sign}{\mathop{\rm sign}\limits}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\conv}{\mathrm{conv}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\VCdim}{\mathop{\mathrm{VCdim}}\nolimits}
+\newcommand{\scal}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\eqdef}{\equiv}
+\def\CC_#1^#2{\tbinom{#1}{#2}}
+%\def\CC_#1^#2{C_{#1}^{#2}}
+\providecommand{\Prob}{\mathsf{P}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\Expect}{\mathsf{E}}
+\newcommand{\Var}{\mathsf{D}}
+\newcommand{\bin}{\mathop{\rm bin}\nolimits}
+\newcommand{\Bin}{\mathop{\rm Bin}\nolimits}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,\:#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+
+\newcommand{\cond}{\mspace{3mu}{|}\mspace{3mu}}
+
+% for algorithms
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\REMARK}[1]{\item[]\textsl{#1}}
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\EXIT}{\STATE\textbf{exit}}
+\newcommand{\vkID}[1]{\text{\sf #1}}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\textbf{Procedure} \vkID{#1}}
+
+\def\XYtext(#1,#2)#3{\rlap{\kern#1\lower-#2\hbox{#3}}}
+\newcommand{\TODO}[1]{\par\smallskip\noindent\fbox{\parbox{150mm}{\textsf{\textbf{~~TO DO:} #1}}}\par\smallskip}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Author's hacking for SLANTED THEOREMS -- may be removed
+\makeatletter
+\def\@begintheorem#1#2{\trivlist
+   \item[\hskip \labelsep{\bfseries #1\ #2}]\slshape}
+\def\@opargbegintheorem#1#2#3{\trivlist
+      \item[\hskip \labelsep{\bfseries #1\ #2\ (#3)}]\slshape}
+\def\@endtheorem{\endtrivlist}
+\renewcommand{\emph}[1]{\textit{#1}}
+\makeatother
+% The END of "Author's hacking"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{remark}[theorem]{Remark}
+\newenvironment{proofsketch}{\noindent{\bf Proof sketch:}}{\qed\medskip}
+
+\begin{document}
+
+\begin{equation}
+\label{eq:SC-bound}
+    Q_\eps(\mu,\XX)
+    \leq
+    \sum_{a\in A}
+        \frac{\CC_{L-q-r}^{\ell-q}}{\CC_{L}^{\ell}}
+        \Hyper{L-q-r}{m-r}{\ell-q}{\tfrac\ell L (m - \eps k)},
+\end{equation}
+
+\section{Sources-based bound}
+
+Bound~\eqref{eq:SC-bound} is exact for some model sets of classifiers,
+but on experiments with real data it can be overestimated by several orders.
+In this section we derive a sharper bound that takes into account similarities
+between classifiers with incomparable error vectors.
+
+Let~$A_{ij}$ be a set of all objects where~$a_j$ produces an error
+but~$a_i$ doesn't:
+\[
+    A_{ij}
+    =
+    \{
+        x \in \XX
+        \cond
+        I(a_i, x) = 0,
+        I(a_j, x) = 1
+    \}.
+\]
+
+\begin{lemma}
+\label{choise_condition_lemma}
+    Suppose learning algorithm~$\mu$ is a PessERM and
+    all classifiers in~$\AA$ are arranged in ascending order with respect to the number of errors.
+    Then for any sample~$X \subseteq \XX$
+    \begin{equation}
+    \label{choise_condition}
+        \left[ \mu X = a_i \right]
+        =
+        \Biggl( \prod_{j = 1}^{i - 1} \Bigl[ |X \cap A_{ji}| \leq |X \cap A_{ij}| \Bigr] \Biggr)
+        \Biggl( \prod_{j = i + 1}^{D} \Bigl[ |X \cap A_{ji}| < |X \cap A_{ij}| \Bigr] \Biggr).
+    \end{equation}
+\end{lemma}
+
+This lemma gives a necessary and sufficient condition
+for choosing classifier~$a$ by learning algorithm~$\mu$.
+This condition cannot be used directly for computation
+of~$P_a$ because of its complexity,
+but it can be turned into necessary condition by exclusion of some multipliers.
+For example, if we keep only multipliers corresponding to upper neighbourhood of~$a$
+and to all sources of SC-graph with error vectors comparable to~$a$,
+then we can derive combinatorial bound~\eqref{eq:SC-bound}.
+However, this bound takes into account only similarity between classifiers with
+comparable error vectors, which is quite restrictive.
+To improve this we propose to compare $a$ with all sources and determine the source that results in
+minimal contribution of~$a$ into the bound.
+
+\begin{theorem}
+\label{bound_sources_theorem}
+    Suppose learning algorithm~$\mu$ is an ERM,
+    $S$ is a set of all sources of SC-graph and
+    $\AA = \{a_1, \dots, a_D\}$ is a set of classifiers. Then
+    \begin{equation}
+    \label{bound_sources}
+        Q_\eps (\mu, \XX)
+        \leq
+        \sum_{i = 1}^{D}
+            \min_{s \in S}
+            \Biggl\{
+                \sum_{t = 0}^{T_{is}}
+                    \frac{
+                        C_q^t C_{L - u - q}^{\ell - u - t}
+                    }{
+                        C_L^\ell
+                    }
+                    \mathcal{H}_{L - u - q}^{\ell - u - t, m - q}
+                    \Bigl(
+                        \tfrac{\ell}{L} (m - \eps k) - t
+                    \Bigr)
+            \Biggr\},
+    \end{equation}
+    where
+    $u \equiv u(a_i)$,
+    $q \equiv q(a_i)$,
+    $m \equiv m(a_i)$,
+    $T_{is} = \min(|A_{is}|, |A_{si}|)$.
+\end{theorem}
+
+\section{Overfitting bounds estimation with random walks}
+All combinatorial bounds have a form of
+\[
+    Q_\eps \leq B_\eps = \sum_{a \in \AA} b(a),
+\]
+which involves summation over all classifiers.
+In practice this is intractable since the number of classifiers
+can be enormously large.
+It is known that only classifiers from lower layers of SC-graph
+make significant contribution to combinatorial bounds,
+but even lower layers can be too large.
+To overcome this difficulty we propose to sample classifiers from SC-graph and use them to estimate bound~$B_\eps$.
+This idea is formalized by random walk techniques.
+
+Denote SC-graph by~$G = (V, E)$.
+The basic purpose of random walk is to generate a sequence of vertices from the graph
+such that probabilities of picking every vertex are known.
+One way to achieve this is to use simple random walk~(SRW) which starts from some vertex
+and then walks on the graph, choosing next vertex uniformly from the neighbourhood of current vertex.
+It is known that for connected and non-bipartite graphs the frequency of appearance of vertex $v$ in SRW walk
+converges to the following \emph{stationary} distribution:
+\[
+    \pi(v) = \frac{\deg(v)}{2 |E|}.
+\]
+
+However, simple random walk explores the graph very slowly
+and it may take too many iterations to generate a representative sample
+of classifiers.
+This can be improved by generating several initial vertices and starting
+a simple random walk from each of them.
+This idea is formalized in \emph{Frontier Sampling~(FS)} algorithm~\cite{ribeiro2010multidimensional},
+which performs several parallel dependent random walks,
+and generates a sequence of vertices with the same stationary distribution~$\pi$
+as in simple random walk.
+
+Let~$a_1, \dots, a_n$ be a sample of classifiers from~$\AA$ generated
+by SRW or FS algorithm.
+It can be derived from the Strong Law of Large Numbers for Markov chains~\cite{roberts2004markovchains}
+that the following gives an unbiased estimator for~$B_\eps$:
+\begin{equation}
+\label{rw_bound_estimate}
+    \hat B_\eps
+    =
+    |\AA|
+    \frac{
+        \sum_{i = 1}^{n} b(a_i) / \deg(a_i)
+    }{
+        \sum_{i = 1}^{n} 1 / \deg(a_i)
+    }.
+\end{equation}
+The proof is given in Appendix.
+
+\section{Compositions of linear classifiers}
+
+\paragraph{Set of linear classifiers.}
+Consider a binary classification problem with labels~$y_i \in \{-1, +1\}$,
+$i = 1, \dots, L$ assigned to each object~$x_i \in \mathbb{X} \subset \RR^d$.
+Consider the set of unbiased linear classifiers:
+\[
+    a(x; w) = \sign \langle w, x \rangle,
+\]
+where~$w \in \RR^d$ is a real vector of weights.
+Each linear classifier corresponds to a hyperplane such that
+objects are labeled as ``$+1$'' on one side of the hyperplane and as ``$-1$'' on the other side.
+
+\paragraph{Traversal of SC-graph.}
+We will use random walks to estimate bounds of overfitting,
+so an algorithm for finding neighbourhood of a linear classifier is needed.
+Our proposed algorithm is based on the framework of geometrical arrangements and
+is described in details in appendix.
+
+\paragraph{Experimental design.}
+We use combinatorial bounds to build a composition of linear classifiers by simple majority voting:
+\begin{equation}
+\label{linerar_classifier_composition}
+    a(x) = \sign \sum_{i = 1}^p \text{th} \langle w_i, x \rangle.
+\end{equation}
+Each of basic classifiers is trained on subsample chosen by ComBoost algorithm,
+which discards objects with too large and too small margins.
+
+After choosing subsample we do feature selection by greedy incremental search.
+We choose the feature set with minimal inverted bound on every step;
+the inverted bound is computed as follows:
+\begin{enumerate}
+    \item A linear classifier is trained by SVM.
+    \item We step down from the vertex corresponding to this classifier to any source of SC-graph.
+    \item We explore all SC-graph layers up to $(m_0 + 3)$-th for other sources,
+        where $m_0$ is the layer of the vertex found on previous step.
+    \item We sample~$2000$ vertices by Frontier Sampling algorithm starting from all found sources.
+    \item The bound~\eqref{bound_sources} or~\eqref{eq:SC-bound} is estimated
+        using~\eqref{rw_bound_estimate}.
+        Then estimated bound is inverted to get our feature set quality criterion:
+        \[
+            Q_c = \nu(a_0, X) + \eps \left(1/2\right),
+        \]
+        where~$a_0$ is the classifier with minimal number of errors.
+\end{enumerate}
+
+We compare described method with the following modifications:
+\begin{itemize}
+    \item Instead of inverted combinatorial bound we can use empirical risk~$\nu(a_0, X)$
+        as a criterion for feature selection.
+        Comparison with this alternative is intended to show that usage of overfitting bounds
+        gives an advantage over methods that do not account for overfitting explicitly.
+    \item Instead of inverted combinatorial bound we can use a cross-validation bound
+        as a criterion for feature selection. Comparison with this alternative shows
+        whether combinatorial bounds are sharp enough to provide accurate estimation of overfitting.
+    \item Instead of building a composition using ComBoost and feature selection
+        we can build a two-layer neural network with hyperbolic tangent
+        activation function using backpropagation. This alternative is interesting
+        because such neural network gives a classifier
+        of the form~\eqref{linerar_classifier_composition}.
+\end{itemize}
+
+\paragraph{Experimental results.}
+We tested our approach on~$4$ real data sets from UCI.
+For each data set we randomly chose~$200$ object for training sample.
+The results are shown in table~\ref{lin_classifiers_results}.
+
+\begin{table}[t]
+    \begin{tabular}{| m{50mm} | m{15mm} | m{15mm} | m{15mm} | m{15mm} |}
+    \hline
+            &   \texttt{Wine Quality}
+            &   \texttt{Statlog}
+            &   \texttt{Waveform}
+            &   \texttt{Faults}     \\ \hline
+
+        ComBoost and feature selection based on empirical risk~$\nu(\mu, \mathbb{X})$
+            &   $64,70$
+            &   $84,92$
+            &   $84,78$
+            &   $73,39$    \\ \hline
+
+        Two-layer neural network
+            &   $72,06$
+            &   $85,41$
+            &   $86,79$
+            &   $74,51$    \\ \hline
+
+        ComBoost and feature selection based on cross-validation bound
+            &   $71,06$
+            &   $85,26$
+            &   $86,38$
+            &   $75,76$    \\ \hline
+
+        ComBoost and feature selection based on bound~\eqref{eq:SC-bound}
+            &   $69,48$
+            &   $86,26$
+            &   $85,77$
+            &   $\boldsymbol{77,81}$    \\ \hline
+
+        ComBoost and feature selection based on bound~\eqref{bound_sources}
+            &   $\boldsymbol{74,68}$
+            &   $\boldsymbol{86,75}$
+            &   $\boldsymbol{86,91}$
+            &   $74,03$    \\ \hline
+    \end{tabular}
+    \caption{Experimental results for 4 data sets from UCI repository.
+        For each algorithm and each data set a test quality in percents is given.}
+    \label{lin_classifiers_results}
+\end{table}
+
+\section{Appendix}
+\subsection{Proof of sources-based bound.}
+\paragraph{Proof of Lemma~\ref{choise_condition_lemma}.}
+Let~$\AA = \{a_1, \dots, a_D\}$ be a set of classifiers,
+enumerated in the ascending order with respect to the number of their errors.
+We assume that if there is more that one classifier with the same minimal number of errors on training set~$X$
+and the maximal number of errors on test set~$\bar X$,
+then PessERM~$\mu$ chooses the classifier with the largest index in~$\AA$.
+
+First we prove that arbitrary $a_i \in A$ is chosen by PessERM if and only if $|X \cap A_{ji}| \leq |X \cap A_{ij}|$ for all $j < i$ and
+$|X \cap A_{ji}| < |X \cap A_{ij}|$ for all $j > i$.
+\begin{equation}
+\label{choise_conditions_AB}
+    \mu X = a_i \Leftrightarrow
+	\begin{cases}
+         \text {all } j < i \text{ satisfy } |X \cap A_{ji}| \leq |X \cap A_{ij}|, \\
+		 \text {all } j > i \text{ satisfy } |X \cap A_{ji}| < |X \cap A_{ij}|.
+	\end{cases}
+\end{equation}
+Let us use a proof by contradiction to show the direct statement.
+Assume that $\mu X = a_i$, but the right hand side of \eqref{choise_conditions_AB} doesn't hold.
+It means that either some $j < i$ satisfies $|X \cap A_{ji}| > |X \cap A_{ij}|$,
+or there is $j > i$ such that $|X \cap A_{ji}| \geq |X \cap A_{ij}|$.
+If $|X \cap A_{ji}| > |X \cap A_{ij}|$ then~$a_i$ makes more errors on training set~$X$ than~$a_j$.
+Therefore~$a_i$ cannot be chosen by learning algorithm~$\mu$.
+Lets now assume that
+$|X \cap A_{ji}| = |X \cap A_{ij}|$
+and
+$j > i$.
+It follows from~$|X \cap A_{ji}| = |X \cap A_{ij}|$
+that classifiers~$a_i$ and~$a_j$ make the same number of errors
+on training set~$X$:
+$n(a_i, X) = n(a_j, X)$.
+In addition, $j > i$ implies that~$m(a_j) \geq m(a_i)$
+since classifiers are arranged in ascending order
+with respect to the number of errors.
+Then
+\[
+    n(a_j, \bar X)
+    =
+    m(a_j) - n(a_j, X)
+    \geq
+    m(a_i) - n(a_i, X)
+    =
+    n(a_i, \bar X).
+\]
+In other words, classifiers~$a_i$ and~$a_j$
+make the same number of errors on training set,
+$a_j$ makes at least as many errors as $a_i$ on test set, and $a_j$ has a larger index.
+That means that~$a_i$ cannot be chosen by learning algorithm~$\mu$.
+This contradiction proves direct statement of \eqref{choise_conditions_AB}.
+
+To prove the converse we start with the right-hand side of \eqref{choise_conditions_AB}, and show that
+an arbitrary classifier~$a_j \neq a_i$ cannot be chosen by learning algorithm~$\mu$.
+If~$|X \cap A_{ji}| < |X \cap A_{ij}|$
+then~$a_j$ makes more errors on training set than~$a_i$ and therefore classifier $a_j$ cannot be chosen
+by learning algorithm~$\mu$.
+Lets consider the remaining case with $|X \cap A_{ji}| = |X \cap A_{ij}|$ and $j < i$.
+Then $m(a_j) \leq m(a_i)$,
+so~$n(a_j, \bar X) \leq n(a_i, \bar X)$ and~$a_j$ cannot be chosen by~$\mu$.
+Then any classifier~$a_j \neq a_i$ cannot be chosen by~$\mu$ which implies~$[\mu X = a_i]$.
+
+So we have proven that right-hand side of~\eqref{choise_conditions_AB}
+gives necessary and sufficient conditions for~$[\mu X = a_i]$.
+Finally note that conditions~\eqref{choise_conditions_AB} are equivalent to
+\[
+    [\mu X = a_i] =
+        \Biggl( \prod_{j = 1}^{i - 1} \Bigl[ |X \cap A_{ji}| \leq |X \cap A_{ij}| \Bigr] \Biggr)
+        \Biggl( \prod_{j = i + 1}^{D} \Bigl[ |X \cap A_{ji}| < |X \cap A_{ij}| \Bigr] \Biggr),
+\]
+which proves the statement of the lemma.
+\qed
+
+\paragraph{Proof of Theorem~\ref{bound_sources_theorem}.}
+At first we derive an upper bound on~$[\mu X = a_i]$ using Lemma~\ref{choise_condition_lemma}
+by taking into account relationship of~$a_i$ to its upper neighbourhood~$C^+(a_i)$
+and to some source~$a_s$:
+\begin{align*}
+    [\mu X = a_i]
+    \leq
+    &\left(
+        [s \leq i]
+        \Bigl[|A_{si} \cap X| \leq |A_{is} \cap X| \Bigr]
+        +
+        [s > i]
+        \Bigl[ |A_{si} \cap X| < |A_{is} \cap X| \Bigr]
+    \right)
+    \times \\
+    &\times
+    \prod_{j:\ a_j \in C^+(a_i)}
+        \Bigl[ |A_{ji} \cap X| < |A_{ij} \cap X| \Bigr] \leq \\
+    \leq
+    &\Bigl[ |A_{si} \cap X| \leq |A_{is} \cap X| \Bigr]
+    \prod_{j:\ a_j \in C^+(a_i)}
+        \Bigl[ |A_{ji} \cap X| < |A_{ij} \cap X| \Bigr] \leq \\
+    \leq
+    &\Bigl[ |A_{si} \cap X| \leq |A_{is}| \Bigr]
+    \prod_{j:\ a_j \in C^+(a_i)}
+        \Bigl[ |A_{ji} \cap X| < |A_{ij} \cap X| \Bigr]
+    = \\
+    =
+    &\Bigl[ |A_{si} \cap X| \leq |A_{is}| \Bigr]
+    \prod_{j:\ a_j \in C^+(a_i)}
+        \Bigl[ |A_{ij} \cap X| > 0 \Bigr]
+\end{align*}
+
+So in order to choose classifier~$a_i$ by learning algorithms~$\mu$
+all objects from $\bigcup_{a_j \in C^+(a_i)} A_{ij}$ must fall into training set
+and no more than~$|A_{is}|$ objects from~$A_{si}$ should fall into~$X$.
+Then it is easy to derive the following bound:
+\begin{multline*}
+    \Prob [\mu X = a_i]
+    \Prob
+        \bigl[
+            \delta (a_i, X) \geq \varepsilon
+            \ \big|\
+            \mu X = a_i
+        \bigr]
+    \leq \\
+    \leq
+    \sum_{t = 0}^{\min(|A_{is}|, |A_{si}|)}
+        \frac{
+            C_{|A_{si}|}^t C_{L - u - |A_{si}|}^{\ell - u - t}
+        }{
+            C_L^\ell
+        }
+        \mathcal{H}_{L - u - |A_{si}|}^{\ell - u - t,\ m - |A_{si}|}
+        \left(
+            \frac{\ell}{L} (m - \varepsilon k) - t
+        \right).
+\end{multline*}
+
+To get the final bound we use the law of total probability
+and for each classifier~$a_i$ we choose the source~$a_s$ that results
+in minimal contribution of~$a_i$ into bound:
+\begin{multline*}
+    Q_{\varepsilon}(\mu, \mathbb{X})
+    =
+    \sum_{i = 1}^{D}
+        \Prob [\mu X = a_i]
+        \Prob
+            \bigl[
+            \delta (a_i, X) \geq \varepsilon
+            \ \big|\
+            \mu X = a_i
+        \bigr]
+    \leq \\
+    \leq
+    \sum_{i = 1}^{D}
+        \min_{s \in S}
+        \Biggl\{
+            \sum_{t = 0}^{T_{is}}
+                \frac{
+                    C_{|A_{si}|}^t C_{L - u - |A_{si}|}^{\ell - u - t}
+                }{
+                    C_L^\ell
+                }
+                \mathcal{H}_{L - u - |A_{si}|}^{\ell - u - t,\ m - |A_{si}|}
+                \left(
+                    \frac{\ell}{L} (m - \varepsilon k) - t
+                \right)
+        \Biggr\}.
+\end{multline*}
+\qed
+
+\subsection{Random walk algorithms.}
+We give here random walk algorithms for convenience, see algorithms~\ref{alg:SRW} and~\ref{alg:FS}.
+Note that both algorithms produce a sequence of classifiers with stationary distribution
+only given that graph~$G$ is connected and non-bipartite.
+However, SC-graph is always multipartite and therefore it is bipartite.
+A very simple way to solve this problem is to use \emph{lazy} random walks~\cite{lovasz93survey}
+that on each step stays at the same vertex with some probability~$p > 0$~(usually~$p = 1/2$).
+This modification is reflected in both~\ref{alg:SRW} and~\ref{alg:FS} algorithms.
+
+\begin{algorithm}[t]
+\caption{Simple Random Walk.}
+\label{alg:SRW}
+\begin{algorithmic}[1]
+    \REQUIRE
+        Graph $G = (V, E)$;
+        iteration number $N$;
+        initial vertex~$v_0$;
+    \ENSURE
+        Sample of classifiers $v_1, v_2, \dots, v_{N}$;
+    \BEGIN
+    \FOR{$i = 1, \dots, N$}
+        \STATE\textbf{with probability $\frac12$}
+            \STATE\quad pick a vertex $v^\prime$ from uniform
+                distribution on~$\{ v^\prime \in V \ |\ (v_{i - 1}, v^\prime) \in E \}$;
+            \STATE\quad $v_i := v^\prime$;
+        \STATE\textbf{otherwise}
+            \STATE\quad $v^\prime := v$;\; $v_i := v$;
+    \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Frontier Sampling.}
+\label{alg:FS}
+\begin{algorithmic}[1]
+    \REQUIRE
+        Graph $G = (V, E)$;
+        iteration number $N$;
+        initial vertices $P = (v^1, \dots, v^s)$;
+    \ENSURE
+        Sample of classifiers $v_1, v_2, \dots, v_{N}$;
+    \BEGIN
+    \FOR{$i = 1, \dots, N$}
+        \STATE choose $v \in P$ with probability $\frac{\deg(v)}{\sum_{u \in P} \deg(u)}$;
+        \STATE\textbf{with probability $\frac12$}
+            \STATE\quad pick a vertex $v^\prime$ from uniform
+                distribution on~$\{ v^\prime \in V \ |\ (v, v^\prime) \in E \}$;
+            \STATE\quad $v_i := v^\prime$;
+        \STATE\textbf{otherwise}
+            \STATE\quad $v^\prime := v$;\; $v_i := v$;
+        \STATE Replace in $P$ vertex $v$ with $v^\prime$;
+    \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Bound estimation.}
+Suppose we have a sample of classifiers~$a_1, \dots, a_n$ generated
+by algorithms~\ref{alg:SRW} or~\ref{alg:FS}, so it is known that this sequence has
+a stationary distribution~$\pi(a) = \deg(a) / 2 |E|$.
+Our purpose is now to estimate the bound~$B_\eps = \sum_{a \in \AA} b(a)$
+using this sample.
+
+The Strong Law of Large Numbers for Markov chains~\cite{roberts2004markovchains} tells that
+if random walk has a stationary distribution~$\pi$ then
+\[
+    \mu_n(f)
+    =
+    \frac{1}{n}
+    \sum_{i = 1}^{n}
+        b(a_i)
+    \xrightarrow[n \to \infty]{\mathrm{a.\,s.}}
+    \sum_{a \in \AA}
+        b(a) \pi(a).
+\]
+To get an estimate for~$B_\eps$ we should use the weight function~$w(v) = \frac{1}{\pi(a)}$;
+in this case
+\[
+    \mu_n(w f)
+    =
+    \frac{1}{n}
+    \sum_{i = 1}^{n}
+        w(a_i) b(a_i)
+    =
+    \frac{1}{n}
+    \sum_{i = 1}^{n}
+        \frac{b(a_i)}{\pi(a_i)}
+    \xrightarrow[n \to \infty]{\mathrm{a.\,s.}}
+    \sum_{a \in \AA}
+        \frac{b(a)}{\pi(a)} \pi(a)
+    =
+    \sum_{a \in \AA}
+        b(a)
+    =
+    B_\eps,
+\]
+so~$\mu_n(w f)$ gives a consistent estimator for~$B_\eps$.
+However, expression for~$\mu_n(w f)$ contains number of edges~$|E|$
+which is usually unknown.
+The solution is to use a slightly different estimator:
+\begin{equation*}
+    \hat B_\eps
+    =
+    |\AA|
+    \frac{\mu_n (w f)}{\mu_n(w)}
+    =
+    |\AA|
+    \frac{
+        \frac{1}{n}
+        \sum_{i = 1}^{n}
+            \frac{2 |E|}{\deg(a_i)}
+            b(a_i)
+    }{
+        \frac{1}{n}
+        \sum_{i = 1}^{n}
+            \frac{2 |E|}{\deg(a_i)}
+    }
+    =
+    |\AA|
+    \frac{
+        \sum_{i = 1}^{n} b(a_i) / \deg(a_i)
+    }{
+        \sum_{i = 1}^{n} 1 / \deg(a_i)
+    }.
+\end{equation*}
+To prove that this bound is consistent note that
+\begin{align*}
+    \mu_n (w f)
+        &\xrightarrow[n \to \infty]{\mathrm{a.\,s.}}
+        \sum_{a \in \AA} b(a)
+        =
+        B_\eps \\
+    \mu_n(w)
+    	&\xrightarrow[n \to \infty]{\mathrm{a.\,s.}}
+    	\sum_{a \in \AA} 1
+    	=
+    	|\AA|
+\end{align*}
+
+Note that~$|\AA|$ is known, for example, for the set of linear classifiers.
+
+\subsection{Equivalence classes of linear classifiers.}
+We will use the framework of geometrical arrangements~\cite{agarwal98arrangements}
+to analyze equivalence classes of the set of linear classifiers.
+
+Denote the parameter space of our classifier set as~$\WW \equiv \RR^d$.
+Let $\XX$ be in general position.
+
+Our goal is to describe classes of hyperplanes that have the same error vectors
+and to find an effective algorithm for determining the neighbourhood of
+linear classifier in SC-graph.
+Instead of working with points from $\XX$ and hyperplanes that separate them,
+it's more convenient to switch to dual space,
+where each linear classifier corresponds to a single point,
+and each object from~$\XX$ corresponds to a hyperplane.
+To do so lets associate each object~$x_i \in \XX$ with the following hyperplane in a parameter space~$\WW$:
+$h_i = \{ w \in \WW: \langle w, x_i \rangle = 0 \}$;
+and also associate every hyperplane~$\{ x \in \RR^d : \langle w, x \rangle = 0 \}$
+with the point~$w$ in a parameter space.
+Each~$h_i$ dissects~$\WW$ into two half-spaces:
+positive~$h_i^+ = \{ w \in \WW: I(a(\cdot; w), x_i) = 0 \}$
+and negative~$h_i^+ = \{ w \in \WW: I(a(\cdot; w), x_i) = 1 \}$,
+corresponding to classifiers that give correct/incorrect answer on~$x_i$ respectively.
+
+The set of hyperplanes~$\HH = \{h_i : i = 1, \dots, L\}$ partitions~$\WW$
+into convex polyhedrons called \emph{cells}.
+Formally each cell is a closure of some connected component
+of the set~$\WW \setminus \HH$.
+Each cell is convex because it can be represented as an intersection
+of some half-spaces.
+The described partition of~$\WW$ into cells is called \emph{cell arrangement}.
+
+The main property of cell arrangement is that each classifier~$a$ bijectively
+corresponds to some cell~$C_a$,
+so all linear classifiers with same error vectors lie in one cell.
+If two classifiers~$a_1$ and~$a_2$ are connected by an edge in SC-graph,
+then their error vectors differ only in one position.
+This means that cells~$C_{a_1}$ and~$C_{a_2}$ share common $(d - 1)$-dimensional face.
+Consequently, cells corresponding to neighbour classifiers have a common vertex.
+
+Our algorithm for finding neighbourhood of a classifier
+at first determines all cells that have a common vertex with
+the cell corresponding to the classifier and then checks each of them
+whether their error vector differ from given classifier's vector only in one position.
+
+At first we describe how to find a vertex of a cell given a point inside this cell.
+Let~$z^0 = (z_1^0, \dots, z_d^0)$ be a point inside cell~$C_{a_0}$.
+We will find some vertex of~$C_{a_0}$ in~$d$ steps.
+At the first step we try to project~$z^0$ on each hyperplane from~$\HH$
+and find such projection that its error vector is the same as of~$z^0$.
+Denote the hyperplane that satisfies this requirement as~$h^1$
+and the projected point as~$z^1$.
+At the second step we try to project~$z^1$ on each flat
+from~$\HH \cap h^1 = \{ h_1 \cap h^1, \dots, h_L \cap h^1 \} \setminus h^1$,
+and find projection with the same error vector.
+After~$d$ steps we will find a point~$z^d$ that lies in the intersection of~$d$
+hyperplanes from~$\HH$, which means that~$z^d$ is a vertex of cell arrangement,
+and has the same error vector as~$z^0$. This means
+that~$z^d$ still lies in cell~$C_{a_0}$.
+
+The second stage of our algorithm finds \emph{all} vertices of the cell~$C_{a_0}$.
+We already have one vertex~$v$ that lies on intersection of~$d$ hyperplanes;
+denote that set of hyperplanes as~$H_v$.
+It can be shown that if vertices~$v$ and~$u$ of arrangement are connected with an edge,
+then~$|H_v \cap H_u| = d - 1$,
+so to find all vertices connected by edge with~$v$ it's sufficient to try all ways
+to change one hyperplane in~$H_v$.
+Then we do breadth-first search to find all vertices of the cell.
+
+Let~$G = (V, E)$ be a graph where vertices~$V$ correspond to vertices of cell
+and edges~$E$ correspond to edges of this cell.
+It is known~\cite{balinski61graph} that this graph is connected,
+so BFS will find all vertices.
+
+When all vertices of~$C_{a_0}$ are found, it's easy to find all its neighbours.
+Let~$v$ be a vertex that lies on intersection of hyperplanes from~$H_v$.
+Recall that each hyperplane~$h_i \in H_v$ corresponds to some object~$x_i \in \XX$.
+Then~$C_{a_0}$ has~$(d - 1)$-dimensional faces corresponding to all such objects,
+which means that~$a_0$ has neighbour classifier with error vectors different on these objects.
+
+
+\begin{thebibliography}{27}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Agarwal and Sharir(1998)]{agarwal98arrangements}
+    P.~K.~Agarwal and M.~Sharir.
+    \newblock Arrangements and their applications.
+    \newblock \emph{Handbook of Computational Geometry}, 49--119, 1998.
+\bibitem[Balinski(1961)]{balinski61graph}
+    M.~L.~Balinski.
+    \newblock On the graph structure of convex polyhedra in $n$-space.
+    \newblock \emph{Pacific Journal of Mathematics}, 11:\penalty0 431--434, 1961.
+\bibitem[Lovasz(1993)]{lovasz93survey}
+    L.~Lovasz.
+    \newblock Random Walks on Graphs: A Survey.
+    \newblock \emph{Combinatorics, Paul Erdos is Eighty}, 2\penalty0 (1):\penalty0 1--46, 1993.
+\bibitem[Ribeiro and Towsley(2010)]{ribeiro2010multidimensional}
+    B.~Ribeiro and D.~Towsley.
+    \newblock Estimating ans sampling graphs with multidimensional random walks.
+    \newblock \emph{10th Conf. on Internet Measurement}, 390--403, 2010.
+\bibitem[Roberts and Rosenthal(2004)]{roberts2004markovchains}
+    G.~O.~Roberts and J.~S.~Rosenthal.
+    \newblock General state space Markov chains and MCMC algorithms.
+    \newblock \emph{Probability Surveys}, 1:\penalty0 20--71, 2004.
+\end{thebibliography}
+
+\end{document}

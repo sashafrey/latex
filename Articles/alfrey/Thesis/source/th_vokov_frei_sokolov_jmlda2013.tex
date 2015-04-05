@@ -1,0 +1,229 @@
+\documentclass[12pt,twoside]{article}
+\usepackage{jmlda}
+%\NOREVIEWERNOTES
+
+\usepackage{multicol}
+\graphicspath{{./eps//}}
+\captionsetup{belowskip=4pt,aboveskip=4pt}
+
+\def\XX{\mathbb{X}}
+\newcommand{\X}{\bar X}
+\newcommand{\XXell}{[\XX]^\ell}
+\def\eps{\epsilon}
+\newcommand{\Arg}{\mathop{\rm Arg}\limits}
+\newcommand{\hypergeom}[5]{{#1}_{#2}^{#4,\:#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\hypergeom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\hypergeom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\hypergeom{\bar{H}}{#1}{#2}{#3}{#4}}
+\def\LR{\text{LR}}
+
+\title
+    %[Образец оформления статьи для публикации] % Краткое название; не нужно, если полное название влезает в~колонтитул
+    {Computable combinatorial overfitting bounds}
+\author
+    %[Автор~И.\,О. и др.] % список авторов для колонтитула; не нужен, если основной список влезает в колонтитул
+    {Vorontsov~K.\,V., Frey~A.\,I., Sokolov~E.\,A.} % основной список авторов, выводимый в оглавление
+    [Vorontsov~K.\,V.$^1$, Frey~A.\,I.$^2$, Sokolov~E.\,A.$^3$] % список авторов, выводимый в заголовок; не нужен, если он не отличается от основного
+\thanks
+    %{Работа поддержана РФФИ (проект \No\,11-07-00480, \No\,12-07-33099\,-мол-а-вед) и~программой ОМН~РАН
+    % <<Алгебраические и~комбинаторные методы математической кибернетики
+    % и~информационные системы нового поколения>>.}
+    {This work was supported by the Russian Foundation for Basic Research
+(project no.\,11-07-00480, no.\,12-07-33099\,-mol-a-ved)
+and by the program ``Algebraic and Combinatorial Methods in
+Mathematical Cybernetics and New Generation Information Systems''
+of the Department of Mathematical Sciences of the Russian Academy of Sciences.}
+
+\email
+    {voron@forecsys.ru, oleksandr.frei@gmail.com, sokolov.evg@gmail.com}
+\organization
+    {$^1$Dorodnitsyn Computing Centre, Russian Academy of Sciences; $^2$Moscow Institute of Physics and Technology; $^3$Moscow State University}
+\abstract
+    {In this paper we study computable combinatorial data dependent generalization bounds.
+This approach is~based on simplified probabilistic assumptions: we assume that
+the instance space is finite, the labeling function is deterministic, and the loss function is binary.
+We~use a~random walk across a~set of~linear classifiers with low error rate to compute the bound efficiently.
+We provide experimental evidence to confirm that this approach leads to practical overfitting bounds in classification tasks.}
+\titleRus
+    {Вычислимые комбинаторные оценки вероятности переобучения}
+\authorRus
+    {Воронцов~К.\,В.$^1$, Фрей~А.\,И.$^2$, Соколов~Е.\,А.$^3$}
+\organizationRus
+    {$^1$Москва, Вычислительный Центр РАН; $^2$Московский Физико-Технический Институт; $^3$Московский Государственный Университет}
+\abstractRus
+    {В данной статье изучаются комбинаторные оценки обобщающей способности, вычислимые по обучающей выборке.
+     Эти оценки основаны на упрощенной вероятностной модели, в которой рассматривается лишь конечная генеральная совокупность объектов и бинарная функция потерь.
+     Для линейных классификаторов предлагается новый эффективный метод вычисления комбинаторных оценок,
+     использующий случайные блужданий по множеству классификаторов с низким числом ошибок.
+     В заключении приводится экспериментальное обоснование предлагаемого метода.}
+\begin{document}
+\English
+\maketitle
+\linenumbers
+\section{Introduction}
+
+Accurate bounding of overfitting is an active area of research starting with the pioneer work~\cite{vapnik71convergence}.
+A~widely adapted approach is based on a probabilistic framework,
+where an instance space $\XX$ (usually of an infinite cardinality)
+is equipped with an unknown probability distribution.
+Consider an observed i.i.d. sample $X = \{x_1, \dots, x_\ell\}$ from $\XX$,
+a set $A$ of all feasible classifiers (for example, all linear classifiers in the original feature space),
+and a learning algorithm $\mu$ which selects a specific classifier $a = \mu X$ from the $A$ based on the observed sample $X$.
+The goal of generalization bounds is to predict an average performance of the classifier $a$ on the whole~$\XX$.
+Most generalization bounds are derived from various concentration inequalities~\cite{lugosi03concentration}
+and take into account the dimensionality~of~$A$
+(such as VC-dimension, fat-shattering dimension, etc.),
+properties of the learning algorithm $\mu$
+(such as the local properties of empirical risk minimization~\cite{koltchinskii06rademacher}),
+and information drawn from the observed sample~$X$
+(such as the normalized margin in margin-based bounds~\cite{koltchinskii02margin, koltchinskii03convex}).
+Generalization bounds can be useful in structural risk minimization and in model selection,
+and we hope that some time in the future they could replace costly cross-validation procedures.
+
+Despite recent significant improvements~\cite{boucheron05survey}, there is still a big gap between theory and practice.
+Even the latest PAC-Bayesian bounds~\cite{jin2012pacbayes} vastly overestimate overfitting, especially when the cardinality of an instance space is small.
+Another difficulty is~that intermediate bounds
+are usually expressed in terms of unobservable quantities
+%(such as the probability distribution $\Prob$),
+and that makes impossible to measure and compare factors of overestimation.
+Finally, many papers lack experimental evaluation.
+As a result, from practical perspective the existing bounds are not well suitable
+for prediction and control of overfitting.
+
+We believe that a simplified probabilistic framework is~quite sufficient for obtaining practical overfitting bounds.
+In this paper we assume that the instance space $\XX$ is finite,
+and for each object $x \in \XX$ and classifier $a \in A$ there exists a deterministic binary loss $I(a, x) \in \{0, 1\}$
+associated with classification of $x$ as $a(x)$.
+We~assume that all partitions of the set $\XX$ into
+an observed training sample~$X$ of size~$\ell$
+and a hidden test sample $\X=\XX\setminus X$ of size~$k$
+can occur with equal probability.
+Then the overfitting probability can be defined by a~purely combinatorial formula~\cite{voron09overfitting}:
+\begin{equation}
+    \label{eq:QEps}
+    Q_\eps (\mu, \XX)
+    =
+    \Prob%{\CC_L^\ell}^{-1} \sum_{X\in\XXell}
+    \bigl[
+        \nu(\mu(X), \X) - \nu(\mu(X),X)  \geq \eps
+    \bigr],
+\end{equation}
+where
+%$L = \ell+k = |\XX| $ is the total number of objects,
+$\mu$~is~a~learning algorithm,
+%$\XXell$ stands for a set of all subsamples $X\subset\XX$ of a given size~$\ell$,\;
+$\nu(a, X)$ is an error rate of a classifier $a \in A$ on a sample~$X$,
+and the square brackets denote a transformation of a~logical value into a numerical one:
+%according to Iverson's convention:
+$[\textit{true}]=1$, $[\textit{false}]=0$. %~\cite{knuth98concrete-eng}.
+
+
+Also note that a direct computation of \eqref{eq:QEps} is intractable
+because it involves a sum across all $\CC_{\ell+k}^\ell$ subsets $X \subset \XX$.
+For empirical risk minimization we use efficient upper bounds on \eqref{eq:QEps},
+obtained in~\cite{voron11premi}, and compare them with Monte-Carlo estimate of \eqref{eq:QEps}.
+
+
+
+The rest of this paper is organized as follows.
+Section 2 contains a brief review of combinatorial bounds on \eqref{eq:QEps}.
+Section 3 describes our algorithm of sampling a representative set of linear classifiers.
+We provide experimental results in Section 4, and conclude in Section 5.
+
+\section{Background}
+
+\section{Sampling linear classifiers}
+
+\section{Experiment}
+\label{sec:Experiment}
+
+\section{Conclusion}
+
+\begin{thebibliography}{00}
+\bibitem{agarwal98arrangements}
+    \BibAuthor{Agarwal\;P.\,K., Sharir\;P.}
+    \BibTitle{Arrangements and their applications}~//
+    In Handbook of Computational Geometry,\,pp. 49--119, 1998.
+
+\bibitem{blake98uci}
+    \BibAuthor{Asuncion\;A, Newman\;D.\,J.}
+    \BibTitle{UCI Machine Learning Repository}~//
+    University of California, Irvine, School of Information and Computer Sciences, 2007.
+
+\bibitem{avrachenkov10restarts}
+    \BibAuthor{Avrachenkov\;K., Ribeiro\;B., Towsley\;D.~(2010)}
+    \BibTitle{Improving random walk estimation accuracy with uniform restarts}~//
+    Proc. of WAW 2010.
+
+\bibitem{bax97similar}
+    \BibAuthor{Bax\;E.}
+    \BibTitle{Similar classifiers and VC error bounds}, 1997.
+
+\bibitem{boucheron05survey}
+    \BibAuthor{Boucheron\;S., Bousquet\;O., Lugosi\;G.}
+    \BibTitle{Theory of classification: A survey of some recent advances}~//
+    ESAIM: probability and statistics, vol.\,9(1), pp.\,323--375, 2005.
+
+\bibitem{haussler94predicting}
+    \BibAuthor{Haussler\;D., Littlestone\;N., Warmuth\;M.\,K.}
+    \BibTitle{Predicting $\{0, 1\}$-functions on randomly drawn points}~//
+    Information and Computation, vol.\,115(2), pp.\,248--292, 1994.
+
+\bibitem{jin2012pacbayes}
+    \BibAuthor{Jin\;C., Wang\;L.}
+    \BibTitle{Dimensionality Dependent PAC-Bayes Margin Bound}~//
+    In Advances in Neural Information Processing Systems, vol.\,25, pp.\,1043--1051, 2012.
+
+\bibitem{koltchinskii06rademacher}
+    \BibAuthor{Koltchinskii\;V.}
+    \BibTitle{Local Rademacher complexities and oracle inequalities in risk minimization (with discussion)}~//
+    The Annals of Statistics, vol.\,34, pp.\,2593-2706, 2006.
+
+\bibitem{koltchinskii02margin}
+    \BibAuthor{Koltchinskii\;V., Panchenko\;D.}
+    \BibTitle{Empirical margin distributions and bounding the generalization error of combined classifiers}~//
+    The Annals of Statistics, vol.\,30(1), pp.\,1-50, 2002.
+
+\bibitem{koltchinskii03convex}
+    \BibAuthor{Koltchinskii\;V., Panchenko\;D.}
+    \BibTitle{Bounding the generalization error of convex combinations of classifiers: balancing the dimensionality and the margins}~//
+    The Annals of Applied Probability, vol.\,13(1), pp.\,213-252, 2003.
+
+\bibitem{lee12backtrack}
+    \BibAuthor{Lee\;C., Xu\;X., Eun\;D.}
+    \BibTitle{Beyond Random Walk and Metropolis-Hastings Samplers: Why You Should Not Backtrack for Unbiased Graph Sampling}~//
+    ACM SIGMETRICS Performance Evaluation Review, vol.\,40(1), pp.\,319--330, 2012.
+
+\bibitem{lugosi03concentration}
+    \BibAuthor{Lugosi\;G.}
+    \BibTitle{On concentration-of-measure inequalities}~//
+    Machine Learning Summer School, Australian National University, Canberra, 2003.
+
+\bibitem{ribeiro10multidimensional}
+    \BibAuthor{Ribeiro\;B., Towsley\;D.}
+    \BibTitle{Estimating and sampling graphs with multidimensional random walks}~//
+    10th Conf. on Internet Measurement, pp.\,390--403, 2010.
+
+\bibitem{vapnik71convergence}
+    \BibAuthor{Vapnik\;V.\,N., Chervonenkis\;A.\,Y.}
+    \BibTitle{On the uniform convergence of relative frequencies of events to their probabilities}~//
+    Theory of Probability and Its Applications, vol.\,16(2), pp.\,264--280, 1971.
+
+\bibitem{voron09overfitting}
+    \BibAuthor{Vorontsov\;K.\,V.}
+    \BibTitle{Splitting and similarity phenomena in the sets of classifiers and their effect on the probability of overfitting}~//
+    Pattern Recognition and Image Analysis, vol.\,19(3), pp.\,412--420, 2009.
+
+\bibitem{voron11premi}
+    \BibAuthor{Vorontsov\;K.\,V., Ivahnenko\;A.\,A.}
+    \BibTitle{Tight combinatorial generalization bounds for threshold conjunction rules.}~//
+    4-th Int'l Conf. on Pattern Recognition and Machine Intelligence (PReMI'11).
+    Lecture Notes in Computer Science, Springer-Verlag, pp.\,66--73, 2011.
+
+\end{thebibliography}
+
+% Решение Программного Комитета:
+%\ACCEPTNOTE
+%\AMENDNOTE
+%\REJECTNOTE
+\end{document}

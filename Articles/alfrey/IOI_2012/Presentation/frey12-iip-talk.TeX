@@ -1,0 +1,459 @@
+\documentclass[unicode,lefteqn]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath,mathrsfs}
+\usepackage{mathrsfs}
+\usepackage[russian]{babel}
+\usepackage{array}
+\usepackage{ulem}\normalem
+\usepackage[all]{xy}
+\usepackage[noend]{algorithmic}
+\usepackage{multirow}
+%\documentclass{article}\usepackage{beamerarticle}
+
+\usetheme{Warsaw}%{Darmstadt}
+\usefonttheme[onlylarge]{structurebold}
+\setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+%\setbeameroption{show notes}
+%\setbeameroption{show only notes}   % for printing notes
+
+\newcommand{\headline}{\hline\hstrut}
+
+%\newcommand{\XX}{\mathbb{X}}
+\newcommand{\XX}{\mathbb{X}}
+%\newcommand{\XXell}{\XX_L^\ell}
+%\newcommand{\XXell}{[\XX]^\ell}
+\newcommand{\X}{\bar X}
+\newcommand{\YY}{Y}
+%\newcommand{\va}{\vec a}
+%\newcommand{\vA}{\vec A}
+%\renewcommand{\AA}{\mathbb{A}}
+\renewcommand{\AA}{A}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\fI}{\mathbb{S}}
+%\newcommand{\fI}{\mathfrak{I}}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\emptyset}{\varnothing}\newcommand{\emset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}\newcommand{\eps}{\varepsilon}
+\renewcommand{\kappa}{\varkappa}
+\renewcommand{\phi}{\varphi}
+\newcommand{\what}{\widehat}
+\newcommand{\wtil}{\widetilde}
+\newcommand{\Expect}{\mathsf{E}}
+\def\Pr[#1]{\Prob\left[#1\right]}
+\def\Prbig[#1]{\Prob\bigl[#1\bigr]}
+\def\PrBig[#1]{\Prob\Bigl[#1\Bigr]}
+\newcommand{\const}{\mathsf{const}}
+\newcommand{\sign}{\mathop{\mathsf{sign}}\limits}
+\newcommand{\bbr}[1]{\text{\itshape\b#1}}
+%\newcommand{\bv}{\vec}
+\newcommand{\Arg}{\mathop{\mathsf{Arg}}\limits}
+\definecolor{light-green}{rgb}{0.6,1.0,0.6}
+\definecolor{light-red}{rgb}{1.0,0.6,0.6}
+\definecolor{light-yellow}{rgb}{1.0,1.0,0.8}
+\definecolor{green}{rgb}{0.0,0.6,0.0}
+\definecolor{yellow}{rgb}{0.6,0.6,0.0}
+\newcommand{\fbx}[2]{\fcolorbox{#2}{light-#2}{\vphantom{o}\hspace{#1mm}}}
+%\newcommand{\a}[1]{\alert{#1}}
+\def\g#1{{\color{green}#1}}
+\def\r#1{{\color{red}#1}}
+\newcommand{\hstrut}{\rule{0pt}{2.5ex}}
+
+%\newcommand\mylim[1]{\mathop{\operator@font #1}\limits}
+%\newcommand\argmin{\mylim{arg\,min}}
+%\newcommand\argmax{\mylim{arg\,max}}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+\newcommand{\argmax}{\mathop{\rm argmax}\limits}
+
+\makeatletter
+\newcommand{\@hyper@geom}[5]{{#1}_{#2}^{#4,#3}\left(#5\right)}
+\newcommand{\hyper}[4]{\@hyper@geom{h}{#1}{#2}{#3}{#4}}
+\newcommand{\Hyper}[4]{\@hyper@geom{H}{#1}{#2}{#3}{#4}}
+\newcommand{\HyperR}[4]{\@hyper@geom{\bar{H}}{#1}{#2}{#3}{#4}}
+\makeatother
+
+\newcommand{\Binom}[2]{C_{#1}^{#2}}
+\newcommand{\CLl}{\Binom{L}{\ell}}
+
+\newtheorem{vkAxiom}{Аксиома}
+\newtheorem{vkHyp}{Гипотеза}
+\newtheorem{vkTheorem}{Теорема}
+\newtheorem{vkLemma}{Лемма}
+\newtheorem{vkDef}{Определение}
+\newtheorem{vkProblem}{Задача}
+
+% Оформление алгоритмов в пакетах algorithm, algorithmic
+\definecolor{KwColor}{rgb}{0,0,0.6}
+\newcommand{\vkKw}[1]{{\bf\color{KwColor} #1}}
+\renewcommand{\algorithmicrequire}{\rule{0pt}{2.5ex}\vkKw{Вход:}}
+\renewcommand{\algorithmicensure}{\vkKw{Выход:}}
+\renewcommand{\algorithmicend}{\vkKw{конец}}
+\renewcommand{\algorithmicif}{\vkKw{если}}
+\renewcommand{\algorithmicthen}{\vkKw{то}}
+\renewcommand{\algorithmicelse}{\vkKw{иначе}}
+\renewcommand{\algorithmicelsif}{\algorithmicelse\ \algorithmicif}
+\renewcommand{\algorithmicendif}{\algorithmicend\ \algorithmicif}
+\renewcommand{\algorithmicfor}{\vkKw{для}}
+\renewcommand{\algorithmicforall}{\vkKw{для всех}}
+\renewcommand{\algorithmicdo}{}
+\renewcommand{\algorithmicendfor}{\algorithmicend\ \algorithmicfor}
+\renewcommand{\algorithmicwhile}{\vkKw{пока}}
+\renewcommand{\algorithmicendwhile}{\algorithmicend\ \algorithmicwhile}
+\renewcommand{\algorithmicloop}{\vkKw{цикл}}
+\renewcommand{\algorithmicendloop}{\algorithmicend\ \algorithmicloop}
+\renewcommand{\algorithmicrepeat}{\vkKw{повторять}}
+\renewcommand{\algorithmicuntil}{\vkKw{пока}}
+%\renewcommand{\algorithmiccomment}[1]{{\footnotesize // #1}}
+\renewcommand{\algorithmiccomment}[1]{{\itshape\quad--- #1}}
+% Мои дополнительные команды для описания алгоритмов
+\newcommand{\BEGIN}{\\[1ex]\hrule\vskip 1ex}
+\newcommand{\PARAMS}{\renewcommand{\algorithmicrequire}{\vkKw{Параметры:}}\REQUIRE}
+\newcommand{\END}{\vskip 1ex\hrule\vskip 1ex}
+\newcommand{\vkReturn}{\vkKw{вернуть} }
+\newcommand{\RET}{\STATE\vkReturn}
+\newcommand{\EXIT}{\STATE\vkKw{выход}}
+\newcommand{\CONTINUE}{\STATE\vkKw{следующий} }
+\newcommand{\IFTHEN}[1]{\STATE\algorithmicif\ #1 {\algorithmicthen}}
+\newcommand{\vkProcedure}[1]{\text{#1}\:}
+\newcommand{\vkProc}[1]{\text{#1}\:}
+\newcommand{\PROCEDURE}[1]{\medskip\STATE\vkKw{ПРОЦЕДУРА} \vkProcedure{#1}}
+
+% Рисование нейронных сетей и диаграмм
+\newenvironment{network}%
+    {\begin{xy}<1ex,0ex>:}%
+    {\end{xy}}
+\def\nnNode[#1](#2)#3{\POS(#2)*#3="#1"}
+\def\nnLink[#1,#2]#3{\POS"#1"\ar #3 "#2"}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Применение комбинаторных оценок переобучения]
+    {Применение комбинаторных оценок \\ вероятности переобучения \\ в голосовании пороговых конъюнкций.}
+\vspace{-5cm}
+\author[Андрей Ивахненко]{%
+    Александр~Фрей \qquad (\texttt{sashafrey@gmail.com})\\
+    \underline{Андрей~Ивахненко} \quad~ (\texttt{andrej\_iv@mail.ru})\\
+    }
+\institute{\footnotesize Вычислительный Центр им.\,А.\,А.\,Дородницына РАН}
+
+\vspace{-1cm}
+\date[ИОИ-9, 16--22 сентября 2012]{\footnotesize \includegraphics[width=16mm,height=11mm]{ioi.png.eps}\\
+    Интеллектуализация Обработки Информации, ИОИ-9\\
+    16--22 сентября 2012, Черногория, г.\,Будва
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+    %\scriptsize
+    \tableofcontents
+\end{frame}
+
+\section{Постановка задачи}
+\subsection{Задача классификации и проблема переобучения}
+
+\begin{frame}[t]{Задача классификации}
+
+\begin{itemize}
+
+\item Объекты описаны $n$ действительными признаками, $x_i = (x_i^1, \ldots, x_i^n) \in \RR^n$.
+
+\item Выборка объектов: ${\XX=(x_i)_{i=1}^L} \subset \RR^n$
+
+\item Каждому объекту~$x_i$ однозначно соответствует ответ:  $y_i \in Y = \{+1, -1\}$
+
+\item Задача: восстановить зависимость $a \colon \RR^n \rightarrow Y$ по обучающей выборке $X \subset \XX$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[t]{Проблема переобучения}
+Качество на скрытой контрольной выборке оказывается ниже, чем на обучающей.
+\centering {
+    \includegraphics[height=48mm]{Overfitting-png.eps}
+}
+\end{frame}
+
+
+\begin{frame}[t]{Проблема переобучения}
+В данной работе предлагается способ модификации метода построения алгоритмов, учитывающий переобучение с помощью комбинаторных оценок.
+
+\centering {
+    \includegraphics[height=44mm]{ErrRateOfLength-png.eps}
+    
+    \footnotesize
+    Зависимость частоты ошибок на тестовой выборке от числа правил в классификаторе. Задача Echo
+    Cardiogram.
+}
+
+\end{frame}
+
+\subsection{Алгоритм --- простое голосование логических правил}
+
+\begin{frame}[t]{Алгоритм --- простое голосование логических правил}
+
+В~общем случае \emph{правило} --- это функция вида
+\[
+    r\colon \RR^n\to\{0,1\}, %\in R.
+\]
+относящая объекты $\{x \colon r(x) = 1 \}$ к классу $y \in Y$.
+
+\bigskip
+Алгоритм классификации $a\colon \RR^n \to Y$ --- простое голосование логических правил:
+\[
+    a(x) = \sign \biggl(\sum_{r \in R_{+1}} \!\! r(x) - \sum_{r \in R_{-1}} \!\! r(x) \biggr),
+\]
+где $R_y$ "--- множество правил класса~$y$.
+
+\end{frame}
+
+\subsection{Правила --- конъюнкции пороговых предикатов}
+\begin{frame}[t]{Правила --- конъюнкции пороговых предикатов}
+
+В~данной работе правила --- это
+семейство конъюнкций пороговых предикатов:
+\[
+    r(x) \equiv r(x;c^1,\ldots,c^n) = \prod_{j\in \omega} \bigl[ x^j \lessgtr_j c^j \bigr],
+\]
+$x = (x^1,\ldots,x^n) \in \RR^n$ --- произвольный объект;\\
+$\omega\subseteq\{1,\ldots,n\}$ --- подмножество признаков;\\
+$\lessgtr_j$ --- одна из операций сравнения $\{\leq,\geq\}$;\\
+$c^j$ --- порог по $j$"=му признаку.
+\end{frame}
+
+
+\section{Оценки вероятности переобучения}
+\subsection{Переобучение правил}
+\begin{frame}[t]{Хорошие правила}
+
+Для поиска (\emph{индукции}) правил класса~$y$ по обучающей выборке~${X \subset \XX}$
+решается задача двухкритериальной оптимизации:
+\begin{align*}
+    p(r,X) &= \sum_{x_i\in X} \! r(x_i) \, [y_i = y ] \to \max_r;\\
+    n(r,X) &= \sum_{x_i\in X} \! r(x_i) \, [y_i \neq y ] \to \min_r;
+\end{align*}
+
+На практике максимизируют различные критерии информативности $H(p, n)$ (возрастает по $p$, убывает по $n$):
+\begin{itemize}
+\item энтропийный критерий;
+\item индекс Джини;
+\item статистические тесты (точный тест Фишера, $\chi^2$, $\omega^2$ и~др.)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Переобучение правил}
+\centering {
+    \includegraphics[height=56mm]{Map-of-rules-overfitting-png.eps}
+    
+    Модифицированный критерий информативности:
+\[
+    \label{eq:Hpn}
+        \tilde H(p, n)
+        = H\bigl(
+            p + \Delta p,\:
+            n + \Delta n
+        \bigr).
+\]
+}
+
+\end{frame}
+
+\begin{frame}[t]{Комбинаторная вероятность переобучения}
+    \begin{itemize}
+        \item $\XX = \{x_1, x_2, \dots, x_L \}$ "--- генеральное множество объектов,
+        \item $R = \{r_1, r_2, \dots, r_D\}$ "--- множество логических правил,
+        \item $I(r, x_i) = \bigl[r(x_i) \neq [y_i = y]\bigr]$ "--- индикатор ошибки,
+        \item $n(r, X)$ "--- число ошибок правила $r$ на выборке $X \subset \XX$,
+        \item $\nu(r, X) = n(r, X) / |X|$ "--- частота ошибок $r$ на $X \subset \XX$,
+        \item Метод обучения $\mu$ выбирает правило $r = \mu X$ по $X \subset \XX$,
+        \item Переобученность: $\delta(r, X) = \nu (r, \bar X) - \nu (r, X)$,
+              где $(X, \X)$ "--- разбиение $\XX$ на обучающую и контрольную выборку.
+        \item Вероятность переобучения:
+            \[
+                Q(\eps) = \Prob[\delta(\mu X, X) \geq \eps] = \frac{1}{C_L^\ell} \sum_{X \sqcup \X} [\delta(\mu X, X) \geq \eps].
+            \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Специфика вероятности переобучения правил}
+    \begin{enumerate}
+        \item Наличие ошибок первого и второго рода
+        \begin{itemize}
+            \item $I' (r, x) = [r(x_i) = 0][y_i = y]$ "--- индикатор ошибки I рода,
+            \item $I''(r, x) = [r(x_i) = 1][y_i \neq y]$ "--- индикатор ошибки II рода.
+            \item $n'(r, X), n''(r, X), \nu'(r, X), \nu''(r, X)$ "--- число и частота ошибок относительно $I'$ и $I''$.
+        \end{itemize}
+        \item Метод обучения
+        \begin{itemize}
+            \item Обычно "--- минимизация эмпирического риска:
+            \[\mu X = \argmin\limits_{r \in R}  n(r, X);\]
+            \item Для правил "--- максимизация критерия информативности:
+            \[
+                \mu X = \argmax\limits_{r \in R} H(p(r, X), n(r, X)).
+            \]
+%            где $p(r,X)$ и $n(r, X)$ "--- число объектов, правильно и~неправильно покрытых правилом.
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\subsection{Оценки вероятности переобучения}
+\begin{frame}[t]{Оценки вероятности переобучения}
+    \begin{itemize}
+        \item $\XX_r = \{x \in \XX \colon I(r, x) = 1\}$ "--- множество ошибок правила $r$,
+        \item $[v \prec r] = [\XX_v \subset \XX_r]$ "--- частичный порядок, $v, r \in R$,
+    \end{itemize}
+    \begin{Theorem}
+        Пусть $v \prec r$. Тогда $[\mu X = r] \leq [\XX_r \backslash \XX_v \subset \X]$.
+    \end{Theorem}
+    \begin{itemize}
+        \item Неполноценность правила:
+            \[
+                q(r) = \left|\bigcup\limits_{v \colon \XX_v \subset \XX_r} \XX_r \backslash \XX_v\right|.
+            \]
+        \item Оценка вероятности переобучения:
+            \begin{align*}
+                \label{eqConSplitSeparate}
+                Q'(\eps) &\leq
+                    %\Prob \{\delta'(\mu X, X) \geq \eps\} =
+                    \sum_{r \in R} \frac{\Binom{L-q}{\ell}}{\CLl}\Hyper{L-q}{\ell}{m' - q'}{\tfrac{\ell}{L} \left(m' - \eps k\right)} \equiv \eta'(\eps); \\
+                %Q''(\eps) &\leq
+                    %\Prob \{\delta''(\mu X, X) \geq \eps\} =
+                 %   \sum_{r \in R} \frac{\Binom{L-q}{\ell}}{\CLl}\Hyper{L-q}{\ell}{m'' - q''}{\tfrac{\ell}{L} \left(m'' - \eps k\right)} \equiv \eta''(\eps);
+            \end{align*}
+    \end{itemize}
+\end{frame}
+
+
+\subsection{Модифицированный критерий информативности}
+\begin{frame}[t]{Модифицированный критерий информативности}
+    \begin{itemize}
+        \item Оценка вероятности переобучения:
+            \begin{align*}
+                Q'(\eps) &\leq
+                    %\Prob \{\delta'(\mu X, X) \geq \eps\} =
+                    \sum_{r \in R} \frac{\Binom{L-q}{\ell}}{\CLl}\Hyper{L-q}{\ell}{m' - q'}{\tfrac{\ell}{L} \left(m' - \eps k\right)} \equiv \eta'(\eps); \\
+                Q''(\eps) &\leq
+                    %\Prob \{\delta''(\mu X, X) \geq \eps\} =
+                    \sum_{r \in R} \frac{\Binom{L-q}{\ell}}{\CLl}\Hyper{L-q}{\ell}{m'' - q''}{\tfrac{\ell}{L} \left(m'' - \eps k\right)} \equiv \eta''(\eps);
+            \end{align*}
+            где $m, m', m'', q, q', q''$ "--- число ошибок и неполноценность алгоритмов относительно индикаторов ошибок $I$, $I'$, $I''$.
+        \item $\eps'(\eta')$ и $\eps''(\eta'')$ "--- функции, обратные к $\eta'(\eps)$ и $\eta''(\eps)$;
+        \item Модифицированный критерий информативности:
+            \[
+                \label{eq:Hpn}
+                    \tilde H(p, n)
+                    = H\bigl(
+                        p - \ell \eps'(0.5),\:
+                        n + \ell \eps''(0.5)
+                    \bigr).
+            \]
+    \end{itemize}
+\end{frame}
+
+\section{Эксперименты}
+
+\subsection{Схема эксперимента}
+\begin{frame}[t]{Схема эксперимента}
+\begin{itemize}
+  \item Вычисление поправок $\eps'(0.5)$ и $\eps''(0.5)$:
+    \begin{itemize}
+        \item проводилось для всех наборов из не более трёх признаков;
+        \item производилось отдельно для правил класса $+1$ и $-1$;
+        \item для построения множества $R$ запускался алгоритм генерации правил.
+    \end{itemize}
+  \item Композиция правил настраивалась с помощью ComBoost. На каждой итерации:
+    \begin{itemize}
+        \item правила обучались по подвыборке объектов с малым отступом;
+        \item запрещалось $30\%$ случайно-выбранных признаков.
+    \end{itemize}
+  \item Поиск правил производился последовательным добавлением признаков и выбором порогов;
+    \begin{itemize}
+        % \item Вещественные признаки разбивались на 10 градаций;
+        %\item на каждой итерации отбиралось 30 лучших правил;
+        \item базовый критерий информативности - точный тест Фишера;
+        \item поправки $\eps'(0.5)$ и $\eps''(0.5)$ брались для набора признаков, использованных в правиле.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Результат эксперимента}
+\begin{frame}[t]{Результат эксперимента}
+
+\vspace{-0.8cm}
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \tabcolsep=5pt
+    \begin{tabular}[t]{|l|r|r|r|r|r|r|}
+    \headline
+           & \multicolumn{2}{c|}{ComBoost-A}  & \multicolumn{2}{c|}{ComBoost-B} & \multicolumn{2}{c|}{ComBoost-C}\\
+    \headline
+    задача     & обуч. & тест & обуч. & тест & обуч. & тест \\
+    \headline
+    australian  &6.2    &\textbf{13.8} &9.9    &14.9     &6.8    &14.0  \\
+    echo-card   &0.1    &2.4  &0.2    &\textbf{0.9}    &0.1    &2.3    \\
+    german         &12.9   &26.0 &18.3   &27.6    &13.1   &\textbf{25.4}\\
+    heart dis.      &7.6    &19.3 &11.1   &\textbf{18.5}  &8.0    &18.9\\
+    hepatitis      &1.8    &21.4 &7.8    &\textbf{18.0}    &3.0    &19.9\\
+    labor         &0.5    &10.9  &1.1    &11.9    &0.6    &\textbf{8.9}\\
+    liver         &8.3    &32.3 &33.0   &42.7  &11.3   &\textbf{31.4} \\
+    \hline
+    \end{tabular}
+
+  \smallskip
+  Средний процент ошибок на обучающей и тестовой выборке по различным задачам и методам контроля переобучения.
+\end{table}
+%\vspace{-0.4cm}
+\begin{itemize}[]
+    \item ComBoost-A: без поправок на переобучение;
+    \item ComBoost-B: с~поправками по комбинаторным формулам;
+    \item ComBoost-C: с~поправками по эмпирической оценке $Q(\eps)$, вычисляемой методом Монте-Карло.
+\end{itemize}
+
+\end{frame}
+
+\subsection{Отличие от предыдущих работ}
+\begin{frame}[t]{Отличие от предыдущих работ}
+\small
+\begin{itemize}
+\item Для вычисления поправок к информативности вместо специально разработанных алгоритмов  используется результат работы алгоритма генерации правил шага обучения алгоритма.
+\item Раньше в вычислении оценки участвовали только правила отличающиеся на одну ошибку, а теперь требуется лишь сравнимость векторов ошибок.
+\item Проверена практическая применимость теории комбинаторной оценки переобучения для Committee Boosting.
+\item Раньше методом обучения была минимизация эмпирического риска, а теперь~--- выбор информативных правил.
+\end{itemize}
+\small
+\emph{Vorontsov K. V., Ivahnenko A. A. Tight Combinatorial Generalization Bounds for Threshold Conjunction Rules // PReMI'11. Springer-Verlag, 2011. — Pp. 66-73.}
+\end{frame}
+
+%\begin{frame}[t]{Выводы}
+%\begin{itemize}
+%    \item Нам удалось повысить качество классификации путем сбора дополнительной информации о задаче.
+%    \item Данная методика в том или ином виде сработала для нескольких логических алгоритмов классификации.
+%    %\item Технические решения для применения комбинаторной теории переобчения
+%\end{itemize}
+%\end{frame}
+
+%\subsection{Дальнейшие планы}
+%\begin{frame}[t]{Дальнейшие планы}
+%\begin{itemize}
+%\item Переход от учета к управлению переобученностью в процессе построения алгоритмов,
+%\item Он-лайн оценка переобученности, умение остановить построение классификатора,
+%\item Дальнейшие уточнения оценок вероятности переобучения,
+%\item Open-source реализация алгоритмов.
+%\end{itemize}
+%\end{frame}
+
+\end{document}
+
