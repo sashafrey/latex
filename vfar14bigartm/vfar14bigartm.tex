@@ -1,4 +1,4 @@
-\documentclass[russian]{llncs}
+\documentclass[russian,english]{llncs}
 \usepackage[utf8]{inputenc}
 \usepackage[T2A]{fontenc}
 \usepackage[final]{graphicx}
@@ -63,21 +63,22 @@
     Marina Dudarenko\inst{5}
 }
 \institute{\noindent
-    Dorodnicyn Computing Centre of RAS, MIPT, HSE, Yandex,
-    \hfill\email{voron@forecsys.ru}
+    Yandex,
+    Moscow Institute of Physics and Technology,
+    ~~\email{voron@forecsys.ru}
     \and
     Schlumberger Information Solutions,
-    \hfill\email{oleksandr.frei@gmail.com}
+    ~~\email{oleksandr.frei@gmail.com}
     \and
     Lomonosov Moscow State University,
-    \hfill\email{great-mel@yandex.ru}
+    ~~\email{great-mel@yandex.ru}
     \and
-    Moscow Institute of Physics and Technology,
     Yandex,
-    \hfill\email{peter@romov.ru}
+    Moscow Institute of Physics and Technology,
+    ~~\email{peter@romov.ru}
     \and
     Lomonosov Moscow State University,
-    \hfill\email{m.dudarenko@gmail.com}
+    ~~\email{m.dudarenko@gmail.com}
 }
 
 \maketitle
@@ -114,9 +115,11 @@ Practical applications of topic models include many areas, such as
 information retrieval for long-text queries,
 %revealing research trends and research fronts,
 classification, categorization, summarization and segmentation of texts.
+Topic models are increasingly used for non-textual and heterogeneous data
+including signals, images, video and networks.
 More ideas, models and applications are outlined in the survey~\cite{daud10knowledge}.
 
-From a statistical point of view, a~probabilistic topic model
+From a statistical point of view, a~probabilistic topic model (PTM)
 defines each topic by a~multinomial distribution over words,
 and then describes each document with a~multinomial distribution over topics.
 From an optimizational point of view,
@@ -128,18 +131,17 @@ A typical approach in this case is to apply regularization techniques,
 which impose problem-specific constrains
 and ultimately lead to a~better solution.
 
-Existing works on topic modeling describe hundreds of models, adapted to different situations.
-For practitioners, most of the models are too difficult to quickly
-understand, compare, combine and embed into applications.
-This leads to a~common practice of using only the basic models such as
+Modern literature on topic modeling offers hundreds of models adapted to different situations.
+Nevertheless,
+most of these models are too difficult for practitioners
+to quickly understand, adapt and embed into applications.
+This leads to a~common practice of tasting only the basic out-of-date models such as
 \emph{Probabilistic Latent Semantic Analysis}, PLSA~\cite{hofmann99plsi} and
 \emph{Latent Dirichlet Allocation}, LDA~\cite{blei03latent}.
-Some of the difficulties are rooted in Bayesian learning framework,
+Most practical inconveniences are rooted in Bayesian learning,
 which is the dominating approach in topic modeling.
 Bayesian inference of topic models requires a~laborious mathematical work,
-which prevents unification and flexible manipulation of various topic models.
-Until now, there was no freely available development tools
-to easily design, modify, select, and combine topic models.
+which prevents flexible unification, modification, selection, and combination of topic models.
 
 In this paper we announce \textbf{the BigARTM open source project} for
 regularized multimodal topic modeling of large collections,
@@ -165,9 +167,9 @@ such as regularization and multi-modal topic modeling.
 
 The rest of the paper is organized as follows.
 In~section~\ref{sec:Multimodal}
-we~introduce a~multimodal topic modeling for documents with additional discrete metadata.
+we~introduce a~multimodal topic model for documents with metadata.
 In~section~\ref{sec:Online}
-we~generalize the~fast online algorithm~\cite{hoffman10online} to additively regularized multimodal topic models.
+we~generalize the~fast online algorithm~\cite{hoffman10online} to multimodal ARTM.
 In~section~\ref{sec:BigARTM}
 we~describe parallel architecture and implementation details of the BigARTM library.
 In~section~\ref{sec:Experiments}
@@ -288,7 +290,8 @@ transforms a~vector $(x_t)_{t\in T}$ to a~discrete distribution;
 $m(w)$~is the modality of the term~$w$, so that $w\in W^{m(w)}$.
 
 The system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}
-follows from Karush--Kuhn--Tucker conditions (see Appendix~A for the proof).
+follows from Karush--Kuhn--Tucker conditions.
+%(see Appendix~A for the proof).
 It~can be~solved by various numerical methods.
 Particularly,
 the simple-iteration method is equivalent to the EM algorithm,
@@ -299,7 +302,7 @@ With no regularization (${R=0}$) it~corresponds to PLSA~\cite{hofmann99plsi}.
 
 Many Bayesian topic models can be considered
 as special cases of ARTM with different regularizers~$R$,
-as shown in~\cite{voron14aist,voron14mlj}.
+as shown in~\cite{voron14mlj,voron14aist}.
 For~example,
 LDA~\cite{blei03latent} corresponds to the entropy smoothing regularizer.
 
@@ -317,11 +320,11 @@ we split the collection~$D$ into batches~$D_b$, ${b=1,\dots,B}$,
 and organize EM iterations so that
 each document vector $\theta_d$ is~iterated until convergence at a~constant matrix~$\Phi$,
 see Algorithm~\ref{alg:Online} and~\ref{alg:ProcessBatch}.
-Matrix~$\Phi$ is updated rarely, after all documents from the batch are processed.
+\mbox{Matrix}~$\Phi$ is updated rarely, after all documents from the batch are processed.
 For a~large collection
 matrix~$\Phi$ often stabilizes after small initial part of the collection.
 Therefore a~single pass through the collection might be sufficient to learn a~topic model.
-The second pass may be needed for the initial part of the collection.
+%The second pass may be needed for the initial part of the collection.
 
 Algorithm~\ref{alg:Online} does not specify how often to synchronize $\Phi$ matrix
 at steps~\ref{alg:sync-begin}--\ref{alg:sync-end}.
@@ -342,7 +345,7 @@ can be learned by the above online EM algorithm.
 The main goal for BigARTM architecture is to ensure a constant memory usage regardless of the collection size.
 For this reason each $D_b$ batch is stored on disk in a separate file,
 and only a limited number of batches is loaded into the main memory at any given time.
-The entire $\Theta$ matrix is also never stored in the memory.
+The entire $\Theta$ matrix is never stored in the memory.
 As a result, the memory usage stays constant regardless of the size of the collection.
 
 \SetAlgoSkip{}
@@ -350,13 +353,13 @@ As a result, the memory usage stays constant regardless of the size of the colle
 \caption{Online EM-algorithm for multimodal ARTM}
 \label{alg:Online}
 \BlankLine
-\KwIn{collection $D_b$, discounting factor $\rho\in(0,1]$;}
+\KwIn{collection $\{D_b\colon b=1,\dots,B\}$, discounting factor $\rho\in(0,1]$;}
 \KwOut{matrix $\Phi$;}
 \BlankLine
 initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$\;
-$n_{wt} := 0$,~ $\tilde n_{wt} := 0$\;
+$n_{wt} := 0$,~ $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
 \ForAll{batches $D_b$, $b = 1,\dots,B$}{
-    $\tilde n_{wt} := \tilde n_{wt} + \kw{ProcessBatch}(D_b, \phi_{wt})$\;
+    $(\tilde n_{wt}) := (\tilde n_{wt}) + \kw{ProcessBatch}(D_b, \phi_{wt})$\;
     \If{(synchronize)\label{alg:sync-begin}}{
         $n_{wt} := \rho n_{wt} + \tilde n_{dw}$ for all $w \in W$ and $t \in T$\; \label{alg:merging}
         $\phi_{wt} := \norm_{w\in W^m}
@@ -375,7 +378,7 @@ $n_{wt} := 0$,~ $\tilde n_{wt} := 0$\;
 \label{alg:ProcessBatch}
 \BlankLine
 \KwIn{batch $D_b$, matrix $\phi_{wt}$;}
-\KwOut{matrix $\tilde n_{wt}$;}
+\KwOut{matrix ($\tilde n_{wt}$);}
 \BlankLine
 $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
 \ForAll{$d \in D_b$}{
@@ -398,11 +401,11 @@ For this reason BigARTM implements a concurrent processing of the batches
 and keeps a single-threaded code for the $\kw{ProcessBatch}(D_b, \phi_{wt})$ routine.
 
 To split collection into batches and process them concurrently is a common approach,
-introduced in AD-LDA algorithm \cite{newman2009distributed}, and
-then further developed in PLDA \cite{wang2009plda} and PLDA{+} \cite{liu2011plda+} algorithms.
+introduced in AD-LDA algorithm \cite{newman09distributed}, and
+then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
 These algorithms require all concurrent workers to become idle before an update of the $\Phi$ matrix.
 Such synchronization step adds a large overhead in the online algorithm where $\Phi$ matrix is updated multiple times on each iteration.
-An alternative architecture without the synchronization step is described in \cite{smola2010architecture},
+An alternative architecture without the synchronization step is described in \cite{smola10architecture},
 however it mostly targets a distributed cluster environment.
 In our work we develop an efficient single-node architecture where all workers benefit from the shared memory space.
 
@@ -514,7 +517,7 @@ to run automated continuous integration builds (\url{http://travis-ci.org}).
 
 In this section we evaluate the runtime performance and the algorithmic quality of \mbox{BigARTM}
 against two popular software packages~---
-Gensim~\cite{rehurek_lrec}
+Gensim~\cite{rehurek10software}
 %\footnote{\url{http://radimrehurek.com/gensim/}}
 and Vowpal Wabbit%
 \footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/}}.
@@ -535,8 +538,8 @@ but no more than in $10\%$ documents in the collection.
 The resulting dictionary was caped at $|W| = 100\,000$ most frequent words.
 
 Both Gensim and VW.LDA represents the resulting topic model as Dirichlet distribution over $\Phi$ and $\Theta$ matrices:
-$\vec{\theta}_{d} \sim \text{Dir}(\vec{\gamma}_d)$ and
-$\vec{\phi}_{t} \sim \text{Dir}(\vec{\lambda}_t)$.
+${\vec\theta}_{d} \sim \text{Dir}({\vec\gamma}_d)$ and
+${\vec\phi}_{t} \sim \text{Dir}({\vec\lambda}_t)$.
 On~contrary, BigARTM outputs a non-probabilistic matrices $\Phi$ and $\Theta$.
 To~compare the perplexity we take the mean or the mode of the posterior distributions:
 \begin{align*}
@@ -579,30 +582,30 @@ In LdaMulticore the workflow is similar to BigARTM --- several batches are proce
         \emph{perplexity} is calculated according to \eqref{eq:perplexity} on held-out documents.
     }
 	\label{tab:libraries_comparison}
-    \vskip-2ex\centering\tabcolsep=8pt
+    \centering\tabcolsep=4.3pt
 	\begin{tabular}[t]{l|c|rrrr}
 	\hline
-	& & & & \multicolumn{2}{c}{perplexity} \\
-	library & procs & train time & inference & mode & mean \\
+	& & train & inference & \multicolumn{2}{c}{perplexity} \\
+	library & procs & time & time & mode & mean \\
 	\hline
-	BigARTM +smoothing & 1 & 62 min & 127 sec & \multicolumn{2}{c}{4000} \\
-	Gensim LDA & 1 & 369 min & 395 sec & 4213 & 4161  \\
-	Vowpal Wabbit LDA & 1 & 73 min & 120 sec & 4061 & 4108 \\
+	BigARTM & 1 & 35 min & 72 sec & \multicolumn{2}{c}{4000} \\
+	LdaModel & 1 & 369 min & 395 sec & 4213 & 4161  \\
+	VW.LDA & 1 & 73 min & 120 sec & 4061 & 4108 \\
 	\hline
-	BigARTM +smoothing & 4 & 13 min & 33 sec & \multicolumn{2}{c}{4061}  \\
-	Gensim LDA-Multicore & 4 & 60 min & 222 sec & 4055 & 4111  \\	
+	BigARTM & 4 & 9 min & 20 sec & \multicolumn{2}{c}{4061}  \\
+	LdaMulticore & 4 & 60 min & 222 sec & 4055 & 4111  \\	
 	\hline
-	BigARTM +smoothing & 8 & 8 min & 24 sec & \multicolumn{2}{c}{4304}  \\
-	Gensim LDA-Multicore & 8 & 57 min & 224 sec & 4379 & 4455 \\
+	BigARTM & 8 & 4.5 min & 14 sec & \multicolumn{2}{c}{4304}  \\
+	LdaMulticore & 8 & 57 min & 224 sec & 4379 & 4455 \\
 	\hline
 	\end{tabular}
 \end{table}
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[height=35mm]{speedup_bigartm.eps}
-	\includegraphics[height=35mm]{speedup_gensim.eps}
-	\caption{Speed up for BigARTM (left chart) and Gensim (right chart)}
+	\includegraphics[height=35mm]{bigartm_speedup.eps}
+	\includegraphics[height=35mm]{bigartm_memory.eps}
+	\caption{Running BigARTM in parallel: speed up (left) and memory usage (right)}
 	\label{fig:bigartm_speedup}
 \end{figure}
 
@@ -619,15 +622,15 @@ Updates were performed after each batch in non-parallel runs, and after $P$ batc
 LDA priors were fixed as
 ${\alpha = 0.1}$,\, ${\beta = 0.1}$,
 so that
-$\vec{\theta}_d \sim \text{Dir}(\alpha)$,\,
-$\vec{\phi}_t \sim \text{Dir}(\beta)$.
+${\vec\theta}_d \sim \text{Dir}(\alpha)$,\,
+${\vec\phi}_t \sim \text{Dir}(\beta)$.
 
-Table\;\ref{tab:libraries_comparison} compares the performance of VW.LDA, Gensim, and BigARTM.
-
-Fig.\;\ref{fig:bigartm_speedup} compares BigARTM and Gensim speedup depending on the number of CPU threads
-for Amazon AWS~c3.8xlarge with 32~cores,
-Gensim~\mbox{0.10.3} under Python~\mbox{2.7},
-and the parameter of LDA-Multicore $\kw{workers}=\kw{nProcessors}-1$.
+Table\;\ref{tab:libraries_comparison} compares the performance of
+VW.LDA, Gensim LdaModel, Gensim LdaMulticore, and BigARTM.
+%
+Fig.\;\ref{fig:bigartm_speedup} shows BigARTM speedup and memory consumption depending on the number of CPU threads
+for Amazon AWS~c3.8xlarge with 32~virtual cores,
+Gensim~\mbox{0.10.3} under Python~\mbox{2.7}.
 
 %{\color{red}ToDo: discussions.}
 
@@ -659,18 +662,16 @@ the characteristics of topic lexical kernels (size, purity, and contrast) averag
     \hline
     Model & $\mathcal{P}_{10k}$ & $\mathcal{P}_{100k}$ &  $\mathcal{S}_{\Phi}$ & $\mathcal{S}_{\Theta}$ &  $\mathcal{K}_{s}$ & $\mathcal{K}_{p}$ &  $\mathcal{K}_{c}$ \\
     \hline
-    LDA              & 3499 & 3827 & 0.0  & 0.0  & 931  & 0.535 & 0.516 \\
-    ARTM             & 3592 & 3944 & 96.3 & 80.5 & 1135 & 0.810 & 0.732 \\
+        LDA    & 3436 & 3801 & 0.0  & 0.0  & 873  & 0.533 & 0.507 \\
+        ARTM   & 3577 & 3947 & 96.3 & 80.9 & 1079 & 0.785 & 0.731 \\
     \hline
     \end{tabular}
 \end{table}
 
 \begin{figure}[t]
-\begin{tabular}{cc}
-\input{plot_perplexity_sparsity}
-&
-\input{plot_kernel}
-\end{tabular}
+    \centering
+    \includegraphics[width=60mm]{plot_perplexity_sparsity.eps}\hfill
+    \includegraphics[width=60mm]{plot_kernel.eps}
 \caption{Comparison of LDA (thin) and ARTM (bold) models. The number of processed documents is shown along the X~axis.}
 \label{fig:comparison_plot}
 \end{figure}
@@ -862,30 +863,23 @@ Hofmann, T.: Probabilistic latent semantic indexing. In: Proceedings of the
   22nd annual international ACM SIGIR conference on Research and development in
   information retrieval. pp. 50--57. ACM, New York, NY, USA (1999)
 
-\bibitem{liu2011plda+}
-Liu, Z., Zhang, Y., Chang, E.Y., Sun, M.: PLDA+: Parallel latent dirichlet
-  allocation with data placement and pipeline processing. ACM Transactions on
-  Intelligent Systems and Technology (TIST)  2(3), ~26 (2011)
+\bibitem{liu11plda}
+Liu, Z., Zhang, Y., Chang, E.Y., Sun, M.: {PLDA+:} parallel latent {D}irichlet
+  allocation with data placement and pipeline processing. ACM Trans. Intell.
+  Syst. Technol.  2(3),  26:1--26:18 (May 2011)
 
-\bibitem{newman2009distributed}
+\bibitem{newman09distributed}
 Newman, D., Asuncion, A., Smyth, P., Welling, M.: Distributed algorithms for
-  topic models. The Journal of Machine Learning Research  10,  1801--1828
-  (2009)
-
-\bibitem{rehurek_lrec}
-{\v R}eh{\r u}{\v r}ek, R., Sojka, P.: {Software Framework for Topic Modelling
-  with Large Corpora}. In: {Proceedings of the LREC 2010 Workshop on New
-  Challenges for NLP Frameworks}. pp. 45--50. ELRA, Valletta, Malta (May 2010).
-  %\url{http://is.muni.cz/publication/884893/en}
+  topic models. J. Mach. Learn. Res.  10,  1801--1828 (Dec 2009)
 
 \bibitem{rubin12statistical}
 Rubin, T.N., Chambers, A., Smyth, P., Steyvers, M.: Statistical topic models
   for multi-label document classification. Machine Learning  88(1-2),  157--208
   (2012)
 
-\bibitem{smola2010architecture}
-Smola, A., Narayanamurthy, S.: An architecture for parallel topic models.
-  Proceedings of the VLDB Endowment  3(1-2),  703--710 (2010)
+\bibitem{smola10architecture}
+Smola, A., Narayanamurthy, S.: An architecture for parallel topic models. Proc.
+  VLDB Endow.  3(1-2),  703--710 (Sep 2010)
 
 \bibitem{voron14dan-eng}
 Vorontsov, K.V.: Additive regularization for topic models of text collections.
@@ -903,159 +897,166 @@ Vorontsov, K.V., Potapenko, A.A.: Tutorial on probabilistic topic modeling:
   International Publishing Switzerland, Communications in Computer and
   Information Science (CCIS) (2014)
 
-\bibitem{wang2009plda}
-Wang, Y., Bai, H., Stanton, M., Chen, W.Y., Chang, E.Y.: PLDA: Parallel latent
-  dirichlet allocation for large-scale applications. In: Algorithmic Aspects in
-  Information and Management, pp. 301--314. Springer (2009)
+\bibitem{rehurek10software}
+\v{R}eh\r{u}\v{r}ek, R., Sojka, P.: Software framework for topic modelling with
+  large corpora. In: Proceedings of the {LREC} 2010 Workshop on New Challenges
+  for {NLP} Frameworks. pp. 45--50. {ELRA}, Valletta, Malta (May 2010)
+
+\bibitem{wang09plda}
+Wang, Y., Bai, H., Stanton, M., Chen, W.Y., Chang, E.Y.: {PLDA}: Parallel
+  latent {D}irichlet allocation for large-scale applications. In: Proceedings
+  of the 5th International Conference on Algorithmic Aspects in Information and
+  Management. pp. 301--314. AAIM '09, Springer-Verlag, Berlin, Heidelberg
+  (2009)
 
 \end{thebibliography}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newpage
-\section*{Appendix A}
-
-Consider the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}.
-
-Topic~$t$ is called \emph{regular} for the modality~$m$
-if ${n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}} > 0}$
-for at least one term ${w\in W^m}$.
-If~the~reverse inequality holds for all ${w\in W^m}$ then
-topic~$t$ is called \emph{irregular}.
-
-Document~$d$ is called \emph{regular}
-if ${n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}} > 0}$
-for at least one topic ${t\in T}$.
-If~the reverse inequality holds for all ${t\in T}$ then
-document~$d$ is called \emph{irregular}.
-
-\begin{theorem}
-\label{th:multimodal}
-    If the function $R(\Phi,\Theta)$ is continuously differentiable
-    and $(\Phi,\Theta)$ is the local maximum
-    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
-    then for any regular topic-modality pair $(t,m)$ and any regular document~$d$
-    the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta} holds.
-\end{theorem}
-
-\begin{note}
-    If a~topic~$t$ is irregular
-    then the $t$-th vector-column in matrix~$\Phi^m$ equals zero
-    and can not represent a~discrete distribution.
-    This means that topic~$t$ for the modality~$m$ must be excluded from the model.
-    This mechanism is useful for irrelevant topics elimination and determining the number of topics.
-\end{note}
-\begin{note}
-    If a~documents~$d$ is irregular
-    then the $d$-th vector-column in matrix~$\Theta$ equals zero
-    and can not represent a~discrete distribution.
-    This means that document~$d$ must be excluded from the model.
-    For example, a~document may be too short or irrelevant to the given collection.
-\end{note}
-
-\begin{proof}
-    For the local minimum $\Phi^m,\Theta$
-    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
-    the Karush--Kuhn--Tucker (KKT) conditions can be written as follows:
-    %(conditions with respect to $\theta_{td}$ are analogous):
-    \begin{gather*}
-        \sum_{d} n_{dw} \frac{\theta_{td}}{p(w\cond d)} + \frac{\partial R}{\partial \phi_{wt}}
-        = \lambda_t - \lambda_{wt};
-        \quad
-        \lambda_{wt}\geq 0;
-        \quad
-        \lambda_{wt}\phi_{wt} = 0;
-    \\
-        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\! n_{dw} \frac{\phi_{wt}}{p(w\cond d)} + \frac{\partial R}{\partial \theta_{td}}
-        = \mu_d - \mu_{td};
-        \quad
-        \mu_{td}\geq 0;
-        \quad
-        \mu_{td}\theta_{td} = 0;
-    \end{gather*}
-    where $\lambda_t$, $\lambda_{wt}$, $\mu_d$, $\mu_{td}$
-    are KKT multipliers for normalization and nonnegativity constrains.
-
-    Let us multiply
-    both sides of the first equation by~$\phi_{wt}$,
-    both sides of the second equation by~$\theta_{td}$,
-    and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep}
-    in~the~left-hand side of both equations.
-    Then we sum
-    the right-hand side of the first equation over~$d$,
-    the right-hand side of the second equation over~$t$:
-    \begin{gather*}
-        \phi_{wt} \lambda_t
-        =
-        \sum_{d}
-        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
-        + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
-        =
-        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}};
-    \\
-        \theta_{td} \mu_{d}
-        =
-        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\!
-        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
-        + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
-        =
-        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}.
-    \end{gather*}
-
-    An~assumption that $\lambda_t\leq 0$ contradicts the regularity condition for the $(t,m)$ pair.
-    Then ${\lambda_t>0}$.
-    Either ${\phi_{wt}= 0}$ or both sides of the first equation are positive.
-    Combining these two cases in one formula, we write:
-    \begin{equation}
-    \label{eq:in-theorem-1:phi}
-        \phi_{wt} \lambda_t
-        =
-        \max\biggl\{
-        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
-        \biggr\}.
-    \end{equation}
-    Analogously,
-    an~assumption that $\mu_d\leq 0$ contradicts the regularity condition for the document~$d$.
-    Then ${\mu_d>0}$.
-    Either ${\theta_{td}= 0}$ or both sides of the second equation are positive,
-    consequently,
-    \begin{equation}
-    \label{eq:in-theorem-1:theta}
-        \theta_{td} \mu_d
-        =
-        \max\biggl\{
-        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
-        \biggr\}.
-    \end{equation}
-
-    Let us sum
-    both sides of~the first equation over all~${w\in W^m}$,
-    then
-    both sides of~the second equation over all~${t\in T}$:
-    \begin{gather}
-    \label{eq:in-theorem-2:phi}
-        \lambda_t
-        =
-        \sum_{w\in W^m}
-        \max\biggl\{
-        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
-        \biggr\};
-    \\
-    \label{eq:in-theorem-2:theta}
-        \mu_d
-        =
-        \sum_{t\in T}
-        \max\biggl\{
-        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
-        \biggr\}.
-    \end{gather}
-
-    Finally,
-    we obtain~\eqref{eq:Mstep:phi} by expressing $\phi_{wt}$ from~\eqref{eq:in-theorem-1:phi} and \eqref{eq:in-theorem-2:phi}.
-
-    Analogously,
-    we obtain~\eqref{eq:Mstep:theta} by expressing $\theta_{td}$ from~\eqref{eq:in-theorem-1:theta} and \eqref{eq:in-theorem-2:theta}.
-    \qed
-\end{proof}
+%%%\newpage
+%%%\section*{Appendix A}
+%%%
+%%%Consider the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}.
+%%%
+%%%Topic~$t$ is called \emph{regular} for the modality~$m$
+%%%if ${n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}} > 0}$
+%%%for at least one term ${w\in W^m}$.
+%%%If~the~reverse inequality holds for all ${w\in W^m}$ then
+%%%topic~$t$ is called \emph{irregular}.
+%%%
+%%%Document~$d$ is called \emph{regular}
+%%%if ${n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}} > 0}$
+%%%for at least one topic ${t\in T}$.
+%%%If~the reverse inequality holds for all ${t\in T}$ then
+%%%document~$d$ is called \emph{irregular}.
+%%%
+%%%\begin{theorem}
+%%%\label{th:multimodal}
+%%%    If the function $R(\Phi,\Theta)$ is continuously differentiable
+%%%    and $(\Phi,\Theta)$ is the local maximum
+%%%    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
+%%%    then for any regular topic-modality pair $(t,m)$ and any regular document~$d$
+%%%    the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta} holds.
+%%%\end{theorem}
+%%%
+%%%\begin{note}
+%%%    If a~topic~$t$ is irregular
+%%%    then the $t$-th vector-column in matrix~$\Phi^m$ equals zero
+%%%    and can not represent a~discrete distribution.
+%%%    This means that topic~$t$ for the modality~$m$ must be excluded from the model.
+%%%    This mechanism is useful for irrelevant topics elimination and determining the number of topics.
+%%%\end{note}
+%%%\begin{note}
+%%%    If a~documents~$d$ is irregular
+%%%    then the $d$-th vector-column in matrix~$\Theta$ equals zero
+%%%    and can not represent a~discrete distribution.
+%%%    This means that document~$d$ must be excluded from the model.
+%%%    For example, a~document may be too short or irrelevant to the given collection.
+%%%\end{note}
+%%%
+%%%\begin{proof}
+%%%    For the local minimum $\Phi^m,\Theta$
+%%%    of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
+%%%    the Karush--Kuhn--Tucker (KKT) conditions can be written as follows:
+%%%    %(conditions with respect to $\theta_{td}$ are analogous):
+%%%    \begin{gather*}
+%%%        \sum_{d} n_{dw} \frac{\theta_{td}}{p(w\cond d)} + \frac{\partial R}{\partial \phi_{wt}}
+%%%        = \lambda_t - \lambda_{wt};
+%%%        \quad
+%%%        \lambda_{wt}\geq 0;
+%%%        \quad
+%%%        \lambda_{wt}\phi_{wt} = 0;
+%%%    \\
+%%%        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\! n_{dw} \frac{\phi_{wt}}{p(w\cond d)} + \frac{\partial R}{\partial \theta_{td}}
+%%%        = \mu_d - \mu_{td};
+%%%        \quad
+%%%        \mu_{td}\geq 0;
+%%%        \quad
+%%%        \mu_{td}\theta_{td} = 0;
+%%%    \end{gather*}
+%%%    where $\lambda_t$, $\lambda_{wt}$, $\mu_d$, $\mu_{td}$
+%%%    are KKT multipliers for normalization and nonnegativity constrains.
+%%%
+%%%    Let us multiply
+%%%    both sides of the first equation by~$\phi_{wt}$,
+%%%    both sides of the second equation by~$\theta_{td}$,
+%%%    and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep}
+%%%    in~the~left-hand side of both equations.
+%%%    Then we sum
+%%%    the right-hand side of the first equation over~$d$,
+%%%    the right-hand side of the second equation over~$t$:
+%%%    \begin{gather*}
+%%%        \phi_{wt} \lambda_t
+%%%        =
+%%%        \sum_{d}
+%%%        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
+%%%        + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+%%%        =
+%%%        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}};
+%%%    \\
+%%%        \theta_{td} \mu_{d}
+%%%        =
+%%%        \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\!
+%%%        n_{dw} \frac{\phi_{wt}\theta_{td}}{p(w\cond d)}
+%%%        + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+%%%        =
+%%%        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}.
+%%%    \end{gather*}
+%%%
+%%%    An~assumption that $\lambda_t\leq 0$ contradicts the regularity condition for the $(t,m)$ pair.
+%%%    Then ${\lambda_t>0}$.
+%%%    Either ${\phi_{wt}= 0}$ or both sides of the first equation are positive.
+%%%    Combining these two cases in one formula, we write:
+%%%    \begin{equation}
+%%%    \label{eq:in-theorem-1:phi}
+%%%        \phi_{wt} \lambda_t
+%%%        =
+%%%        \max\biggl\{
+%%%        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
+%%%        \biggr\}.
+%%%    \end{equation}
+%%%    Analogously,
+%%%    an~assumption that $\mu_d\leq 0$ contradicts the regularity condition for the document~$d$.
+%%%    Then ${\mu_d>0}$.
+%%%    Either ${\theta_{td}= 0}$ or both sides of the second equation are positive,
+%%%    consequently,
+%%%    \begin{equation}
+%%%    \label{eq:in-theorem-1:theta}
+%%%        \theta_{td} \mu_d
+%%%        =
+%%%        \max\biggl\{
+%%%        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
+%%%        \biggr\}.
+%%%    \end{equation}
+%%%
+%%%    Let us sum
+%%%    both sides of~the first equation over all~${w\in W^m}$,
+%%%    then
+%%%    both sides of~the second equation over all~${t\in T}$:
+%%%    \begin{gather}
+%%%    \label{eq:in-theorem-2:phi}
+%%%        \lambda_t
+%%%        =
+%%%        \sum_{w\in W^m}
+%%%        \max\biggl\{
+%%%        n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}, 0
+%%%        \biggr\};
+%%%    \\
+%%%    \label{eq:in-theorem-2:theta}
+%%%        \mu_d
+%%%        =
+%%%        \sum_{t\in T}
+%%%        \max\biggl\{
+%%%        n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}, 0
+%%%        \biggr\}.
+%%%    \end{gather}
+%%%
+%%%    Finally,
+%%%    we obtain~\eqref{eq:Mstep:phi} by expressing $\phi_{wt}$ from~\eqref{eq:in-theorem-1:phi} and \eqref{eq:in-theorem-2:phi}.
+%%%
+%%%    Analogously,
+%%%    we obtain~\eqref{eq:Mstep:theta} by expressing $\theta_{td}$ from~\eqref{eq:in-theorem-1:theta} and \eqref{eq:in-theorem-2:theta}.
+%%%    \qed
+%%%\end{proof}
 
 \end{document}
 
