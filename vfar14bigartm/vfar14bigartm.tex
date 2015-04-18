@@ -316,21 +316,18 @@ from a build-in user extendable library.
 %\cite{zhang13sparse}
 
 Following the idea of Online LDA \cite{hoffman10online}
-we split the collection~$D$ into batches~$D_b$, ${b=1,\dots,B}$,
+we split the collection into batches,
 and organize EM iterations so that
-each document vector $\theta_d$ is~iterated until convergence at a~constant matrix~$\Phi$,
-see Algorithm~\ref{alg:Online} and~\ref{alg:ProcessBatch}.
+each document vector $\theta_d$ is~iterated until convergence at a~constant matrix~$\Phi$.
 \mbox{Matrix}~$\Phi$ is updated rarely, after all documents from the batch are processed.
 For a~large collection
 matrix~$\Phi$ often stabilizes after small initial part of the collection.
 Therefore a~single pass through the collection might be sufficient to learn a~topic model.
 %The second pass may be needed for the initial part of the collection.
 
-Algorithm~\ref{alg:Online} does not specify how often to synchronize $\Phi$ matrix
-at steps~\ref{alg:sync-begin}--\ref{alg:sync-end}.
-It~can be done after every batch or less frequently
-(for instance if $\frac{\partial R}{\partial \phi_{wt}}$ takes long time to evaluate).
-This flexibility is especially important for concurrent implementation of the algorithm,
+\mbox{Matrix}~$\Phi$ can be updated after every batch or less frequently
+(for instance if it takes long time to evaluate all regularizers).
+This flexibility is important for concurrent implementation of the algorithm,
 where multiple batches are processed in parallel.
 In~this case synchronization can be triggered when a fixed number of documents had been processed since the last synchronization.
 
@@ -342,63 +339,9 @@ can be learned by the above online EM algorithm.
 \section{BigARTM architecture}
 \label{sec:BigARTM}
 
-The main goal for BigARTM architecture is to ensure a constant memory usage regardless of the collection size.
-For this reason each $D_b$ batch is stored on disk in a separate file,
-and only a limited number of batches is loaded into the main memory at any given time.
-The entire $\Theta$ matrix is never stored in the memory.
-As a result, the memory usage stays constant regardless of the size of the collection.
-
-\SetAlgoSkip{}
-\begin{algorithm2e}[t]
-\caption{Online EM-algorithm for multimodal ARTM}
-\label{alg:Online}
-\BlankLine
-\KwIn{collection $\{D_b\colon b=1,\dots,B\}$, discounting factor $\rho\in(0,1]$;}
-\KwOut{matrix $\Phi$;}
-\BlankLine
-initialize $\phi_{wt}$ for all $w \in W$ and $t \in T$\;
-$n_{wt} := 0$,~ $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
-\ForAll{batches $D_b$, $b = 1,\dots,B$}{
-    $(\tilde n_{wt}) := (\tilde n_{wt}) + \kw{ProcessBatch}(D_b, \phi_{wt})$\;
-    \If{(synchronize)\label{alg:sync-begin}}{
-        $n_{wt} := \rho n_{wt} + \tilde n_{dw}$ for all $w \in W$ and $t \in T$\; \label{alg:merging}
-        $\phi_{wt} := \norm_{w\in W^m}
-            \bigl(
-                n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
-            \bigr)$
-        for all $w \in W^m$,\, $m=1,\dots,M$ and $t \in T$\; \label{alg:phi}
-
-        $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\; \label{alg:sync-end}
-    }
-}
-\end{algorithm2e}
-
-\begin{algorithm2e}[t]
-\caption{\kw{ProcessBatch}($D_b, \phi_{wt}$)}
-\label{alg:ProcessBatch}
-\BlankLine
-\KwIn{batch $D_b$, matrix $\phi_{wt}$;}
-\KwOut{matrix ($\tilde n_{wt}$);}
-\BlankLine
-$\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
-\ForAll{$d \in D_b$}{
-	initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
-	\Repeat{$\theta_d$ converges}{
-        $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $t \in T$\;
-        $n_{td} := \sum_{w\in d} \tau_{m(w)} n_{dw} p_{tdw}$ for all $t \in T$\;
-        $\theta_{td} := \norm_{t\in T}
-            \bigl(
-                n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
-            \bigr)$ for all $t \in T$\;
-	}
-	increment $\tilde n_{wt}$ by $n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
-}
-\end{algorithm2e}
-
-\paragraph{Concurrency.}
-An general rule of concurrency design is to express parallelism at the highest possible level.
-For this reason BigARTM implements a concurrent processing of the batches
-and keeps a single-threaded code for the $\kw{ProcessBatch}(D_b, \phi_{wt})$ routine.
+BigARTM architecture allows processing large collections without loading the entire corpus into memory.
+This is achieved by storing each batch in a separate file on disk,
+and loading a limited number of batches into the main memory at any given time.
 
 To split collection into batches and process them concurrently is a common approach,
 introduced in AD-LDA algorithm \cite{newman09distributed}, and
@@ -409,31 +352,18 @@ An alternative architecture without the synchronization step is described in \ci
 however it mostly targets a distributed cluster environment.
 In our work we develop an efficient single-node architecture where all workers benefit from the shared memory space.
 
-\begin{figure}[t]
-\begin{centering}
-\includegraphics[height=36mm]{diagramm_artm_core.eps}
-\caption{Diagram of key BigARTM components}
-\label{fig:diagramm_artm_core}
-\end{centering}
-\end{figure}
+True out-of-core implementation should avoid storing full $\Theta$ matrix in the memory.
+In BigARTM this is done by calculating $\theta_{td}$ on the fly for a given batch during its processing.
+Inference of $\theta_{td}$ is executed in parallel in such a way that many batches are processed concurrently,
+however each batch is processed by simple single-threaded code.
+This makes it easy to optimize this performance-critical routine,
+and at the same time gives almost linear speedup with the number of processors.
 
-To run multiple $\kw{ProcessBatch}$ in parallel the inputs and outputs of this routine are stored in two separate in-memory queues,
-locked for push and pop operations with spin locks.
-This approach does not add any noticeable synchronization overhead because
-both queues only store smart pointers to the actual data objects,
-so push and pop operations does not involve copying or relocating big objects in the memory.
-
-Smart pointers are also essential for lifecycle of the $\Phi$ matrix.
-This matrix is \emph{read} by all processors threads, and can be \emph{written} at any time by the merger thread.
-To update $\Phi$ without pausing all processor threads we keep two copies~--- an \emph{active $\Phi$} and a \emph{background $\Phi$} matrices.
-The active matrix is read-only, and is used by the processor threads.
-The background matrix is being built in a background by the merger thread
-at steps \ref{alg:merging} and~\ref{alg:phi} of Algorithm~\ref{alg:Online},
-and once it is ready merger thread marks it as active.
-Before processing a new batch the processor thread gets the current active matrix from the merger thread.
-This object is passed via shared smart pointer to ensure that processor thread can keep ownership of its $\Phi$ matrix
-until the batch is fully processed.
-As a result, all processor threads keep running concurrently with the update of $\Phi$ matrix.
+Processing each batch results in an $\hat n_{wt}$ increment that has to be applied to the $\Phi$ matrix.
+We merge $\hat n_{wt}$ in a background, and asynchronously build a new $\Phi$ matrix.
+This doubles the memory usage, but enables BigARTM to update $\Phi$ matrix without pausing all batch processing threads.
+As a result, BigARTM avoids this costly synchronization step, which is important for online algorithm
+where $\Phi$ matrix is updated multiple times on each iteration.
 
 Note that all processor threads share the same $\Phi$ matrix,
 which means that memory usage stays at constant level regardless of how many cores are used for computation.
@@ -446,32 +376,19 @@ Besides, an arbitrary overlap between reads and writes of the $\Phi$ matrix elim
 The design with two copies of the $\Phi$ matrix gives much more control over this
 and in certain cases allows BigARTM to behave in a fully deterministic way.
 
-The design with two $\Phi$ matrices only supports a~single merger thread,
-and we believe it should handle all $\tilde n_{wt}$ updates coming from many threads.
-This is a reasonable assumption because
-merging at step~\ref{alg:merging} takes only about $O(|W|\cdot|T|)$ operations to execute, while
-$\kw{ProcessBatch}$ takes $O(n |T| I)$ operations,
-where
-$n$~is the number of non-zero entries in the batch,
-$I$~is the average number of inner iterations in $\kw{ProcessBatch}$ routine.
-The ratio $n / |W|$ is typically from 100 to 1000 (based on datasets in UCI Bag-Of-Words repository),
-and $I$ is $10 \dots 20$, so the ratio safely exceeds the expected number of cores
-(up to 32 physical CPU cores in modern workstations, and even 60 cores of the Intel Xeon Phi co-processors).
-
 \paragraph{Data layout.}
 BigARTM uses dense single-precision matrices to represent $\Phi$ and~$\Theta$.
 Together with the $\Phi$ matrix we store a global dictionary of all terms ${w \in W}$.
 This dictionary is implemented as $\kw{std::unordered\_map}$ that maps a string representation of ${w \in W}$
 into its integer index in the $\Phi$ matrix.
 This dictionary can be extended automatically as more and more batches came through the system.
-To achieve this each batch $D_b$ contains a local dictionary $W_b$, listing all terms that occur in the batch.
+To achieve this each batch contains a local dictionary, listing all terms that occur in the batch.
 The $n_{dw}$ elements of the batch are stored as a~sparse CSR matrix (Compressed Sparse Raw format),
-where each row correspond to a~document ${d \in D_b}$,
-and terms~$w$ run over a~local batch dictionary~$W_b$.
+where rows correspond to documents from the batch, and terms run over the~local batch dictionary.
 
 For performance reasons $\Phi$ matrix is stored in column-major order, and $\Theta$ in row-major order.
 This layout ensures that $\sum_t \phi_{wt} \theta_{td}$ sum runs on contiguous memory blocks.
-In both matrices all values smaller than $10^{-16}$ are always replaced with zero to avoid performance issues with denormalized numbers%
+We also take special precautions to avoid performance issues with denormalized numbers%
 \footnote{\url{http://en.wikipedia.org/wiki/Denormal_number#Performance_issues}}.
 %http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
 
@@ -490,27 +407,6 @@ In addition to the APIs the library also has a simple CLI interface.
 
 BigARTM has built-in libraries of regularizers and quality measures
 that can be extended in current implementation only through project recompilation.
-
-\paragraph{Basic tools.}
-A careful selection of the programming tools is important for any software project.
-This is especially true for BigARTM as its code is written in C++,
-a language that by itself offers less functionality comparing to Python, .NET Framework or Java.
-To mitigate this we use
-various parts of the Boost C++ Libraries,
-Google Protocol Buffers for data serialization,
-ZeroMQ library for network communication,
-and several other libraries.
-%This tools are not specific for topic modeling, and should be considered for any scientific library written in C++.
-
-BigARTM uses CMake as a cross-platform build system,
-and it successfully builds on Windows, Linux and OS X in 32 and 64 bit configurations.
-Building the library require a recent C++ compiler with C++11 support (GNU GCC 4.6.3, clang 3.4 or Visual Studio 2012 or newer),
-and Boost Libraries 1.46.1 or newer. All the other third-parties are included in BigARTM repository.
-
-We also use free online services
-to store source code (\url{https://github.com}),
-to host online documentation (\url{https://readthedocs.org}) and
-to run automated continuous integration builds (\url{http://travis-ci.org}).
 
 \section{Experiments}
 \label{sec:Experiments}
