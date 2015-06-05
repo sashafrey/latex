@@ -30,3 +30,7 @@
 *.vrb
 *.xdy
 *.tdo
+
+# Latexian temporary files
+TSWLatexianTemp*
+*-eps-converted-to.pdf
