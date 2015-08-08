@@ -88,7 +88,7 @@
 Probabilistic topic modeling of text collections is a powerful tool for statistical text analysis
 based on the preferential use of graphical models and Bayesian learning.
 Additive regularization for topic modeling (ARTM) is a~recent semi-probabilistic approach, which
-provides a~much simpler inference for many models previously studied only in the Bayesian settings.
+provides a~simpler inference for many models previously studied only in the Bayesian settings.
 ARTM reduces barriers to entry into topic modeling research field
 and facilitates combination of topic models.
 %ARTM gives a~natural way to combine regularizers for multi-criteria topic modeling.
@@ -134,18 +134,18 @@ hundreds of models adapted to different situations~\cite{daud10knowledge}.
 Nevertheless,
 most of these models are too difficult for practitioners
 to quickly understand, adapt and embed into applications.
-This leads to a~common practice of tasting only the basic out-of-date models such as
+This leads to a~common practice of tasting only the very basic models such as
 \emph{Probabilistic Latent Semantic Analysis}, PLSA~\cite{hofmann99plsi} and
 \emph{Latent Dirichlet Allocation}, LDA~\cite{blei03latent}.
 Most practical inconveniences are rooted in Bayesian learning,
 which is the dominating approach in topic modeling.
 
-Bayesian learning is very powerful and general theoretical framework,
-for which topic modeling is one of example applications.
-Bayesian inference is elegant when conjugate priors are used.
-However, the Dirichlet conjugate prior
-is not always a~better choice from the linguistic point of view.
-In~particular, it conflicts with natural assumptions of~sparsity.
+Bayesian learning is a very powerful and general theoretical framework,
+and topic modeling is just one of its applications.
+Bayesian inference is elegant when used with conjugate priors.
+However, from the linguistic point of view the Dirichlet conjugate prior
+is not necessary the~best choice
+as it conflicts with natural assumptions of~sparsity.
 Better motivated non-conjugate priors
 require a~laborious mathematical work and
 lead to intricate learning algorithms.
@@ -185,33 +185,33 @@ thereby all Bayesian approaches to sparsing are much more complicated~%
 \cite{shashanka07sparse,wang09decoupling,ugander11concave,eisenstein11sparse,chien13bayesian}.
 
 ARTM makes topic models easier to design, to explain, to infer, and to combine,
-thereby reducing barriers to entry into topic modeling research field.
+naturally reducing barriers to entry into topic modeling research field.
 
-In~this paper we develop the multimodal extension if ARTM approach
-and contribute its parallel online implementation into BigARTM open source projet.
+In~this paper we develop the multimodal extension of ARTM approach
+and incorporate its parallel online implementation into BigARTM open source projet.
 %In~this paper we develop the ARTM approach in three directions:
 %the multiple modalities modeling,
 %the online algorithm, and
 %the parallel implementation.
 
 Multimodal data has become increasingly important in many application areas.
-Large collections of data coming from the web %or sensor networks
+Large data collections coming from the web or sensor networks
 consist of heterogeneous linked data.
 Typically, texts are accompanied by images, audio or video clips, usage data,
 metadata containing authors, links, date-time stamps, etc.
 In~these cases documents are considered as multimodal containers,
-for which words are the elements of only one of multiple modalities.
+where words form the elements of only one modality.
 All modalities are useful for determining more relevant topics,
 and, vice-versa,
-topics are useful for crossmodal retrieval, 
-making recommendations for users or 
+topics are useful for crossmodal retrieval,
+making recommendations for users or
 making predictions when data of some modalities are missing.
 We~introduce the multimodal additively regularized topic model
 with an arbitrary number of modalities
 and generalize the regularized EM-algorithm for this case.
 
-Online algorithms have proven to be the fastest
-for the large document collections, including those arriving in a~stream.
+Online algorithms have proven to be very efficient
+for large document collections, including those arriving in a~stream.
 Online algorithms are now available for
 PLSA~\cite{bassiou14online},
 LDA variational inference~\cite{hoffman10online},
@@ -355,7 +355,7 @@ ${p_{tdw} = p(t\cond d,w)}$~\cite{voron14aist}:
 \end{align}
 where the ``norm'' operator transforms
 a~real vector $(x_t)_{t\in T}$ to
-a~vector $(\tilde x_t)_{t\in T}$ of discrete distribution:
+a~vector $(\tilde x_t)_{t\in T}$ with a discrete distribution:
 \[
     \tilde x_t = \norm_{t\in T} x_t = \frac{\max\{x_t,0\}}{\sum\limits_{s\in T} \max\{x_s,0\}}.
 \]
@@ -377,24 +377,25 @@ for fixed distributions $\beta$, $\alpha$.
 The choice of these distributions as uniform
 corresponds to the use of symmetric Dirichlet priors in Bayesian approach.
 
-Due to the additivity ARTM can build topic models for various applications
+Additivity of ARTM models let users build topic models for various applications
 simply by choosing a~suitable combination of~predefined regularizers
-from a~user extendable \mbox{library}.
+from an extendable \mbox{library}.
 %
-For~example, 
-a~combination of five regularizers improves the interpretability of topics in~\cite{voron14mlj}.
-Authors split the set of topics into two subsets: ${T = S \sqcup B}$. 
-Domain-specific topics~${t\in S}$ contain terms of particular domain areas.
-Background topics~${t\in B}$ contain common words that may occur in many documents.
-To~make topics from~$S$ sparse they maximize the KL-divergences
-$KL(\alpha\|\theta_d)$ and
-$KL(\beta\|\phi_t)$ as regularizers.
-To~make topics from~$B$ smooth they minimize the KL-divergences
+For~example,
+in \cite{voron14mlj} as many as five regularizers are combined together to improve interpretability of the model.
+The key idea is to split the set of topics $T$ into two subsets: ${T = S \sqcup B}$,
+and to configure regularizers in such a way that
+domain-specific terms go into the set $S$,
+while commonly used words land in the set $B$.
+Sparsity of \emph{domain topics} $t \in S$ is promoted by a regularizer that maximize the KL-divergences
 $KL(\alpha\|\theta_d)$ and
 $KL(\beta\|\phi_t)$.
-Also they introduce the covariance regularizer
-to make all topics weakly correlated as columns of $\Phi$~matrix.
-The additive combination of regularizers is summarized as follows:
+Smoothness of \emph{background topics} $t \in B$ is promoted by minimizing KL-divergences
+$KL(\alpha\|\theta_d)$ and
+$KL(\beta\|\phi_t)$.
+Finally, a covariance regularizer is used to
+reduce correlation between topics in terms of the columns of the $\Phi$~matrix.
+The final combination of regularizers is as follows:
 \begin{align*}
     R(\Phi,\Theta)
     =&
@@ -412,27 +413,27 @@ The additive combination of regularizers is summarized as follows:
 \end{align*}
 where $\beta_0$, $\alpha_0$, $\beta_1$, $\alpha_1$, $\gamma$
 are regularization coefficients.
-This approach has been extended in~\cite{voron14aist} by~adding 
-a~regularizer that maximizes the KL-divergence
-$KL\bigl( \frac1{|T|}\|p(t) \bigr)$.
-This regularizer has an effect of topic selection.
-Starting with excessively high number of topics
-it~eliminates insignificant, duplicated, and linearly dependent topics~\cite{voron15slds}.
-Compared with Hierarchical Dirichlet Process, HDP~\cite{teh06hierarchical},
-topic sparsing regularizer has several advantages.
-It~gives a~more stable number of~topics, it is much faster, 
-and it can be easily combined with other topic models via additive regularization.
 
-Another important issue for ARTM is optimization of regularization coefficients~$\rho_i$.
-According to the Tikhonov's theory of~ill-posed inverse problems~\cite{tihonov77methods-eng},
-the regularization coefficients must tend to zero with the number of iteration. 
-In~this case we can achieve a~stable solution.
-In~practice, 
-we~choose the regularization path 
-by~adaptive tuning of regularization coefficients proposed in~\cite{voron14mlj,voron14aist,voron15slds}.
-This is an empirical technique based on visual control of 
+This combination was extended in~\cite{voron14aist} by a new regularizer that maximizes the KL-divergence
+$KL\bigl( \frac1{|T|}\|p(t) \bigr)$,
+leading to topic selection.
+Starting from an excessively high number of topics
+the regularizer eliminates insignificant, duplicated, and linearly dependent topics~\cite{voron15slds}.
+In terms of topic selection the new regularizer has several advantages over
+Hierarchical Dirichlet Process~\cite{teh06hierarchical}:
+it gives a~more stable number of~topics, takes less time to execute,
+and has ability to combine it with other topic models via additive regularization.
+
+An important subject for ARTM models is optimization of the regularization coefficients~$\rho_i$.
+According to Tikhonov's theory of~ill-posed inverse problems~\cite{tihonov77methods-eng},
+the regularization coefficients must tend to zero with the number of iteration.
+%In~this case we can achieve a~stable solution.
+In~practice,
+the regularization path is selected
+by~adaptive tuning of regularization coefficients~\cite{voron14mlj,voron14aist,voron15slds}.
+This empirical technique is based on visual control of
 multiple intrinsic and extrinsic performance measures
-as functions of the number of iteration.
+on each iteration.
 
 \section{Multimodal ARTM}
 \label{sec:Multimodal}
@@ -860,35 +861,34 @@ and there is a single aggregation thread that asynchronously merges the results.
 %\end{figure}
 
 Table\;\ref{tab:libraries_comparison} compares the performance of
-VW.LDA, Gensim LdaModel and LdaMulticore (\mbox{0.10.3} under Python~\mbox{2.7}), and BigARTM
-for Amazon AWS~c3.8xlarge with 32~virtual cores over
-Intel-based CPU with 16~physical cores with hyper-threading.
+VW.LDA, Gensim LdaModel and LdaMulticore (\mbox{v0.10.3} under Python~\mbox{2.7}), and BigARTM,
+using Amazon EC2 c3.8xlarge instance (Intel-based CPU with 16~physical cores and hyper-threading).
 %
 Each run performs one pass over the Wikipedia corpus and produces a~model with $|T|=100$ topics.
 The collection was split into batches with $10$K documents each
 (\texttt{chunksize} in Gensim, \texttt{minibatch} in VW.LDA).
-The update rule in online algorithm used the discounting factor
+The update rule in online algorithm used a discounting factor
 ${\rho = (b + \tau_0)^{-0.5}}$,
 where $b$ is the number of batches processed so far,
 and $\tau_0$ is a~constant offset parameter introduced in~\cite{hoffman10online},
 in~our experiment ${\tau_0 = 64}$.
 \mbox{Updates} were performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ threads.
-To~make fair comparison we used only smoothing regularization in BigARTM, which is~equivalent to the LDA model.
+To~make a fair comparison we have configured BigARTM to only use the smoothing regularizers, which is~equivalent to the LDA model.
 LDA priors were fixed as ${\alpha = 0.1}$,\, ${\beta = 0.1}$ for all models.
 
 \paragraph{Combination of regularizers}
 
-\mbox{BigARTM} has a~built-in library of regularizers, which can be used in any combination.
+All regularizers built-in \mbox{BigARTM} library can be used in any combination.
 In~the following experiment we combine regularizers described in~section~\ref{sec:ARTM}:
 sparsing of~$\phi_{t}$, sparsing of~$\theta_{d}$, and pairwise decorrelation of~$\phi_{t}$ distributions.
 This combination improves several quality measures without significant loss of perplexity
 for the offline implementation of ARTM~\cite{voron14aist}.
-The goal of our experiment is to show that this remains true
+The goal of our experiment is to show that the same remains true
 for the online implementation in BigARTM.
 We~use the following built-in performance measures:
 the hold-out perplexity,
-the sparsity of $\Phi$ and $\Theta$ matrices, and
-the characteristics of topic lexical kernels (size, purity, and contrast) averaged across all topics.
+sparsity of $\Phi$ and $\Theta$ matrices, and
+several characteristics (size, purity, and contrast) of the topic's lexical kernels, averaged across all topics.
 %
 Table \ref{tab:model_comparison} compares the results of additive combination of regularizers (ARTM) and the usual LDA model.
 Figure~\ref{fig:comparison_plot} presents performance measures as functions of the number of processed documents.
@@ -1147,25 +1147,23 @@ The interpretability of the user profile $p(t\cond u)$ enables new ways of using
 
 \section{Conclusions}
 \label{sec:Conclusions}
-Additive Regularization of Topic Models (ARTM)
-is a~powerful non-Bayesian framework,
-which facilitates the development, inference, combining, and understanding of topic models.
+We have presented an Additive Regularization of Topic Models (ARTM),
+a~powerful non-Bayesian framework for topic model inference.
+ARTM facilitates the development of topic models and allows merging models together in arbitrary combinations.
 Combining multiple modalities with multiple regularization criteria
 covers dozens of models previously studied only in the Bayesian settings.
-The inference is reduced to 
-the differentiation of each regularizer with respect to the model parameters and 
-then applying of the ready-to-use formula of the regularized \mbox{M-step}.
 
-\mbox{BigARTM} is an open source project 
+\mbox{BigARTM} is an open source project
 for parallel online multimodal regularized topic modeling of large text collections.
-Its~implementation is much faster than existing popular topic modeling tools.
-\mbox{BigARTM} provides a~high flexibility for various applications due to
+Its~implementation is faster than existing popular topic modeling tools.
+\mbox{BigARTM} provides high flexibility for various applications due to
 multimodality and additive combinations of regularizers.
+\mbox{BigARTM} has a built-in library of regularizers and quality measures.
 
 \mbox{BigARTM} architecture has a~rich potential.
-Current components can be reused in a~distributed solution that runs on cluster.
-Further improvement of single-node can be achieved by offloading batch processing into GPU.
-
+In future version it will be extended to run on a~distributed cluster environment,
+improve performance and reduce memory usage for sparse topic models,
+implement APIs for Java and C\#.
 
 \bigskip
 \subsubsection*{Acknowledgements.}
@@ -1197,7 +1195,7 @@ D.~M. Blei and M.~I. Jordan.
 \newblock Modeling annotated data.
 \newblock In {\em Proceedings of the 26th Annual International ACM SIGIR
   Conference on Research and Development in Informaion Retrieval}, pages
-  127--134, New York, NY, USA, 2003. 
+  127--134, New York, NY, USA, 2003.
 
 \bibitem{blei03latent}
 D.~M. Blei, A.~Y. Ng, and M.~I. Jordan.
@@ -1223,13 +1221,13 @@ A.~Daud, J.~Li, L.~Zhou, and F.~Muhammad.
 \bibitem{smet09weblinking}
 W.~De~Smet and M.-F. Moens.
 \newblock Cross-language linking of news stories on the web using interlingual topic modelling.
-\newblock In {\em Proceedings of the 2Nd ACM Workshop on Social Web Search and Mining}, 
+\newblock In {\em Proceedings of the 2Nd ACM Workshop on Social Web Search and Mining},
 SWSM '09, pages 57--64, New York, NY, USA, 2009.
 
 \bibitem{dietz07unsupervised}
 L.~Dietz, S.~Bickel, and T.~Scheffer.
 \newblock Unsupervised prediction of citation influences.
-\newblock In {\em Proceedings of the 24th international conference on Machine learning}, ICML '07, 
+\newblock In {\em Proceedings of the 24th international conference on Machine learning}, ICML '07,
 pages 233--240, New York, NY, USA, 2007.
 
 \bibitem{eisenstein11sparse}
@@ -1247,7 +1245,7 @@ T.~Hofmann.
 \newblock Probabilistic latent semantic indexing.
 \newblock In~{\em Proceedings of the 22nd annual international ACM SIGIR
   conference on Research and development in information retrieval},
-  pages 50--57, 1999. 
+  pages 50--57, 1999.
 
 \bibitem{hu08ials}
 Y.~Hu, Y.~Koren and C.~Volinsky.
@@ -1280,13 +1278,13 @@ Z.~Liu, Y.~Zhang, E.~Y. Chang, and M.~Sun.
 D.~Mimno, M.~Hoffman, and D.~Blei.
 \newblock Sparse stochastic inference for latent Dirichlet allocation.
 \newblock In J.~Langford and J.~Pineau, editors, {\em Proceedings of the 29th
-  International Conference on Machine Learning (ICML-12)}, pages 1599--1606, 2012. 
+  International Conference on Machine Learning (ICML-12)}, pages 1599--1606, 2012.
 
 \bibitem{mimno09polylingual}
 D.~Mimno, H.~M. Wallach, J.~Naradowsky, D.~A. Smith, and A.~McCallum.
 \newblock Polylingual topic models.
 \newblock In {\em Proceedings of the 2009 Conference on Empirical Methods in
-  Natural Language Processing: Volume~2}, EMNLP '09, pages 880--889, 2009. 
+  Natural Language Processing: Volume~2}, EMNLP '09, pages 880--889, 2009.
 
 \bibitem{newman09distributed}
 D.~Newman, A.~Asuncion, P.~Smyth, and M.~Welling.
@@ -1298,19 +1296,19 @@ D.~Newman, C.~Chemudugunta, and P.~Smyth.
 \newblock Statistical entity-topic models.
 \newblock In {\em Proceedings of the 12th ACM SIGKDD International Conference
   on Knowledge Discovery and Data Mining}, KDD '06, pages 680--686, New York,
-  NY, USA, 2006. 
+  NY, USA, 2006.
 
 \bibitem{ni09mining}
 X.~Ni, J.-T. Sun, J.~Hu, and Z.~Chen.
 \newblock Mining multilingual topics from wikipedia.
-\newblock In {\em Proceedings of the 18th International Conference on World Wide Web}, WWW '09, 
-pages 1155--1156, 2009. 
+\newblock In {\em Proceedings of the 18th International Conference on World Wide Web}, WWW '09,
+pages 1155--1156, 2009.
 
 \bibitem{platt10translingual}
 J.~C.~Platt, K.~Toutanova, W.-T.~Yih.
 \newblock Translingual document representations from discriminative projections.
-\newblock In {\em Proceedings of the 2010 Conference on Empirical Methods in Natural Language Processing},  
-pages 251--261, Stroudsburg, PA, USA, 2010. 
+\newblock In {\em Proceedings of the 2010 Conference on Empirical Methods in Natural Language Processing},
+pages 251--261, Stroudsburg, PA, USA, 2010.
 
 \bibitem{rehurek10software}
 R.~\v{R}eh\r{u}\v{r}ek and P.~Sojka.
@@ -1347,8 +1345,8 @@ Y.~W. Teh, M.~I. Jordan, M.~J. Beal, D.~M. Blei.
 \newblock {\em Journal of the American Statistical Association}, {101}(476):1566--1581, 2006.
 
 \bibitem{tihonov77methods-eng}
-A.~N.~Tikhonov, V.~Y. Arsenin. 
-\newblock Solution of ill-posed problems. 
+A.~N.~Tikhonov, V.~Y. Arsenin.
+\newblock Solution of ill-posed problems.
 \newblock W.~H. Winston, Washington, DC. 1977.
 
 \bibitem{voron14dan-eng}
@@ -1394,25 +1392,25 @@ Y.~Wang, H.~Bai, M.~Stanton, W.-Y. Chen, and E.~Y. Chang.
 
 Consider the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}.
 
-Topic~$t$ is called \emph{regular} for modality~$m$
+A topic~$t$ is called \emph{regular} for a modality~$m$
 if $n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}} > 0$
 for at least one term ${w\in W^m}$.
 If~the~reverse inequality holds for all ${w\in W^m}$ then
-topic~$t$ is called \emph{irregular};
-in this case the $t$-th vector-column in matrix~$\Phi^m$ equals zero
+the topic~$t$ is called \emph{irregular};
+in this case the $t$-th vector-column in the matrix~$\Phi^m$ equals zero
 and can not represent a~discrete distribution.
-This means that topic~$t$ for the modality~$m$ must be excluded from the model.
-This mechanism can be used to eliminate irrelevant topics and determine the number of topics.
+This means that the topic~$t$ for the modality~$m$ must be excluded from the model.
+This mechanism can be used determine the optimal number of topics.
 
-Document~$d$ is called \emph{regular}
+A document~$d$ is called \emph{regular}
 if $n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}} > 0$
 for at least one topic ${t\in T}$.
 If~the reverse inequality holds for all ${t\in T}$ then
-document~$d$ is called \emph{irregular};
-in this case the $d$-th vector-column in matrix~$\Theta$ equals zero
+the document~$d$ is called \emph{irregular};
+in this case the $d$-th vector-column in the matrix~$\Theta$ equals zero
 and can not represent a~discrete distribution.
-This means that document~$d$ must be excluded from the model.
-For example, a~document may be too short or irrelevant to the given collection.
+This means that the document~$d$ must be excluded from the model.
+For example, it may be too short or irrelevant for the collection.
 
 \begin{theorem}
 \label{th:multimodal}
@@ -1523,7 +1521,7 @@ For example, a~document may be too short or irrelevant to the given collection.
     Finally,
     we obtain~\eqref{eq:Mstep:phi} and~\eqref{eq:Mstep:theta}
     by expressing $\phi_{wt}$ from~\eqref{eq:in-theorem-1:phi} and \eqref{eq:in-theorem-2:phi},
-    then 
+    then
     by expressing $\theta_{td}$ from~\eqref{eq:in-theorem-1:theta} and \eqref{eq:in-theorem-2:theta}.
     \qed
 \end{proof}
