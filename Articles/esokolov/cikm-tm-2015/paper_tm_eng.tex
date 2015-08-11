@@ -46,17 +46,15 @@ Lev Bogolubsky\\
 
 
 \begin{abstract}
-    We propose a method for regression over texts
-    that transforms sparse texts to dense features
+    We propose a new method for regression over text collections
+    that transforms the sparse texts to dense features
     using regularized topic models.
     We also discuss the problem of topic model
-    initialization, propose a Naive Bayes-based
-    approach and compare it to many other approaches.
-    Our topic model achieves quality
-    comparable to vector space models using only 10 topics.
-    It also outperforms other topic model-based
-    feature generation methods such as PLSA
-    and Supervised~LDA.
+    initialization, and propose a new approach based on Naive Bayes.
+    This approach is compared to many others,
+    and it achieves a quality comparable to vector space models using as little as ten topics.
+    It also outperforms other methods for feature generation based on topic modeling,
+    such as PLSA and Supervised~LDA.
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -69,49 +67,52 @@ Lev Bogolubsky\\
 \section{Introduction}
 
 Topic modeling is one of the actively developing branches of statistical text analysis.
-A probabilistic topic model detects the subject-matter of a collection of text documents by describing each topic by a discrete distribution over the set of terms, and each document~--- by a discrete distribution over the topic set. Topic modeling has become widely used in a series of applied problems, including newsfeed analysis~\cite{newman06newsfeed}, scientific publication analysis~\cite{griffiths04scientific}, blog analysis~\cite{paul09blogs}.
+A probabilistic topic model detects the subject matter of a textual collection by describing each topic with a discrete distribution over the set of terms, and each document~--- with a discrete distribution over the topic set. Topic modeling has become widely used in a series of applied problems, including newsfeed analysis~\cite{newman06newsfeed}, scientific publication analysis~\cite{griffiths04scientific}, blog analysis~\cite{paul09blogs}.
 
 %par
 
-Despite the great number of papers on methods for topic model
+There exist a great number of papers on methods for topic model
 inference~\cite{blei03lda, porteous08collapsed, mimno12stochastic}
-and on the applications of topic models to the classification,
-insufficient attention was paid to the applications of topic models to the regression problems.
-In most papers devoted to those subjects~\cite{blei07supervised, zhu09medlda, rabinovich14irtm, mimno08arbitrary},
-various modifications of the Latent Dirichlet Analysis~(LDA) model are studied.
-All these models are proposed to be learned by means of Bayesian inference,
-and as a model becomes more complicated, both the inference
-and the formulas complexity grow.
+and on applications of topic modeling to the classification,
+while regression problems receive far less attention.
+Most papers devoted to regression via topic modeling~\cite{blei07supervised, zhu09medlda, rabinovich14irtm, mimno08arbitrary}
+study various modifications of the Latent Dirichlet Analysis~(LDA) model.
+All these models use Bayesian inference,
+and as the model becomes more complicated both the inference
+and the formulas grow in complexity.
 In addition, the complication of the model does not necessarily
-lead to the significant improvement~\cite{zhu09medlda}.
+lead to a significant improvement~\cite{zhu09medlda}.
 
 %par
 
-In this work, another approach to solving of the regression problems with topic models is suggested~---
-namely, the usage of the target vector in the context of
-the Addititve Regularization of Topic Models~(ARTM) methodology.
-Specifically, we introduce a regularizer which demands that
-the target variable is well predicted with a linear formula over
-the probabilities of document belonging to the topics.
-The model suggested can be inferred iteration by iteration
-with the EM-algorithm, which can be easily scaled~\cite{vorontsov14artm}.
+In this work we introduce another approach to solving regression problems via topic modeling.
+The key idea is to use the target vector in the context of
+a novel methodology, Addititve Regularization for Topic Modeling~(ARTM) \cite{vorontsov14artm}.
+We introduce a regularizer to ensure that
+the target variable can be well represented by a linear combination of
+the document topic probabilities.
+The suggested model can be inferred iteration by iteration
+with the EM-algorithm, which can be easily scaled.
 
 %par
 
-The criterion being optimized during the inference of any topic model is a complex and non-convex
-function which has many local extrema. Therefore the result of an optimization is strongly dependent on the initialization method. In this paper we introduce and compare various ways of the topic model initialization.
-We show that the proper choice of the initialization method can lead to a quality gain close to double. Moreover, the simultaneous usage of a proper initialization method and a proper regularization method leads to the significant reduction of the number of iterations needed for the EM-algorithm convergence.
+The inference of most topic models involves difficult optimization of a complex criterion,
+which typically is non-convex and has many local extrema.
+Therefore the result of the optimization is highly dependent on the initialization method.
+In this paper we introduce and compare various methods of topic model initialization.
+We demonstrate that the proper choice of the initialization method may almost double the quality gain.
+Moreover, selecting an appropriate initialization and regularization methods
+typically lead to a significant reduction in the number of iterations needed for the EM-algorithm to converge.
 One can say that the regression topic model adjustment consists of two stages~--- at first,
 we take appropriate features, which are suitable for the problem solving, as an initialization
 for the training set. Then, by means of a topic model we construct a regular way of extraction of those
 features from the text data.
 
 \section{Related Work}
-Most papers devoted to solving regression problems by the means of topic modeling
-propose models based on LDA.
-They allow to use the real-valued target vector while constructing the model.
-For instance, there is a basic method for solving the regression problems
-with topic models, a modification of the LDA model called Supervised LDA~\cite{blei07supervised}.
+Most papers devoted to solving regression problems via topic modeling suggest LDA-based models.
+Those models allow to use the real-valued target vector while constructing the model.
+For instance, the Supervised LDA~\cite{blei07supervised} is a basic modification of LDA
+which allows to solve the regression problems with topic models.
 This method modifies the generative model for texts with an assumption
 that the target variable is generated as a linear combination
 of document topic probabilities with addition of some gaussian noise.
@@ -121,20 +122,19 @@ In our method, we incorporate such regularizer to a simpler PLSA model~\cite{hof
 and show that it achieves similar results, but can be optimized
 by a simpler and faster procedure.
 
-In the paper~\cite{zhu09medlda}, an improvement of Supervised LDA is proposed~--- the MedLDA method,
-introducing a margin maximization requirement.
-In the paper~\cite{mimno08arbitrary}, a method allowing usage of some additional
-real-valued information while constructing the topic model is proposed.
+The MedLDA method from~\cite{zhu09medlda} improves Supervised LDA method by introducing a margin maximization requirement.
+The paper~\cite{mimno08arbitrary} introduces a new method that allows usage of some additional
+real-valued information while constructing the topic model.
 However, its applications for the regression problems are not discussed.
-Finally, the Inverse Regression Topic Model~\cite{rabinovich14irtm} was introduced recently.
-In this model, the distribution of words in a topic depends on the document and changes
+The paper \cite{rabinovich14irtm} introduces Inverse Regression Topic Model,
+and suggests that the distribution of words in a topic depends on the document and changes
 proportionally to the value of the target variable.
 
-A number of initialization methods for EM-algorithm were proposed~\cite{meila98init, blomer13init}.
-However, they are all designed for the unsupervised case and are usually compared
-based on unsupervised metrics and clustering quality.
-In this paper we propose initializations that directly use supervised information
-and compare them based on resulting regression quality.
+A number of initialization methods for EM-algorithm were proposed in~\cite{meila98init, blomer13init}.
+However, all these methods are designed for an unsupervised case.
+Thy are usually compared based on unsupervised metrics and on clustering quality.
+In this paper we propose initializations that directly use supervised information,
+and we compare them based on the quality of the resulting regression.
 
 
 \section{Method}
@@ -659,14 +659,19 @@ but it definitely has some challenges and will be the subject of our further wor
 
 \section{Conclusion}
 
-A method for the topic models application to the regression problems was introduced. This method consists of two parts. At first, we initialize the topic model based on the naive Bayes classifier. The optimization method is able to find a decent local minimum thanks to this classifier. Then, we use the  MSE-regularizer during the model adjustment. It requires that the target variable is expressed as a linear function of probabilities of topics in the document.
+We have presented a new method for solving the regression problems via topic modeling.
+The method consists of two parts.
+At first, we initialize a topic model based on the naive Bayes classifier, which finds a reasonably good local minimum.
+Then, we use the MSE-regularizer throughout the adjustment of the model.
+This regularizer requires that the target variable is represented as a linear combination of document topic probabilities.
 
 %par
 
-The real data experiments have shown that the initialization and the regularization
-both allow sufficient quality gain. Topic probabilities in the documents themselves are good features, they allow
-us to essentially reduce the feature space dimensionality with low quality loss.
-The usage of those probabilities in combination with TF-IDF features allows us to obtain
+The results of our experiments on the real data demonstrate that the proper choice of initialization and regularization
+together produce a considerable quality gain.
+We find that document topic probabilities are powerful features, as they allow
+us to substantially reduce the dimensionality of the feature space with very little quality loss.
+Using those probabilities in combination with TF-IDF features allowed us to obtain
 the best quality among all of the methods used in the comparison.
 
 \bigskip
