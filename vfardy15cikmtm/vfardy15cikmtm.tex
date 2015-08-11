@@ -1,11 +1,11 @@
-\documentclass{acm_proc_article-sp}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\documentclass{sig-alternate-2013}
+%\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{epstopdf}
 %\usepackage[labelsep=period]{caption}
 \usepackage{amssymb,amsmath,mathrsfs}
-\usepackage[russian,english]{babel}
+%\usepackage[russian,english]{babel}
 \usepackage{array}
 %\usepackage{multicol}
 \usepackage[ruled,vlined,linesnumbered,algo2e]{algorithm2e}
@@ -47,13 +47,26 @@
 %     every non boxed y axis/.append style={y axis line style=-}}
 %\pgfplotsset{compat = 1.3}
 
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
+
+\permission{
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from Permissions@acm.org.}
+\conferenceinfo{TM'15,}{October 19, 2015, Melbourne, Australia. \\
+{\mycrnotice{Copyright is held by the owner/author(s). Publication rights licensed to ACM.}}}
+\copyrightetc{ACM \the\acmcopyr}
+\crdata{978-1-4503-3784-7/15/10\ ...\$15.00.\\
+DOI: http://dx.doi.org/10.1145/2809936.2809943}
+
 \begin{document}
-\conferenceinfo{CIKM}{CIKM 2015 Workshop on Topic Models: Post-Processing and Applications}
+
 %\CopyrightYear{2015}
 \title{
     Non-Bayesian Additive Regularization for Multimodal~Topic~Modeling of Large Collections
 }
-\numberofauthors{5}
+\numberofauthors{6}
 \author{
     \alignauthor
         Konstantin Vorontsov\\
@@ -64,24 +77,24 @@
         \affaddr{Schlumberger\\ Information Solutions}
         \email{\footnotesize\sf oleksandr.frei@gmail.com}
     \alignauthor
-        Anastasia Yanina\\
-        \affaddr{Moscow Institute of~Physics and Technology}\\
-        \email{\footnotesize\sf yanina.anastasia.mipt@gmail.com}
-    \and
-    \alignauthor
         Murat Apishev\\
         \affaddr{Moscow State University}\\
         \email{\footnotesize\sf great-mel@yandex.ru}
+    \and
     \alignauthor
         Peter Romov\\
         \affaddr{Yandex}\\
-        \email{\footnotesize\sf peter@romov.ru}
+        \email{\footnotesize\sf romovpa@yandex-team.ru}
     \alignauthor
         Marina Suvorova\\
         \affaddr{Moscow State University}\\
         \email{\footnotesize\sf m.dudarenko@gmail.com}
+    \alignauthor
+        Anastasia Yanina\\
+        \affaddr{Moscow Institute of~Physics and Technology}\\
+        \email{\footnotesize\sf yanina.anastasia.mipt@gmail.com}
 }
-\date{20 February 2015}
+%\date{20 February 2015}
 \maketitle
 
 \begin{abstract}
@@ -100,18 +113,24 @@ to~combine modalities, languages and multiple criteria
 to~find sparse, diverse, and interpretable topics.
 \end{abstract}
 
+\category{H.3.3}{Information Search and Retrieval}{Clustering}
+\category{I.2.7}{Natural Language Processing}{Language \mbox{models}}
+\category{G.1.6}{Optimization}{Constrained optimization}
+%\category{G.1.3}{Numerical Linear Algebra}{Sparse, structured, and very large systems (direct and iterative methods)}
+
+\terms{Theory, Algorithms, Experimentation}
+
 \keywords{%
     Probabilistic Topic Modeling,
     Probabilistic Latent Sematic Analysis,
     Latent Dirichlet Allocation,
-    Additive Regularization of Topic Models,
-    Stochastic Matrix Factorization,
+    Additive Regularization for Topic Modeling,
+%    Stochastic Matrix Factorization,
     EM-algorithm,
     BigARTM.
 }
 
 \section{Introduction}
-
 Topic modeling is a~rapidly developing branch of statistical text analysis~\cite{blei12ptm}.
 Topic model reveals a~hidden thematic structure of a~text collection
 and finds a~compressed representation of each document in terms of its topics.
@@ -144,15 +163,15 @@ Bayesian learning is a very powerful and general theoretical framework,
 and topic modeling is just one of its applications.
 Bayesian inference is elegant when used with conjugate priors.
 However, from the linguistic point of view the Dirichlet conjugate prior
-is not necessary the~best choice
+is not necessary the best choice
 as it conflicts with natural assumptions of~sparsity.
 Better motivated non-conjugate priors
 require a~laborious mathematical work and
 lead to intricate learning algorithms.
-The development of combined and multi-objective topic models also remains a~challenging task in the Bayesian approach.
+The~development of combined and multi-objective topic models also remains a~challenging task in the Bayesian approach.
 An~evolutionary approach to multi-objective Bayesian topic modeling has been proposed in~\cite{khalifa13multi},
 but it seems to be computationally infeasible for large text collections.
-Until now, there was no freely available software to combine topic models.
+Until now, there was no freely available software to combine topic \mbox{models}.
 
 From an optimization perspective,
 topic modeling can be considered as a~special case
@@ -200,7 +219,7 @@ consist of heterogeneous linked data.
 Typically, texts are accompanied by images, audio or video clips, usage data,
 metadata containing authors, links, date-time stamps, etc.
 In~these cases documents are considered as multimodal containers,
-where words form the elements of a single modality.
+words being the elements of one of the modalities.
 All modalities are useful for determining more relevant topics,
 and, vice-versa,
 topics are useful for crossmodal retrieval,
@@ -221,8 +240,8 @@ We~show that the online algorithm is not necessarily associated with
 a~particular type of model, nor
 a~particular type of inference,
 but only with a~certain reorganization of steps in the EM-like iterative process.
-Our online algorithm remains the same
-for any combination of regularizers and any number of modalities.
+Our online algorithm remains the same for PLSA and LDA models,
+as well as for any combination of regularizers and any number of modalities.
 
 The rest of the paper is organized as follows.
 %
@@ -338,32 +357,33 @@ ${p_{tdw} = p(t\cond d,w)}$~\cite{voron14aist}:
 \begin{align}
     \label{eq:ARTM:Estep}
     p_{tdw} &= \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr);
-\\
-    \label{eq:ARTM:Mstep:phi}
-    n_{wt} &= \sum_{d\in D} n_{dw} p_{tdw};\quad
-    \phi_{wt} = \norm_{w\in W}
+\\\notag    
+    n_{wt} &= \sum_{d\in D} n_{dw} p_{tdw};
+\\\label{eq:ARTM:Mstep:phi}
+    \phi_{wt} &= \norm_{w\in W}
         \biggl(
             n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
         \biggr);
-\\
-    \label{eq:ARTM:Mstep:theta}
-    n_{td} &= \sum_{w\in d} n_{dw} p_{tdw};\quad
-    \theta_{td} = \norm_{t\in T}
+\\\notag
+    n_{td} &= \sum_{w\in d} n_{dw} p_{tdw};
+\\\label{eq:ARTM:Mstep:theta}
+    \theta_{td} &= \norm_{t\in T}
         \biggl(
             n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         \biggr);
 \end{align}
 where the ``norm'' operator transforms
 a~real vector $(x_t)_{t\in T}$ to
-a~vector $(\tilde x_t)_{t\in T}$ with a discrete distribution:
+a~vector $(\tilde x_t)_{t\in T}$ representing a discrete distribution:
 \[
     \tilde x_t = \norm_{t\in T} x_t = \frac{\max\{x_t,0\}}{\sum\limits_{s\in T} \max\{x_s,0\}}.
 \]
+
 The system \eqref{eq:ARTM:Estep}--\eqref{eq:ARTM:Mstep:theta}
-can be~solved by various numerical methods,
-for example by the simple-iteration method,
-or, equivalently, by the EM-algorithm.
-%Both methods are commonly used in~practice.
+can be~solved by various numerical methods.
+In~particular, the simple-iteration method is a~popular choice due to its simplicity.
+It~has been proven in~\cite{voron14mlj} that
+it is equivalent to the EM-algorithm for PLSA and LDA topic models.
 
 Many Bayesian topic models can be considered
 as special cases of ARTM with different regularizers~\cite{voron14aist,voron14mlj}.
@@ -377,17 +397,17 @@ for fixed distributions $\beta$, $\alpha$.
 Choosing uniform distributions for $\beta$ and $\alpha$
 corresponds to symmetric Dirichlet priors in Bayesian approach.
 
-Additivity of ARTM models let users build topic models for various applications
+Additive regularization let users build topic models for various applications
 simply by choosing a~suitable combination of~predefined regularizers
 from an extendable \mbox{library}.
-%
+
 For~example,
 in \cite{voron14mlj} as many as five regularizers are combined together to improve interpretability of the model.
 The key idea is to split the set of topics $T$ into two subsets: ${T = S \sqcup B}$,
 and to configure regularizers in such a way that
 domain-specific terms go into the set $S$,
 while commonly used words land in the set $B$.
-Sparsity of \emph{domain topics} $t \in S$ is promoted by a regularizer that maximize the KL-divergences
+Sparsity of \emph{domain topics} $t \in S$ is promoted by two regularizers that maximize the KL-divergences
 $KL(\alpha\|\theta_d)$ and
 $KL(\beta\|\phi_t)$.
 Smoothness of \emph{background topics} $t \in B$ is promoted by minimizing KL-divergences
@@ -419,7 +439,8 @@ $KL\bigl( \frac1{|T|}\|p(t) \bigr)$,
 leading to a topic selection.
 Starting from an excessively high number of topics
 the regularizer eliminates insignificant, duplicated, and linearly dependent topics~\cite{voron15slds}.
-Compared to Hierarchical Dirichlet Process~\cite{teh06hierarchical}, the new regularizer results in a better topic selection algorithm:
+Compared to Hierarchical Dirichlet Process~\cite{teh06hierarchical},
+the new regularizer results in a better topic selection algorithm:
 it gives a~more stable number of~topics, takes less time to execute,
 and has an ability to combine it with other topic models via additive regularization.
 
@@ -436,11 +457,6 @@ on each iteration.
 
 \section{Multimodal ARTM}
 \label{sec:Multimodal}
-
-%Matching Words and Pictures, MoM-LDA \cite{barnard03matching}
-%\cite{virtanen12factorized}
-%\cite{roller13multimodal}
-
 Now assume that
 a~document can contain not only words, but also terms of other modalities.
 Each modality is defined by a finite set (vocabulary) of terms $W^m$, ${m=1,\dots,M}$.
@@ -534,7 +550,8 @@ where $m(w)$~is the modality of the term~$w$,\; $w\in W^{m(w)}$.
 
 The system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}
 follows from Karush--Kuhn--Tucker conditions (see Appendix~A for the proof).
-For single modality (${M=1}$) it gives the regularized EM algorithm
+
+For single modality (${M=1}$) it gives the regularized EM-algorithm
 described in the previous section.
 %%%proposed in~\cite{voron14dan-eng}.
 
@@ -565,6 +582,9 @@ have $L$~modalities for $L$~different languages;
 parallel documents always share one identical topic distribution.
 The BiLingual LDA, BiLDA~\cite{smet09weblinking}
 is also a~multilanguage topic model, but the number of modalities is restricted to two.
+%Matching Words and Pictures, MoM-LDA \cite{barnard03matching}
+%\cite{virtanen12factorized}
+%\cite{roller13multimodal}
 
 
 \section{Online parallel EM-algorithm}
@@ -624,7 +644,7 @@ In our work we develop an efficient single-node architecture where all workers b
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[t]
-\caption{Online EM-algorithm for multimodal ARTM}
+\caption{Online EM for multimodal ARTM} %\mbox{regularized} topic modeling
 \label{alg:Online}
 \BlankLine
 \KwIn{collection $D_b$, discounting factor $\rho\in(0,1]$;}
@@ -671,7 +691,7 @@ $\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
 
 \begin{figure}[t]
 \begin{centering}
-\includegraphics[height=36mm]{diagramm_artm_core.eps}
+\includegraphics[height=38mm]{diagramm_artm_core.eps}
 \caption{Diagram of parallelization components}
 \label{fig:diagramm_artm_core}
 \end{centering}
@@ -703,7 +723,7 @@ Such operations are very efficient, but still come at a considerable synchroniza
 \footnote{\url{http://stackoverflow.com/questions/2538070/atomic-operation-cost}}
 and using them for all reads and writes of the $\Phi$ matrix would cause a significant performance degradation for merger and processor threads.
 Besides, an arbitrary overlap between reads and writes of the $\Phi$ matrix eliminates any possibility of producing a deterministic result.
-The design with two copies of the $\Phi$ matrix gives much more control over this
+The design with two copies of the~$\Phi$~matrix gives much more control over this
 and in certain cases allows the algorithm to behave in a fully deterministic way.
 
 The design with two $\Phi$ matrices only supports a~single merger thread,
@@ -862,7 +882,7 @@ and there is a single aggregation thread that asynchronously merges the results.
 Table\;\ref{tab:libraries_comparison} compares the performance of
 VW.LDA, Gensim LdaModel and LdaMulticore (\mbox{v0.10.3} under Python~\mbox{2.7}), and BigARTM,
 using Amazon EC2 c3.8xlarge instance (Intel-based CPU with 16~physical cores and hyper-threading).
-%
+
 Each run performs one pass over the Wikipedia corpus and produces a~model with $|T|=100$ topics.
 The collection was split into batches with $10$K documents each
 (\texttt{chunksize} in Gensim, \texttt{minibatch} in VW.LDA).
@@ -872,7 +892,8 @@ where $b$ is the number of batches processed so far,
 and $\tau_0$ is a~constant offset parameter introduced in~\cite{hoffman10online},
 in~our experiment ${\tau_0 = 64}$.
 \mbox{Updates} were performed after each batch in non-parallel runs, and after $P$ batches when running in $P$ threads.
-To~make a fair comparison we have configured BigARTM to only use the smoothing regularizers, which is~equivalent to the LDA model.
+To~make a fair comparison we have configured BigARTM to only use the smoothing regularizers,
+which is~equivalent to the LDA model.
 LDA priors were fixed as ${\alpha = 0.1}$,\, ${\beta = 0.1}$ for all models.
 
 \paragraph{Combination of regularizers}
@@ -883,13 +904,16 @@ sparsing of~$\phi_{t}$, sparsing of~$\theta_{d}$, and pairwise decorrelation of~
 This combination improves several quality measures without significant loss of perplexity
 for the offline implementation of ARTM~\cite{voron14aist}.
 The goal of our experiment is to show that the same remains true
-for the online implementation in BigARTM.
+for the online implementation in \mbox{BigARTM}.
+
 We~use the following built-in performance measures:
 the hold-out perplexity,
 the sparsity of $\Phi$ and $\Theta$ matrices, and
-several characteristics (size, purity, and contrast) of the topic's lexical kernels, averaged across all topics.
-%
+several characteristics (size, purity, and contrast)
+of the topic's lexical kernels, averaged across all topics.
+
 Table \ref{tab:model_comparison} compares the results of additive combination of regularizers (ARTM) and the usual LDA model.
+
 Figure~\ref{fig:comparison_plot} presents performance measures as functions of the number of processed documents.
 The first chart shows perplexity and sparsity of $\Phi$, $\Theta$ matrices, and
 the second chart shows average lexical kernel measures.
@@ -908,7 +932,6 @@ the second chart shows average lexical kernel measures.
         LDA    & 3436 & 3801 & 0.0  & 0.0  & 873  & 0.533 & 0.507 \\
         ARTM   & 3577 & 3947 & 96.3 & 80.9 & 1079 & 0.785 & 0.731 \\
     \hline
-
     \end{tabular}
 \end{table}
 
@@ -924,6 +947,7 @@ the second chart shows average lexical kernel measures.
 
 Support vector machine (SVM) based on token frequencies is known to be one of the best methods for text classification.
 However, according to \cite{rubin12statistical} topic models demonstrate even better quality in case of unbalanced interdependent and intersecting classes.
+
 Our experiment aims to prove that multimodal regularized topic models in BigARTM are as good as Dependency~LDA from~\cite{rubin12statistical}.
 Dependency~LDA is in fact a~multimodal topic model with two modalities: words and class labels.
 
@@ -966,6 +990,7 @@ while the optimal number of topics for Dependency LDA~is~200.
 \end{table}
 
 \paragraph{Cross-language search}
+\nopagebreak
 The following experiment shows that multimodal topic model may be used as multilingual one,
 with languages of parallel texts treated as modalities.
 The experiment was held on the \mbox{EuroParl} collection~\cite{koehn05parallel} of European Parliament Proceedings.
@@ -987,6 +1012,7 @@ the test comprised documents of the length more or equal than 100~words.
 The total number of documents is~67379 in the training set, and 16068 in the test set.
 Built-in capability of BigARTM to filter the dictionary was used:
 all rare words, that appear in less than 20~documents, and stop-words, that appear in more than~50\% of documents, were discarded.
+
 Table~\ref{tab:cross-lingual} shows the comparison of
 models from \cite{mimno09polylingual,platt10translingual,mimno12sparse} and our ARTM.
 For the first two models, the authors provide search precision for 50 topics only.
@@ -1146,10 +1172,14 @@ The interpretability of the user profile $p(t\cond u)$ enables new ways of using
 \section{Conclusions}
 \label{sec:Conclusions}
 We have presented an Additive Regularization of Topic Models (ARTM),
-a~powerful non-Bayesian framework for topic model inference.
-ARTM facilitates the development of topic models and allows merging models together in arbitrary combinations.
+a~powerful non-Bayesian framework for topic modeling.
+ARTM facilitates the development of topic models
+and allows merging models together in arbitrary combinations.
 Combining multiple modalities with multiple regularization criteria
-covers dozens of models previously studied only in the Bayesian settings.
+covers dozens of models previously studied in the Bayesian settings.
+%The inference is reduced to
+%the differentiation of each regularizer with respect to the model parameters and
+%then applying of the ready-to-use formula of the regularized \mbox{M-step}.
 
 \mbox{BigARTM} is an open source project
 for parallel online multimodal regularized topic modeling of large text collections.
@@ -1166,8 +1196,9 @@ implement APIs for Java and C\#.
 \bigskip
 \subsubsection*{Acknowledgements.}
 \nopagebreak
-The work was supported by~the Russian Foundation for Basic Research (14-07-00847, 14-07-00908, 14-07-31176)
-and by~Skolkovo Institute of Science and Technology (081-R).
+The work was supported by~the Russian Foundation for Basic Research (14-07-00847, 14-07-00908, 14-07-31176),
+by~Skolkovo Institute of Science and Technology (081-R), and
+Russian Science Foundation (15-18-00091).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1386,7 +1417,7 @@ Y.~Wang, H.~Bai, M.~Stanton, W.-Y. Chen, and E.~Y. Chang.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\newpage
-\section*{Appendix}
+\section*{Appendix A}
 
 Consider the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta}.
 
@@ -1398,7 +1429,7 @@ the topic~$t$ is called \emph{irregular};
 in this case the $t$-th vector-column in the matrix~$\Phi^m$ equals zero
 and can not represent a~discrete distribution.
 This means that the topic~$t$ for the modality~$m$ must be excluded from the model.
-This mechanism can be used determine the optimal number of topics.
+This mechanism can be used determine the number of topics.
 
 A document~$d$ is called \emph{regular}
 if $n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}} > 0$
@@ -1415,39 +1446,43 @@ For example, it may be too short or irrelevant for the collection.
     If the function $R(\Phi,\Theta)$ is continuously differentiable
     and $(\Phi,\Theta)$ is the local maximum
     of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
-    then for any regular topic~$t$ and any regular document~$d$
+    then for any regular topic~$t$ %for a~modality~$m$ 
+    and any regular document~$d$
     the system of equations \eqref{eq:Estep}--\eqref{eq:Mstep:theta} holds.
 \end{theorem}
+\balancecolumns
 
 \begin{proof}
     For the local minimum $\Phi^m,\Theta$
     of the problem~\eqref{eq:multimodal},~\eqref{eq:multimodal:norm}
     the Karush--Kuhn--Tucker (KKT) conditions can be written as follows:
     %(conditions with respect to $\theta_{td}$ are analogous):
-    \begin{gather*}
+    \begin{gather}
+    \label{eq:KKT-phi}
         \sum_{d} n_{dw} \frac{\theta_{td}}{p(w\cond d)} + \frac{\partial R}{\partial \phi_{wt}}
         = \lambda_t - \lambda_{wt};
-    \\
+    \\\notag
         \lambda_{wt}\geq 0;
         \quad
         \lambda_{wt}\phi_{wt} = 0;
     \\
+    \label{eq:KKT-theta}
         \sum_{m} \tau_m \!\!\sum_{w\in W^m}\!\! n_{dw} \frac{\phi_{wt}}{p(w\cond d)} + \frac{\partial R}{\partial \theta_{td}}
         = \mu_d - \mu_{td};
-    \\
+    \\\notag
         \mu_{td}\geq 0;
         \quad
         \mu_{td}\theta_{td} = 0;
-    \end{gather*}
-    where $\lambda_t$, $\lambda_{wt}$, $\mu_d$, $\mu_{td}$
-    are KKT multipliers for normalization and nonnegativity constraints.
+    \end{gather}
+    where $\lambda_t$ and $\mu_d$ are KKT multipliers for normalization constraints,
+    $\lambda_{wt}$ and $\mu_{td}$ are KKT multipliers for nonnegativity constraints.
 
     Let us multiply
-    both sides of the first equation by~$\phi_{wt}$,
-    both sides of the second equation by~$\theta_{td}$,
+    both sides of equation~\eqref{eq:KKT-phi} by~$\phi_{wt}$,
+    both sides of equation~\eqref{eq:KKT-theta} by~$\theta_{td}$,
     and reveal the auxiliary variable~$p_{tdw}$ from~\eqref{eq:Estep}
     in~the~left-hand side of both equations.
-    Then we sum
+    Then let us sum
     the right-hand side of the first equation over~$d$,
     the right-hand side of the second equation over~$t$:
     \begin{gather*}
@@ -1495,9 +1530,9 @@ For example, it may be too short or irrelevant for the collection.
     \end{equation}
 
     Let us sum
-    both sides of~the first equation over all~${w\in W^m}$,
+    both sides of~the first equation over ${w\in W^m}$,
     then
-    both sides of~the second equation over all~${t\in T}$:
+    both sides of~the second equation over ${t\in T}$:
     \begin{gather}
     \label{eq:in-theorem-2:phi}
         \lambda_t
