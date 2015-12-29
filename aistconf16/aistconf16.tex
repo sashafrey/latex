@@ -1,0 +1,151 @@
+\documentclass[russian,english]{llncs}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[final]{graphicx}
+\usepackage{epstopdf}
+\usepackage[labelsep=period]{caption}
+\usepackage[hyphens]{url}
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage[russian,english]{babel}
+%\usepackage{multicol}
+\usepackage[ruled,vlined,linesnumbered,algo2e]{algorithm2e}
+%\usepackage{algorithm}
+%\usepackage[noend]{algorithmic}
+\usepackage{color}
+\usepackage{cmap}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{pgfplots}
+%\usepackage{verbatim}
+\usepackage{standalone}
+
+\tolerance=1000
+\hbadness=5000
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\tsum}{\mathop{\textstyle\sum}\limits}
+\newcommand{\tprod}{\mathop{\textstyle\prod}\limits}
+\newcommand{\cov}{\mathop{\rm cov}\limits}
+\newcommand{\Dir}{\mathop{\rm Dir}\nolimits}
+\newcommand{\norm}{\mathop{\rm norm}\limits}
+\newcommand{\KL}{\mathop{\rm KL}\nolimits}
+%\renewcommand{\geq}{\geqslant}
+%\renewcommand{\leq}{\leqslant}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\cond}{\mspace{3mu}{|}\mspace{3mu}}
+\newcommand{\Loss}{\mathscr{L}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\cL}{\mathscr{L}}
+\newcommand{\cP}{\mathscr{P}}
+\newcommand{\kw}[1]{\textsf{#1}}
+\SetKwFor{ForAll}{\textbf{for all}}{}{}
+
+%... and these rows too.
+\pgfplotsset{ every non boxed x axis/.append style={x axis line style=-},
+     every non boxed y axis/.append style={y axis line style=-}}
+\pgfplotsset{compat = 1.3}
+
+\begin{document}
+%%Analysis of Images, Social Networks, and Texts
+\title{
+    Panda: Parallel Non-blocking Deterministic Algorithm for Online Topic Modelling
+}
+\author{
+    Oleksandr Frei\inst{1}
+    \and
+    Murat Apishev\inst{2}
+    \and
+    Peter Romov\inst{3}
+}
+\institute{\noindent
+    Schlumberger Information Solutions,
+    ~~\email{oleksandr.frei@gmail.com}
+    \and
+    Lomonosov Moscow State University,
+    ~~\email{great-mel@yandex.ru}
+    \and
+    Yandex,
+    Moscow Institute of Physics and Technology,
+    ~~\email{peter@romov.ru}
+}
+
+\maketitle
+
+\begin{abstract}
+Deterministic behavior is an important property for a stochastic algorithm
+because it allows to reproduce the results from run to run.
+In concurrent implementation it might not be sufficient to
+just fix a random seed, because threads scheduling can affect the result.
+In this paper we present a deterministic modification of parallel non-blocking algorithm
+for online topic modeling, previously developed for BigARTM library.
+We implement new algorithm in BigARTM and demonstrate that new version converges faster
+than previous algorithm in terms of perplexity.
+
+\vspace{1em}
+\textbf{Keywords:}
+    probabilistic topic modeling,
+    Probabilistic Latent Sematic Analysis,
+    Latent Dirichlet Allocation,
+    Additive Regularization of Topic Models,
+    stochastic matrix factorization,
+    EM-algorithm,
+    BigARTM.
+\end{abstract}
+
+\section{Introduction}
+
+The rest of the paper is organized as follows.
+In~section~\ref{sec:Previous}
+we introduce basic notation and summarize previous algorithm for online topic modeling, used in $BigARTM v0.6$.
+In~section~\ref{sec:Algorithm}
+we~present a deterministic non-blocking modification of the algorithm.
+In~section~\ref{sec:Architecture}
+we~describe the architecture, implemented in $BigARTM v0.7$.
+In~section~\ref{sec:Experiments}
+we~report results of our experiments on large datasets.
+In~section~\ref{sec:Conclusions}
+we~discuss advantages, limitations and open problems of BigARTM.
+
+TBD: decide whether we should discuss really technical topics:
+\begin{itemize}
+    \item Details of CLI interface and python interface, usage examples
+    \item List new features: coherence score and regularizer, classification, documents markdown (aka $p_{tdw}$ matrices)
+    \item Our technologies (Protobuf for low-level C API, Boost Serialize for import/export, GLog, GFlags, GTest, etc)
+    \item Our build solution and CI solution (CMake, Visual Studio, GitHub, Git submodules, Travis, Apveyour, Read-The-Docs)
+\end{itemize}
+
+\section{Previous algorithm}
+\label{sec:Previous}
+
+\section{Deterministic algorithm}
+\label{sec:Algorithm}
+
+\section{New architecture}
+\label{sec:Architecture}
+
+\section{Experiments}
+\label{sec:Experiments}
+
+\section{Conclusions}
+\label{sec:Conclusions}
+
+TBD
+
+\bigskip
+\subsubsection*{Acknowledgements.}
+
+TBD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{splncs03}
+%\bibliography{MachLearn}
+
+\begin{thebibliography}{10}
+%\providecommand{\url}[1]{\texttt{#1}}
+%\providecommand{\urlprefix}{URL }
+
+TBD
+
+\end{thebibliography}
+
+\end{document}
+
