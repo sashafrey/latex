@@ -194,13 +194,27 @@ where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a docum
 
 Inference of $\Phi$ and $\Theta$ can be done via Offline EM-Algorithm
 (see Algorithm \ref{alg:Offline} and \ref{alg:ProcessDocument}).
-Key step on the algorithm is $\kw{ProcessDocument}$ subroutine
+Key step of the algorithm is $\kw{ProcessDocument}$ subroutine
 that generates a matrix $\hat n_{wt}$ of size $n_d \times |T|$.
-It contains \emph{counters} that describe ``contribution'' of every token into the final $\Phi$ matrix.
-Then $\hat n_{wt}$ counters are aggregated across all documents in the collection
-and normalized, forming a new $\Phi$ matrix for the next iteration.
-To improve convergence rate of the algorithm $\Phi$ matrix should be updated several times during each scan of the collection.
-This leads to an Online algorithm \ref{alg:Online}.
+These values describe contribution of the tokens from the document into the final $\Phi$ matrix.
+Then the offline algorithm aggregates $\hat n_{wt}$ values across all documents in the collection.
+After normalization they form a new $\Phi$ matrix for the next iteration.
+Note that $\theta_{td}$ values appear only within $\kw{ProcessDocument}$ subroutine.
+This makes the algorithm efficient in its memory usage,
+allowing implementation to not store the entire theta matrix.
+Instead, $\theta_{td}$ values are recalculated from scratch on every pass through the collection.
+
+To improve convergence rate of the algorithm 
+the collection can be split into ``batches''.
+The algorithm is adjusted so that
+matrix $\Phi$
+is re-calculated after each batch, incorporating information about new documents.
+Key difference is that the cumulative sum $n_{wt}$ is discounted by a factor $\rho_b < 1$,
+which depends on the iteration. Typical strategy is to use $\rho_b = \dots$.
+
+The new $\Phi$ matrix is based on a weighted sum of the previous $n_{wt}$ matrix
+and new $\hat n_{wt}$ values produced for the latest batch.
+This leads to the Online algorithm \ref{alg:Online}.
 
 % ToDo: define ``norm'' operator somewhere...
 %``norm'' operator transforms
@@ -221,12 +235,12 @@ This leads to an Online algorithm \ref{alg:Online}.
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
 form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
-initialize $(\phi_{wt})$\;
+initialize $(\phi^0_{wt})$\;
 \ForAll{batches $D_b$, $b = 1,\dots,B$} {
     $(\hat n_{wt}) := \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi)$\;
-    $(n_{wt}) := \rho_b \cdot (n_{wt}) + (1 - \rho_b) \cdot (\hat n_{wt})$\;
-    $(r_{wt}) := \dots \text{ (calc regularization)}$\;
-    $(\phi_{wt}) := \norm_{w \in W} (n_{wt} + r_{wt})$\;
+    $(n^b_{wt}) := \rho_b \cdot (n^{b-1}_{wt}) + (1 - \rho_b) \cdot (\hat n_{wt})$\;
+    $(r^b_{wt}) := \dots \text{ (calc regularization)}$\;
+    $(\phi^{b+1}_{wt}) := \norm_{w \in W} (n^b_{wt} + r^b_{wt})$\;
 }
 \end{algorithm2e}
 
@@ -238,7 +252,7 @@ Explain that non-deterministic version has negative impact on convergence.
 \section{Async online algorithm}
 \label{sec:Algorithm}
 
-TBD: explain how \ref{OnlineAsync} is parallelized. 
+TBD: explain how \ref{OnlineAsync} is parallelized.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[h]
