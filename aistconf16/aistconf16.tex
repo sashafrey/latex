@@ -65,13 +65,19 @@
 \maketitle
 
 \begin{abstract}
-In this paper we present a new algorithm for inference of additively regularized topic models
-and discuss key architectural details of our implementation.
+In this paper we present a new asynchronous algorithm for learning additively regularized topic models
+and discuss the main architectural details of our implementation.
 The key property of the new algorithm is that it behaves in a fully deterministic fashion,
-which is typically hard to achieve in a non-blocking parallel implementation.
-The algorithm had been recently implemented in the BigARTM library (\texttt{http://bigartm.org}),
-and in our experiments it performs better comparing to the previous versions in term of convergence,
-CPU utilization and memory usage.
+which is typically hard to achieve in a non-blocking parallel implementation. The algorithm 
+has been 
+%had been 
+recently implemented in the BigARTM library (\texttt{http://bigartm.org}),
+that is known to be faster comparing to other packages for topic modelling such as Vowpal Wabbit or Gensim.
+%which currently is the most performant open-source library for topic modeling.  
+%K.V.: which is faster comparing to other open-source packages for topic modelling such as Vowpal Wabbit or Gensim.
+Our new algorithm is compatible with all features previously introduced in BigARTM library,
+including multimodality, regularizers and scores calculation.
+In our experiments the new implementation spends less time to achieve the same perplexity, has better CPU utilization and lower memory usage.
 
 \vspace{1em}
 \textbf{Keywords:}
@@ -90,13 +96,13 @@ Deterministic behavior is an important property for any algorithm,
 including those of a stochastic nature.
 For the end users of a software system run-to-run reproducibility is a must-have property,
 because this is what they expect based on their previous experience.
-Indeed, refreshing a web-pages or re-doing an operation in almost any software
-produce the same result as before, regardless of how much complexity is hidden behind the scenes.
+Indeed, refreshing a web-pages or re-doing an operation tend to
+produce an identical result, regardless of how much software complexity is hidden behind the scenes.
 For the researches determinism is also important
 because it enables them to reproduce their old experiments
 and study impact of various parameters on the result.
 Finally, for the developers of the algorithm
-determinism allow to write simple unit-tests with well-defined results.
+determinism allow to reproduce bugs and write simple unit-tests with well-defined results.
 
 Determinism is particularly hard to achieve
 in concurrent implementations, because in a multi-threaded environment
@@ -108,8 +114,10 @@ than previous algorithm in terms of perplexity,
 yet being more efficient in CPU and memory usage.
 
 The rest of the paper is organized as follows.
+In~section~\ref{sec:Notation}
+we introduce basic notation used throughout this paper.
 In~section~\ref{sec:Previous}
-we introduce basic notation and summarize previous algorithm for online topic modeling, used in $BigARTM v0.6$.
+we summarize the previous algorithm for online topic modeling, used in $BigARTM v0.6$.
 In~section~\ref{sec:Algorithm}
 we~present a deterministic non-blocking modification of the algorithm.
 In~section~\ref{sec:Architecture}
@@ -131,7 +139,60 @@ we~discuss advantages, limitations and open problems of BigARTM.
 %    https://software.intel.com/en-us/articles/consistency-of-floating-point-results-using-the-intel-compiler
 %\end{itemize}
 
-\section{Previous algorithm}
+\section{Notation}
+\label{sec:Notation}
+
+Let
+$D$ denote a finite set (collection) of texts and
+$W$ denote a~finite set (vocabulary) of all terms from these texts.
+Let
+$n_{dw}$ denote the number of occurrences of a term $w \in W$ in a document $d \in D$;
+$n_{dw}$ values form a sparse matrix of size $|W| \times |D|$,
+known as \emph{bag-of-words} representation of the collection.
+
+Given an $(n_{dw})$ matrix, an additively-regularized topic model (ARTM) finds two matrices:
+$\Phi = \{\phi_{wt}\}$ and $\Theta = \{\theta_{td}\}$,
+of sizes $|W| \times |T|$ and $|T| \times |D|$ respectively,
+where $|T|$ is a used-defined number of \emph{topics} in the model.
+Matrices $\Phi$ and $\Theta$
+provide a compressed representation of the $(n_{dw})$ matrix:
+\[
+n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in D, w \in W,
+\]
+where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a document $d$.
+Matrices $\Phi$ and $\Theta$ are \emph{stochastic}, e.g. their elements are non-negative and all columns are normalized to unity.
+In the sequel we will use ``norm'' operator to transform
+a~real vector into a discrete distribution.
+For example some arbitrary positive values $n_{td}$ and $n_{wt}$
+can be turned into $\theta_{td}$ and $\phi_{wt}$ as follows:
+\begin{align}
+    \theta_{td} = \norm_{t\in T} n_{td} = n_{td} \big/ \sum_{s\in T} n_{sd}; \\
+    \phi_{wt} = \norm_{w \in W} n_{wt} = n_{wt} \big/ \sum_{v \in W} n_{vt}.
+\end{align}
+
+
+To learn $\Phi$ and $\Theta$ from $(n_{td})$ ARTM maximize
+the log-likelihood $\cL(\Phi, \Theta)$, regularized via an additional penalty term $R(\Phi, \Theta)$:
+\begin{align}
+    \cL (\Phi,\Theta) =
+    \sum_{d\in D}\sum_{w\in W} n_{dw} \ln \sum_{t\in T} \phi_{wt} \theta_{td}, \\
+    \cL (\Phi, \Theta) + R(\Phi, \Theta) 
+    \;\to\; \max_{\Phi,\Theta}.
+\end{align}
+
+
+%In additional to plain text many collections has additional data,
+%such as authors, class or category labels, date-time stamps.
+%In \cite{vfardy15cikmtm} this data can be represented as \emph{modalities},
+%where the overall vocabulary $W$ is split into $M$ subsets
+%$W = W^1 \sqcup \dots \sqcup W^M$, one subset per modality,
+%and $\Phi$ matrix is normalized independently within each modality:
+%\begin{align}
+%    \sum_{w \in W^m} \phi_{wt} = 1, \; \text{ for all } t \in T, m = 1, \dots, M \\\notag
+%\end{align}
+
+
+\section{Previous algorithms}
 \label{sec:Previous}
 
 \SetAlgoSkip{}
@@ -149,8 +210,7 @@ initialize $(\phi_{wt})$\;
     %    $(\tilde n_{wt}) := (\tilde n_{wt}) + \kw{ProcessDocument}(d, \Phi)$\;
     %}
     $(n_{wt}) := \mathlarger\sum\limits_{d \in D} \; \kw{ProcessDocument}(d, \Phi)$\;
-    $(r_{wt}) := \dots \text{ (calc regularization)}$\;
-    $(\phi_{wt}) := \norm_{w \in W} (\tilde n_{wt} + r_{wt})$\;
+    $(\phi_{wt}) := \norm_{w \in W} (n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
 \begin{algorithm2e}[t]
@@ -164,35 +224,15 @@ initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
 \Repeat{$\theta_d$ converges}{
     $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $w\in d$ and $t \in T$\;
     $n_{td} := \sum_{w\in d} n_{dw} p_{tdw}$ for all $t \in T$\;
-    $r_{td} := \dots \text{ (calc regularization)}$\;
     $\theta_{td} := \norm_{t\in T}
         \bigl(
-            n_{td} + r_{td}
+            n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         \bigr)$ for all $t \in T$\;
 }
 $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \end{algorithm2e}
 
-Let
-$D$ denote a finite set (collection) of texts and
-$W$ denote a~finite set (vocabulary) of all terms from these texts.
-Let
-$n_{dw}$ denote the number of occurrences of a term $w \in W$ in a document $d \in D$;
-$n_{dw}$ values form a sparse matrix $N_{dw}$ of size $|W| \times |D|$,
-known as \emph{bag-of-words} representation of the collection.
-
-Given an $N_{dw}$ matrix, an additively-regularized topic model infers two stochastic matrices:
-$\Phi = \{\phi_{wt}\}$ and $\Theta = \{\theta_{td}\}$,
-of sizes $|W| \times |T|$ and $|T| \times |D|$ respectively,
-where $|T|$ is a used-defined number of \emph{topics} in the model.
-Matrices $\Phi$ and $\Theta$
-provide a compressed representation of the $N_{dw}$ matrix:
-\[
-n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in D, w \in W,
-\]
-where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a document $d$.
-
-Inference of $\Phi$ and $\Theta$ can be done via Offline EM-Algorithm
+Learning of $\Phi$ and $\Theta$ can be done via Offline EM-Algorithm
 (see Algorithm \ref{alg:Offline} and \ref{alg:ProcessDocument}).
 Key step of the algorithm is $\kw{ProcessDocument}$ subroutine
 that generates a matrix $\hat n_{wt}$ of size $n_d \times |T|$.
@@ -201,78 +241,75 @@ Then the offline algorithm aggregates $\hat n_{wt}$ values across all documents 
 After normalization they form a new $\Phi$ matrix for the next iteration.
 Note that $\theta_{td}$ values appear only within $\kw{ProcessDocument}$ subroutine.
 This makes the algorithm efficient in its memory usage,
-allowing implementation to not store the entire theta matrix.
+allowing implementation to not store the entire theta matrix at any given time.
 Instead, $\theta_{td}$ values are recalculated from scratch on every pass through the collection.
 
-To improve convergence rate of the algorithm 
-the collection can be split into ``batches''.
-The algorithm is adjusted so that
+To improve convergence rate of the algorithm
+the collection is split into ``batches'',
+$D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$,
+and the algorithm is adjusted so that 
 matrix $\Phi$
-is re-calculated after each batch, incorporating information about new documents.
-Key difference is that the cumulative sum $n_{wt}$ is discounted by a factor $\rho_b < 1$,
-which depends on the iteration. Typical strategy is to use $\rho_b = \dots$.
+is re-calculated after every $\eta$ batches.
+This leads to more frequent updates of $\Phi$ matrix, which are performed as the algorithm scans through the collection.
+To simplify the notation
+we introduce a trivial subroutine
+\[
+\kw{ProcessBatches}(\{D_b\}, \Phi) = \mathlarger\sum\limits_{D_b} \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi) \\
+\]
+that aggregates the output of $\kw{ProcessDocument}$ across specific batches at a constant $\Phi$ matrix.
+The algorithm is then given by listing \ref{alg:Online}.
 
-The new $\Phi$ matrix is based on a weighted sum of the previous $n_{wt}$ matrix
-and new $\hat n_{wt}$ values produced for the latest batch.
-This leads to the Online algorithm \ref{alg:Online}.
-
-% ToDo: define ``norm'' operator somewhere...
-%``norm'' operator transforms
-%a~real vector $(x_i)$ to
-%a~vector $(x'_i)$ representing a discrete distribution:
-%\[
-%    x'_i = \norm(x_i) = \frac{\max\{x_i,0\}}{\sum_{j} \max\{x_j,0\}}.
-%\]
-
-%A drawback of the algorithm \ref{alg:Offline} is that the entire collection is processed with a single $\Phi$ matrix.
+Key difference is that the cumulative sum $n_{wt}$ is discounted by a factor $\rho_i < 1$,
+which depends on the iteration. Typical strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
+where typical values for $\tau_0$ are between $64$ and $1024$, for $\kappa$ --- between $0.5$ and $0.7$.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[h]
 \caption{Online algorithm} %\mbox{regularized} topic modeling
 \label{alg:Online}
 \BlankLine
-\KwIn{collection $D$;}
+\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
 form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 initialize $(\phi^0_{wt})$\;
-\ForAll{batches $D_b$, $b = 1,\dots,B$} {
-    $(\hat n_{wt}) := \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi)$\;
-    $(n^b_{wt}) := \rho_b \cdot (n^{b-1}_{wt}) + (1 - \rho_b) \cdot (\hat n_{wt})$\;
-    $(r^b_{wt}) := \dots \text{ (calc regularization)}$\;
-    $(\phi^{b+1}_{wt}) := \norm_{w \in W} (n^b_{wt} + r^b_{wt})$\;
+\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
+    $(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
+    $\rho_i := (\tau_0 + i)^{-\kappa}$\;
+    $(n^{i}_{wt}) := \rho_i \cdot (n^{i-1}_{wt}) + (1 - \rho_i) \cdot (\hat n^{i}_{wt})$\;
+    $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i - 1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
 
-TBD: explain how \ref{Online} is parallelized in the previous BigARTM version.
-Explain why it was non-deterministic.
-Explain what happens if we add strict synchronization point.
-Explain that non-deterministic version has negative impact on convergence.
+A reasonable approach to speedup the online algorithm is to introduce concurrency in the $\kw{ProcessBatches}$ subroutine.
+Indeed, multiple threads can simply process batches $D_{\eta (i - 1) + 1}, \dots, D_{\eta i}$ in parallel,
+given that they synchronize writes $\hat n_{wt}$ values into the resulting matrix.
+The problem with this approach is that all threads will have no useful work to do during steps $5$, $6$ and $7$ of the algorithm.
+The threads can not start processing the next batches because a new version of $\Phi$ matrix is not ready yet.
+In the next section we present a simple modification of the online algorithm that turns it into an asynchronous non-blocking algorithm.
 
-\section{Async online algorithm}
+\section{Asynchronous online algorithm}
 \label{sec:Algorithm}
-
-TBD: explain how \ref{OnlineAsync} is parallelized.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[h]
-\caption{Online async algorithm} %\mbox{regularized} topic modeling
-\label{alg:OnlineAsync}
+\caption{Asynchronous online algorithm} %\mbox{regularized} topic modeling
+\label{alg:Online}
 \BlankLine
-\KwIn{collection $D$;}
+\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
 form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 initialize $(\phi^0_{wt})$\;
-$(n^1_{wt}) := \mathlarger\sum\limits_{d \in D_1} \; \kw{ProcessDocument}(d, \Phi^0)$\;
-\ForAll{batches $D_b$, $b = 2,\dots,B$} {
-    $(\hat n^b_{wt}) := \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi^{b-2})$\;
-    $(n^b_{wt}) := \rho_b \cdot (n^{b-1}_{wt}) + (1 - \rho_b) \cdot (\hat n_{wt})$\;
-    $(r^b_{wt}) := \dots \text{ (calc regularization)}$\;
-    $(\phi^b_{wt}) := \norm_{w \in W} (n^b_{wt} + r^b_{wt})$\;
+$(\hat n^1_{wt}) := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
+\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor - 1$} {
+    $(\hat n^{i+1}_{wt}) := \kw{AsyncProcessBatches}(\{D_{\eta i + 1}, \dots, D_{\eta i + \eta}\}, \Phi^{i-1})$\;
+    $\kw{Await}(\hat n^i_{wt})$\;
+    $\rho_i := (\tau_0 + i)^{-\kappa}$\;
+    $(n^{i}_{wt}) := \rho_i \cdot (n^{i-1}_{wt}) + (1 - \rho_i) \cdot (\hat n^{i}_{wt})$\;
+    $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i-1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
-
 
 Adding delay and grouping several batches into a batchset negatively impact convergence,
 but let utilize full CPU capacity of the machine.
@@ -281,6 +318,10 @@ is able to achieve better performance quicker that non-parallel or synchronous a
 
 \section{New architecture}
 \label{sec:Architecture}
+
+TBD: explain how \ref{Online} is parallelized in the previous BigARTM version.
+Explain why it was non-deterministic.
+Explain that non-deterministic version has negative impact on convergence.
 
 In the new architecture we removed DataLoader thread,
 which previously was responsible for loading batches from disk.
