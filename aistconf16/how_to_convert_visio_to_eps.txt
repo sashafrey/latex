@@ -1,0 +1,2 @@
+1. Use option "Save As" in Microsoft Visio, and choose "Save to PDF".
+2. Upload PDF to http://image.online-convert.com/convert-to-eps

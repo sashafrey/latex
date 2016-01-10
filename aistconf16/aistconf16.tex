@@ -391,9 +391,21 @@ His approach of aggregating results across threads is taken from \cite{smola10ar
 where the same pattern was used to update a shared stated in distributed topic modeling architecture.
 In our case the same idea is applied to aggregating data in shared memory.
 
-\includegraphics[natwidth=501bp,natheight=235bp,width=270bp]{old_arch.png}
+\begin{figure}[t]
+\begin{centering}
+\includegraphics[height=39mm]{diagramm_artm_core.eps}
+\caption{Diagram of parallelization components}
+\label{fig:diagramm_artm_core}
+\end{centering}
+\end{figure}
 
-\includegraphics[natwidth=394bp,natheight=206bp,width=270bp]{new_arch.png}
+\begin{figure}[t]
+\begin{centering}
+\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
+\caption{Diagram of parallelization components (new architecture)}
+\label{fig:diagramm_artm_core}
+\end{centering}
+\end{figure}
 
 \section{Experiments}
 \label{sec:Experiments}
