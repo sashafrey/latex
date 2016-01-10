@@ -47,7 +47,7 @@
 \begin{document}
 %%Analysis of Images, Social Networks, and Texts
 \title{
-    Parallel Non-blocking Deterministic Algorithm for Online Topic Modelling
+    Parallel Non-blocking Deterministic Algorithm for Online Topic Modeling
 }
 \author{
     Oleksandr Frei\inst{1}
@@ -68,16 +68,14 @@
 In this paper we present a new asynchronous algorithm for learning additively regularized topic models
 and discuss the main architectural details of our implementation.
 The key property of the new algorithm is that it behaves in a fully deterministic fashion,
-which is typically hard to achieve in a non-blocking parallel implementation. The algorithm 
-has been 
-%had been 
-recently implemented in the BigARTM library (\texttt{http://bigartm.org}),
-that is known to be faster comparing to other packages for topic modelling such as Vowpal Wabbit or Gensim.
-%which currently is the most performant open-source library for topic modeling.  
-%K.V.: which is faster comparing to other open-source packages for topic modelling such as Vowpal Wabbit or Gensim.
+which is typically hard to achieve in a non-blocking parallel implementation. The algorithm
+%has been
+had been
+recently implemented in the BigARTM library (\texttt{http://bigartm.org}).
 Our new algorithm is compatible with all features previously introduced in BigARTM library,
 including multimodality, regularizers and scores calculation.
-In our experiments the new implementation spends less time to achieve the same perplexity, has better CPU utilization and lower memory usage.
+Previous BigARTM version was already faster than the alternative open source topic modeling packages such as Vowpal Wabbit or Gensim.
+Yet, in our experiments we show that the new implementation spends even less time to achieve the same perplexity, has better CPU utilization and lower memory usage.
 
 \vspace{1em}
 \textbf{Keywords:}
@@ -87,6 +85,8 @@ In our experiments the new implementation spends less time to achieve the same p
     Additive Regularization of Topic Models,
     stochastic matrix factorization,
     EM-algorithm,
+    online learning,
+    asynchronous and parallel computing,
     BigARTM.
 \end{abstract}
 
@@ -160,26 +160,74 @@ provide a compressed representation of the $(n_{dw})$ matrix:
 n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in D, w \in W,
 \]
 where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a document $d$.
-Matrices $\Phi$ and $\Theta$ are \emph{stochastic}, e.g. their elements are non-negative and all columns are normalized to unity.
-In the sequel we will use ``norm'' operator to transform
-a~real vector into a discrete distribution.
-For example some arbitrary positive values $n_{td}$ and $n_{wt}$
-can be turned into $\theta_{td}$ and $\phi_{wt}$ as follows:
-\begin{align}
-    \theta_{td} = \norm_{t\in T} n_{td} = n_{td} \big/ \sum_{s\in T} n_{sd}; \\
-    \phi_{wt} = \norm_{w \in W} n_{wt} = n_{wt} \big/ \sum_{v \in W} n_{vt}.
-\end{align}
+%Matrices $\Phi$ and $\Theta$ are \emph{stochastic}, e.g. their elements are non-negative and all columns are normalized to unity.
+%In the sequel we will use ``norm'' operator to transform
+%a~real vector into a discrete distribution.
+%For example some arbitrary positive values $n_{td}$ and $n_{wt}$
+%can be turned into $\theta_{td}$ and $\phi_{wt}$ as follows:
+%\begin{align}
+%    \theta_{td} = \norm_{t\in T} n_{td} = n_{td} \big/ \sum_{s\in T} n_{sd}; \\
+%    \phi_{wt} = \norm_{w \in W} n_{wt} = n_{wt} \big/ \sum_{v \in W} n_{vt}.
+%\end{align}
 
-
-To learn $\Phi$ and $\Theta$ from $(n_{td})$ ARTM maximize
-the log-likelihood $\cL(\Phi, \Theta)$, regularized via an additional penalty term $R(\Phi, \Theta)$:
-\begin{align}
-    \cL (\Phi,\Theta) =
-    \sum_{d\in D}\sum_{w\in W} n_{dw} \ln \sum_{t\in T} \phi_{wt} \theta_{td}, \\
-    \cL (\Phi, \Theta) + R(\Phi, \Theta) 
+To learn $\Phi$ and $\Theta$ from $(n_{dw})$ ARTM maximizes
+the log-likelihood, regularized via an additional penalty term $R(\Phi, \Theta)$:
+\begin{gather}
+\label{eq:ARTM}
+    \sum_{d\in D}\sum_{w\in W} n_{dw} \ln \sum_{t\in T} \phi_{wt} \theta_{td} + R(\Phi, \Theta)
     \;\to\; \max_{\Phi,\Theta}.
-\end{align}
+\end{gather}
+With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
+Many Bayesian topic models can be considered
+as special cases of ARTM with different regularizers~$R$,
+as shown in~\cite{voron14mlj,voron14aist}.
 
+In \cite{voron14dan-eng} it is shown that the \mbox{local} maximum $(\Phi,\Theta)$
+of the problem~\eqref{eq:ARTM} satisfies
+\begin{align}
+    \label{eq:Estep}
+    p_{tdw} &= \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr);
+\\
+    \label{eq:Mstep:phi}
+    \phi_{wt} &= \norm_{w\in W}
+        \biggl(
+            \sum_{d\in D} n_{dw} p_{tdw} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+        \biggr);
+%    \phi_{wt} &= \norm_{w\in W}
+%        \biggl(
+%            n_{wt} + r_{wt}
+%        \biggr);
+%    \quad
+%    n_{wt} = \sum_{d\in D} n_{dw} p_{tdw};
+%    \quad
+%    r_{wt} = \phi_{wt} \frac{\partial R}{\partial \phi_{wt}};
+\\
+    \label{eq:Mstep:theta}
+    \theta_{td} &= \norm_{t\in T}
+        \biggl(
+            \sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+        \biggr);
+%    \theta_{td} &= \norm_{t\in T}
+%        \biggl(
+%            n_{td} + r_{td}
+%        \biggr);
+%    \quad
+%    n_{td} = \sum_{w\in d} n_{dw} p_{tdw};
+%    \quad
+%    r_{td} = \theta_{td} \frac{\partial R}{\partial \theta_{td}};
+        %\sum_{m=1}^M \tau_m \!\!\sum_{w\in W^m}\!\!\! n_{dw} p_{tdw};
+\end{align}
+where operator
+$\norm_{i \in I} x_i = \frac{\max\{x_i,0\}}{\sum\limits_{j\in I} \max\{x_j,0\}}$
+transforms a~vector $(x_i)_{i \in I}$ to a~discrete distribution.
+
+Learning of $\Phi$ and $\Theta$ from \eqref{eq:Estep}--\eqref{eq:Mstep:theta} can be done by EM-algorithm,
+which starts from a random initial approximation and iterates
+E-step \eqref{eq:Estep} and
+M-steps \eqref{eq:Mstep:phi},\eqref{eq:Mstep:theta}
+until convergence.
+In the sequel we discuss several variations of such EM-algorithm,
+which are all based on the above formulas but differ in the way how operations are ordered and grouped together.
 
 %In additional to plain text many collections has additional data,
 %such as authors, class or category labels, date-time stamps.
@@ -223,16 +271,16 @@ initialize $(\phi_{wt})$\;
 initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
 \Repeat{$\theta_d$ converges}{
     $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $w\in d$ and $t \in T$\;
-    $n_{td} := \sum_{w\in d} n_{dw} p_{tdw}$ for all $t \in T$\;
     $\theta_{td} := \norm_{t\in T}
         \bigl(
-            n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+            \sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         \bigr)$ for all $t \in T$\;
 }
 $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \end{algorithm2e}
 
-Learning of $\Phi$ and $\Theta$ can be done via Offline EM-Algorithm
+
+Offline EM-Algorithm
 (see Algorithm \ref{alg:Offline} and \ref{alg:ProcessDocument}).
 Key step of the algorithm is $\kw{ProcessDocument}$ subroutine
 that generates a matrix $\hat n_{wt}$ of size $n_d \times |T|$.
@@ -247,7 +295,7 @@ Instead, $\theta_{td}$ values are recalculated from scratch on every pass throug
 To improve convergence rate of the algorithm
 the collection is split into ``batches'',
 $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$,
-and the algorithm is adjusted so that 
+and the algorithm is adjusted so that
 matrix $\Phi$
 is re-calculated after every $\eta$ batches.
 This leads to more frequent updates of $\Phi$ matrix, which are performed as the algorithm scans through the collection.
@@ -340,7 +388,7 @@ After processing a batch the processor threads loops through local batch diction
 and for each $w \in W_b$ acquire the corresponding lock $l_w$.
 %ToDo: measure collision ratio.
 His approach of aggregating results across threads is taken from \cite{smola10architecture},
-where the same pattern was used to update a shared stated in distributed topic modelling architecture.
+where the same pattern was used to update a shared stated in distributed topic modeling architecture.
 In our case the same idea is applied to aggregating data in shared memory.
 
 \includegraphics[natwidth=501bp,natheight=235bp,width=270bp]{old_arch.png}
