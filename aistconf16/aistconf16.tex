@@ -568,6 +568,59 @@ In our case the same idea is applied to aggregating data in shared memory.
 \section{Experiments}
 \label{sec:Experiments}
 
+Fig. \ref{fig:compare16}, \ref{fig:compare12} compare the perplexity as a function of time spend by four algorithms ---
+offline,
+online,
+asynchronousonline,
+and old non-deterministic implementation of the online algorithm.
+Each point in the figure corresponds to a moment when the library finished a complete scan of the collection.
+Each algorithm was given a fixed budget (30 minutes in the first chart, 40 minutes in the second chart).
+Lower perplexity means better result.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel=Time (min),
+        ylabel=Perplexity,
+        major grid style={draw=lightgray},
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline16.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old16.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new16.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async16.dat};
+    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \end{axis}
+\end{tikzpicture}
+    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel=Time (min),
+        ylabel=Perplexity,
+        major grid style={draw=lightgray},
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline12.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old12.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new12.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async12.dat};
+    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \end{axis}
+\end{tikzpicture}
+\caption{12 cores, 40 minutes limit} \label{fig:compare12}
+\end{figure}
+
 \section{Conclusions}
 \label{sec:Conclusions}
 

@@ -1,28 +1,56 @@
-\documentclass{standalone}
+\documentclass{article}
 
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{verbatim}
+\usepackage{graphics}
 
 \pagenumbering{gobble}
 
 \begin{document}
 
+\begin{figure}
+\centering
 \begin{tikzpicture}
     \begin{axis}[
-        xlabel=Time,
+        xlabel=Time (min),
         ylabel=Perplexity,
         major grid style={draw=lightgray},
         ymajorgrids=true,
         xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
     ]
-	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {offline.dat};
-	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old.dat};
-    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {online_new.dat};
-    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {online_async.dat};
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {offline16.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old16.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {online_new16.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {online_async16.dat};
     \legend{Offline\\Online old\\Online new\\Online async\\}
-
     \end{axis}
 \end{tikzpicture}
+    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
+\end{figure}
 
-\end{document}
+\begin{figure}
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel=Time (min),
+        ylabel=Perplexity,
+        major grid style={draw=lightgray},
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {offline12.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old12.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {online_new12.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {online_async12.dat};
+    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \end{axis}
+\end{tikzpicture}
+\caption{12 cores, 40 minutes limit} \label{fig:compare12}
+\end{figure}
+
+\end{document} 
