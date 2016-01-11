@@ -1,0 +1,182 @@
+Log file created at: 2016/01/11 11:38:41
+Running on machine: SLB-GXDXS22
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0111 11:38:41.016525 24032 perplexity.cc:25] Perplexity score calculator created: stream_name=@global, model_type=0
+I0111 11:38:41.018525 17464 processor.cc:960] Processor thread started
+I0111 11:38:41.018525 18212 merger.cc:123] Merger thread started
+I0111 11:38:41.018525 23796 processor.cc:960] Processor thread started
+I0111 11:38:41.018525 12172 processor.cc:960] Processor thread started
+I0111 11:38:41.018525 24032 c_interface.cc:222] Creating MasterModel (id=1)...
+I0111 11:38:41.018525 10536 processor.cc:960] Processor thread started
+I0111 11:38:41.024526 24032 c_interface.cc:333] Pass GatherDictionaryArgs: dictionary_target_name=main_dictionary, data_path=e3463243-5abf-4102-ac80-c8f0d560af8f, symmetric_cooc_values=0 to void (__cdecl artm::core::MasterComponent::*)(class artm::GatherDictionaryArgs const & __ptr64) __ptr64
+I0111 11:38:41.025527 24032 dictionary.cc:183] Found 22 batches in 'e3463243-5abf-4102-ac80-c8f0d560af8f' folder
+I0111 11:38:41.037528 23796 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.037528 12172 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.037528 10536 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.037528 17464 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.111536 24032 dictionary.cc:232] Find 7805 unique tokens in 1061 items
+I0111 11:38:41.134537 24032 c_interface.cc:333] Pass InitializeModelArgs: model_name=pwt, dictionary_name=main_dictionary, topics_count=16, topic_name_size=16 to void (__cdecl artm::core::MasterComponent::*)(class artm::InitializeModelArgs const & __ptr64) __ptr64
+I0111 11:38:41.134537 24032 merger.cc:422] InitializeModel() with 16 topics and 7805 tokens
+I0111 11:38:41.181542 24032 c_interface.cc:333] Pass InitializeModelArgs: model_name=nwt, dictionary_name=main_dictionary, topics_count=16, topic_name_size=16 to void (__cdecl artm::core::MasterComponent::*)(class artm::InitializeModelArgs const & __ptr64) __ptr64
+I0111 11:38:41.181542 24032 merger.cc:422] InitializeModel() with 16 topics and 7805 tokens
+I0111 11:38:41.230547 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 288451 bytes
+I0111 11:38:41.246548 24032 c_interface.cc:333] Pass FitOnlineMasterModelArgs, batch_filename_size=22, batch_weight_size=22, update_after:apply_weight:decay_weight=(5:0.00780716:0.992193, 10:0.00780184:0.992198, 15:0.00779652:0.992203, 20:0.00779121:0.992209, 22:0.00778591:0.992214), async=1 to void (__cdecl artm::core::MasterComponent::*)(class artm::FitOnlineMasterModelArgs const & __ptr64) __ptr64
+I0111 11:38:41.246548 24032 master_component.cc:1020] ProcessBatchesArgs: nwt_target_name=nwt_hat0, batch_filename_size=5, batch_weight_size=5, pwt_source_name=pwt, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=yes, predict_class_id=
+I0111 11:38:41.264550 10536 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.264550 17464 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.264550 23796 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.264550 12172 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.264550 24032 master_component.cc:1020] ProcessBatchesArgs: nwt_target_name=nwt_hat1, batch_filename_size=5, batch_weight_size=5, pwt_source_name=pwt, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=no, predict_class_id=
+I0111 11:38:41.268550 23796 processor.cc:1013] Processor: start processing batch 2030671b-fec3-46b5-8eff-a4d363c8f5f3 into model nwt_hat0
+I0111 11:38:41.270551 10536 processor.cc:1013] Processor: start processing batch 01e21e6d-5a70-4d6a-8810-1e87771f09be into model nwt_hat0
+I0111 11:38:41.272552 17464 processor.cc:1013] Processor: start processing batch 07426ec7-6842-40ef-b757-059419cbd242 into model nwt_hat0
+I0111 11:38:41.272552 12172 processor.cc:1013] Processor: start processing batch 2cdf3d48-7aa7-491f-b7d4-d2289277c26a into model nwt_hat0
+I0111 11:38:41.296553 23796 processor.cc:1192] Processor: complete processing batch 2030671b-fec3-46b5-8eff-a4d363c8f5f3 into model nwt_hat0
+I0111 11:38:41.296553 23796 common.h:120] 32ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\2030671b-fec3-46b5-8eff-a4d363c8f5f3.batch) [including 4ms in LoadMessage; 1ms in InitializeSparseNdw; 4ms in InitializeModelIncrement; 14ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.298553 23796 processor.cc:1013] Processor: start processing batch 3996d0a2-9cf2-481f-a41f-d8ba1990fca6 into model nwt_hat0
+I0111 11:38:41.307554 10536 processor.cc:1192] Processor: complete processing batch 01e21e6d-5a70-4d6a-8810-1e87771f09be into model nwt_hat0
+I0111 11:38:41.308554 10536 common.h:120] 44ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\01e21e6d-5a70-4d6a-8810-1e87771f09be.batch) [including 6ms in LoadMessage; 2ms in InitializeSparseNdw; 5ms in InitializeModelIncrement; 19ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.310555 10536 processor.cc:1013] Processor: start processing batch 416f572d-3a29-48bc-a77b-8310dc569f66 into model nwt_hat1
+I0111 11:38:41.322556 23796 processor.cc:1192] Processor: complete processing batch 3996d0a2-9cf2-481f-a41f-d8ba1990fca6 into model nwt_hat0
+I0111 11:38:41.323556 23796 common.h:120] 27ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\3996d0a2-9cf2-481f-a41f-d8ba1990fca6.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 12ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.323556 23796 processor.cc:1013] Processor: start processing batch 4cdabb9b-e117-428a-84d6-f4ac56948a4d into model nwt_hat1
+I0111 11:38:41.327556 17464 processor.cc:1192] Processor: complete processing batch 07426ec7-6842-40ef-b757-059419cbd242 into model nwt_hat0
+I0111 11:38:41.328557 17464 common.h:120] 64ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\07426ec7-6842-40ef-b757-059419cbd242.batch) [including 8ms in LoadMessage; 6ms in InitializeSparseNdw; 8ms in InitializeModelIncrement; 26ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.330557 17464 processor.cc:1013] Processor: start processing batch 57cf91a2-6627-4276-aebf-9f8bf94e4d98 into model nwt_hat1
+I0111 11:38:41.332557 12172 processor.cc:1192] Processor: complete processing batch 2cdf3d48-7aa7-491f-b7d4-d2289277c26a into model nwt_hat0
+I0111 11:38:41.333557 12172 common.h:120] 69ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\2cdf3d48-7aa7-491f-b7d4-d2289277c26a.batch) [including 8ms in LoadMessage; 6ms in InitializeSparseNdw; 8ms in InitializeModelIncrement; 28ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.334558 24032 master_component.cc:1063] MergeModelArgs: nwt_target_name=nwt, class=(nwt:0.992193), class=(nwt_hat0:0.00780716), topic_name_size=0
+I0111 11:38:41.334558 10536 processor.cc:1192] Processor: complete processing batch 416f572d-3a29-48bc-a77b-8310dc569f66 into model nwt_hat1
+I0111 11:38:41.334558 24032 master_component.cc:556] MasterComponent: start merging models
+I0111 11:38:41.334558 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.335557 10536 common.h:120] 27ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\416f572d-3a29-48bc-a77b-8310dc569f66.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 12ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.335557 12172 processor.cc:1013] Processor: start processing batch 62f5ac8d-4d79-411e-be38-6e700878d972 into model nwt_hat1
+I0111 11:38:41.336557 23796 processor.cc:1192] Processor: complete processing batch 4cdabb9b-e117-428a-84d6-f4ac56948a4d into model nwt_hat1
+I0111 11:38:41.336557 23796 common.h:120] 13ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\4cdabb9b-e117-428a-84d6-f4ac56948a4d.batch) [including 0ms in LoadMessage; 0ms in InitializeSparseNdw; 1ms in InitializeModelIncrement; 5ms in InferThetaAndUpdateNwtSparse; 3ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.337558 10536 processor.cc:1013] Processor: start processing batch 79eb9450-989c-450a-a36d-43897f6de9eb into model nwt_hat1
+I0111 11:38:41.350559 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.355559 23796 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.366560 24032 master_component.cc:597] MasterComponent: complete merging models
+I0111 11:38:41.366560 24032 master_component.cc:1068] DisposeModel nwt_hat0
+I0111 11:38:41.375561 24032 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt2, nwt_source_name=nwt, rwt_source_name=
+I0111 11:38:41.375561 24032 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:38:41.375561 17464 processor.cc:1192] Processor: complete processing batch 57cf91a2-6627-4276-aebf-9f8bf94e4d98 into model nwt_hat1
+I0111 11:38:41.376561 17464 common.h:120] 48ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\57cf91a2-6627-4276-aebf-9f8bf94e4d98.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.377562 10536 processor.cc:1192] Processor: complete processing batch 79eb9450-989c-450a-a36d-43897f6de9eb into model nwt_hat1
+I0111 11:38:41.379561 10536 common.h:120] 44ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\79eb9450-989c-450a-a36d-43897f6de9eb.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 21ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.389562 24032 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:38:41.389562 24032 master_component.cc:1068] DisposeModel pwt0
+I0111 11:38:41.389562 24032 master_component.cc:1020] ProcessBatchesArgs: nwt_target_name=nwt_hat2, batch_filename_size=5, batch_weight_size=5, pwt_source_name=pwt2, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=no, predict_class_id=
+I0111 11:38:41.392563 12172 processor.cc:1192] Processor: complete processing batch 62f5ac8d-4d79-411e-be38-6e700878d972 into model nwt_hat1
+I0111 11:38:41.393563 12172 common.h:120] 60ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\62f5ac8d-4d79-411e-be38-6e700878d972.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 30ms in InferThetaAndUpdateNwtSparse; 17ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.395563 17464 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.397563 24032 master_component.cc:1063] MergeModelArgs: nwt_target_name=nwt, class=(nwt:0.992198), class=(nwt_hat1:0.00780184), topic_name_size=0
+I0111 11:38:41.397563 24032 master_component.cc:556] MasterComponent: start merging models
+I0111 11:38:41.398563 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.398563 23796 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.398563 17464 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.399564 17464 processor.cc:1013] Processor: start processing batch 91fc6547-ce9a-4a9e-9a8b-70d11dbaf3bd into model nwt_hat2
+I0111 11:38:41.399564 10536 processor.cc:1013] Processor: start processing batch 936a818e-aea9-41d7-9c2c-c2a586edd3d8 into model nwt_hat2
+I0111 11:38:41.400564 23796 processor.cc:1013] Processor: start processing batch 88d4be71-ee73-4452-8612-0d8494a23baf into model nwt_hat2
+I0111 11:38:41.401564 12172 processor.cc:1013] Processor: start processing batch 87764352-4303-42d8-974b-1a21474c04b8 into model nwt_hat2
+I0111 11:38:41.415565 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.424566 24032 master_component.cc:597] MasterComponent: complete merging models
+I0111 11:38:41.424566 24032 master_component.cc:1068] DisposeModel nwt_hat1
+I0111 11:38:41.425566 24032 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt3, nwt_source_name=nwt, rwt_source_name=
+I0111 11:38:41.425566 24032 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:38:41.426566 17464 processor.cc:1192] Processor: complete processing batch 91fc6547-ce9a-4a9e-9a8b-70d11dbaf3bd into model nwt_hat2
+I0111 11:38:41.427567 17464 common.h:120] 29ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\91fc6547-ce9a-4a9e-9a8b-70d11dbaf3bd.batch) [including 1ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 12ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.427567 10536 processor.cc:1192] Processor: complete processing batch 936a818e-aea9-41d7-9c2c-c2a586edd3d8 into model nwt_hat2
+I0111 11:38:41.429566 10536 common.h:120] 31ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\936a818e-aea9-41d7-9c2c-c2a586edd3d8.batch) [including 1ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 13ms in InferThetaAndUpdateNwtSparse; 7ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.429566 17464 processor.cc:1013] Processor: start processing batch 94ffcb3b-1039-4734-aa6d-9f8da791abd1 into model nwt_hat2
+I0111 11:38:41.437567 24032 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:38:41.437567 24032 master_component.cc:1068] DisposeModel pwt1
+I0111 11:38:41.437567 24032 master_component.cc:1020] ProcessBatchesArgs: nwt_target_name=nwt_hat3, batch_filename_size=5, batch_weight_size=5, pwt_source_name=pwt3, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=no, predict_class_id=
+I0111 11:38:41.446568 23796 processor.cc:1192] Processor: complete processing batch 88d4be71-ee73-4452-8612-0d8494a23baf into model nwt_hat2
+I0111 11:38:41.447568 23796 common.h:120] 49ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\88d4be71-ee73-4452-8612-0d8494a23baf.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 24ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.448568 10536 processor.cc:1013] Processor: start processing batch 9c318ccb-87ee-4a5d-87cc-74615c533e86 into model nwt_hat3
+I0111 11:38:41.449568 23796 processor.cc:1013] Processor: start processing batch b00ba07b-f470-4784-a045-14707963957e into model nwt_hat3
+I0111 11:38:41.451570 12172 processor.cc:1192] Processor: complete processing batch 87764352-4303-42d8-974b-1a21474c04b8 into model nwt_hat2
+I0111 11:38:41.452569 12172 common.h:120] 54ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\87764352-4303-42d8-974b-1a21474c04b8.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 4ms in InitializeModelIncrement; 26ms in InferThetaAndUpdateNwtSparse; 14ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.454569 12172 processor.cc:1013] Processor: start processing batch ba27e9a0-a1fc-4e3c-a370-99c52f08b65e into model nwt_hat3
+I0111 11:38:41.476572 17464 processor.cc:1192] Processor: complete processing batch 94ffcb3b-1039-4734-aa6d-9f8da791abd1 into model nwt_hat2
+I0111 11:38:41.477571 17464 common.h:120] 50ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\94ffcb3b-1039-4734-aa6d-9f8da791abd1.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 24ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.478571 24032 master_component.cc:1063] MergeModelArgs: nwt_target_name=nwt, class=(nwt:0.992203), class=(nwt_hat2:0.00779652), topic_name_size=0
+I0111 11:38:41.478571 24032 master_component.cc:556] MasterComponent: start merging models
+I0111 11:38:41.478571 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.478571 17464 processor.cc:1013] Processor: start processing batch c301e6c5-e52c-4efa-92ff-33294a1c6420 into model nwt_hat3
+I0111 11:38:41.488572 10536 processor.cc:1192] Processor: complete processing batch 9c318ccb-87ee-4a5d-87cc-74615c533e86 into model nwt_hat3
+I0111 11:38:41.489573 10536 common.h:120] 43ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\9c318ccb-87ee-4a5d-87cc-74615c533e86.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 21ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.492573 10536 processor.cc:1013] Processor: start processing batch cd47d3e5-c672-4120-a93f-1c20d8796f11 into model nwt_hat3
+I0111 11:38:41.493573 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.495573 17464 processor.cc:1192] Processor: complete processing batch c301e6c5-e52c-4efa-92ff-33294a1c6420 into model nwt_hat3
+I0111 11:38:41.496573 17464 common.h:120] 19ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\c301e6c5-e52c-4efa-92ff-33294a1c6420.batch) [including 1ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 7ms in InferThetaAndUpdateNwtSparse; 4ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.496573 23796 processor.cc:1192] Processor: complete processing batch b00ba07b-f470-4784-a045-14707963957e into model nwt_hat3
+I0111 11:38:41.497573 23796 common.h:120] 50ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\b00ba07b-f470-4784-a045-14707963957e.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 24ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.497573 12172 processor.cc:1192] Processor: complete processing batch ba27e9a0-a1fc-4e3c-a370-99c52f08b65e into model nwt_hat3
+I0111 11:38:41.499573 12172 common.h:120] 47ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\ba27e9a0-a1fc-4e3c-a370-99c52f08b65e.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 22ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.503574 24032 master_component.cc:597] MasterComponent: complete merging models
+I0111 11:38:41.503574 24032 master_component.cc:1068] DisposeModel nwt_hat2
+I0111 11:38:41.505574 24032 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt4, nwt_source_name=nwt, rwt_source_name=
+I0111 11:38:41.505574 24032 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:38:41.515575 17464 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.515575 24032 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:38:41.515575 24032 master_component.cc:1068] DisposeModel pwt2
+I0111 11:38:41.516576 23796 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.517575 24032 master_component.cc:1020] ProcessBatchesArgs: nwt_target_name=nwt_hat4, batch_filename_size=2, batch_weight_size=2, pwt_source_name=pwt4, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=no, predict_class_id=
+I0111 11:38:41.518575 12172 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.524576 24032 master_component.cc:493] Batches count (=2) is smaller than processors threads count (=4), which may cause suboptimal performance.
+I0111 11:38:41.525576 17464 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.525576 12172 processor.cc:983] Processing queue has data, processing started
+I0111 11:38:41.527576 17464 processor.cc:1013] Processor: start processing batch d858034e-5490-48a0-af44-952baf50ee7f into model nwt_hat4
+I0111 11:38:41.527576 12172 processor.cc:1013] Processor: start processing batch f01d730d-cc6a-4442-a52f-74f393c60e2f into model nwt_hat4
+I0111 11:38:41.541579 10536 processor.cc:1192] Processor: complete processing batch cd47d3e5-c672-4120-a93f-1c20d8796f11 into model nwt_hat3
+I0111 11:38:41.542578 10536 common.h:120] 53ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\cd47d3e5-c672-4120-a93f-1c20d8796f11.batch) [including 3ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 26ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.543578 24032 master_component.cc:1063] MergeModelArgs: nwt_target_name=nwt, class=(nwt:0.992209), class=(nwt_hat3:0.00779121), topic_name_size=0
+I0111 11:38:41.543578 24032 master_component.cc:556] MasterComponent: start merging models
+I0111 11:38:41.543578 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.557579 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.561580 10536 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.566581 24032 master_component.cc:597] MasterComponent: complete merging models
+I0111 11:38:41.566581 24032 master_component.cc:1068] DisposeModel nwt_hat3
+I0111 11:38:41.567580 24032 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt5, nwt_source_name=nwt, rwt_source_name=
+I0111 11:38:41.567580 24032 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:38:41.572582 17464 processor.cc:1192] Processor: complete processing batch d858034e-5490-48a0-af44-952baf50ee7f into model nwt_hat4
+I0111 11:38:41.573581 12172 processor.cc:1192] Processor: complete processing batch f01d730d-cc6a-4442-a52f-74f393c60e2f into model nwt_hat4
+I0111 11:38:41.573581 17464 common.h:120] 48ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\d858034e-5490-48a0-af44-952baf50ee7f.batch) [including 2ms in LoadMessage; 2ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.575582 12172 common.h:120] 50ms in ProcessBatch(e3463243-5abf-4102-ac80-c8f0d560af8f\f01d730d-cc6a-4442-a52f-74f393c60e2f.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:38:41.577581 24032 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:38:41.577581 24032 master_component.cc:1068] DisposeModel pwt3
+I0111 11:38:41.579581 24032 master_component.cc:1063] MergeModelArgs: nwt_target_name=nwt, class=(nwt:0.992214), class=(nwt_hat4:0.00778591), topic_name_size=0
+I0111 11:38:41.579581 24032 master_component.cc:556] MasterComponent: start merging models
+I0111 11:38:41.579581 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.592583 17464 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.594583 12172 processor.cc:976] No data in processing queue, waiting...
+I0111 11:38:41.594583 24032 phi_matrix_operations.cc:97] RetrieveExternalTopicModel() with 16 topics, 7805 tokens
+I0111 11:38:41.602584 24032 master_component.cc:597] MasterComponent: complete merging models
+I0111 11:38:41.602584 24032 master_component.cc:1068] DisposeModel nwt_hat4
+I0111 11:38:41.604584 24032 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt, nwt_source_name=nwt, rwt_source_name=
+I0111 11:38:41.604584 24032 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:38:41.616585 24032 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:38:41.616585 24032 master_component.cc:1068] DisposeModel pwt4
+I0111 11:38:41.618585 24032 master_component.cc:1068] DisposeModel pwt5
+I0111 11:38:41.620586 24032 merger.cc:241] Merger::RequestScore(score_name=Perplexity)
+I0111 11:38:41.620586 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 60 bytes
+I0111 11:38:41.625586 24032 merger.cc:241] Merger::RequestScore(score_name=SparsityPhi)
+I0111 11:38:41.626586 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 32 bytes
+I0111 11:38:41.629586 24032 merger.cc:241] Merger::RequestScore(score_name=SparsityTheta)
+I0111 11:38:41.629586 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 34 bytes
+I0111 11:38:41.639587 24032 merger.cc:241] Merger::RequestScore(score_name=TopTokens)
+I0111 11:38:41.685592 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 5092 bytes
+I0111 11:38:42.162641 24032 merger.cc:241] Merger::RequestScore(score_name=ThetaSnippet)
+I0111 11:38:42.162641 24032 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 729 bytes
+I0111 11:38:42.301654 17464 processor.cc:968] Processor thread stopped
+I0111 11:38:42.301654 17464 processor.cc:969] Total number of processed batches: 6
+I0111 11:38:42.302654 23796 processor.cc:968] Processor thread stopped
+I0111 11:38:42.302654 23796 processor.cc:969] Total number of processed batches: 5
+I0111 11:38:42.303654 12172 processor.cc:968] Processor thread stopped
+I0111 11:38:42.303654 12172 processor.cc:969] Total number of processed batches: 5
+I0111 11:38:42.304654 10536 processor.cc:968] Processor thread stopped
+I0111 11:38:42.304654 10536 processor.cc:969] Total number of processed batches: 6
+I0111 11:38:42.305655 18212 merger.cc:126] Merger thread stopped
+I0111 11:38:42.317656 24032 c_interface.cc:284] Disposing MasterComponent (id=1)...

@@ -1,0 +1,129 @@
+\documentclass{article}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\pagenumbering{gobble}
+\newcounter{wavenum}
+
+\setlength{\unitlength}{1cm}
+% advance clock one cycle, not to be called directly
+\newcommand*{\clki}{
+  \draw (t_cur) -- ++(0,.0) -- ++(.5,0) -- ++(0,-.0) -- ++(.5,0) -- ++(0,.0)
+    node[time] (t_cur) {};
+}
+
+\newcommand*{\MergerQueue}[3]{
+  \fill[fill=#3]
+                         (t_cur) -- ++( .0, .04) -- ++(#2-.0,0) -- ++(.0, -.04)
+                         -- ++(-.0,-.04) -- ++(.0-#2,0) -- cycle;
+  \path (t_cur) -- node[anchor=mid] {#1} ++(#2,0) node[time] (t_cur) {};
+}
+
+\newcommand*{\MQFull}[2][XXX]{
+    \MergerQueue{#1}{#2}{red}
+}
+
+\newcommand*{\MQNormal}[2]{
+    \MergerQueue{#1}{#2}{green}
+}
+
+\newcommand*{\bitvector}[6]{
+  \fill[fill=#3, pattern=#5, pattern color=#4,fill opacity=#6]
+                         (t_cur) -- ++( .0, .2) -- ++(#2-.0,0) -- ++(.0, -.18)
+                         -- ++(-.0,-.18) -- ++(.0-#2,0) -- cycle;
+  \path (t_cur) -- node[anchor=mid] {#1} ++(#2,0) node[time] (t_cur) {};
+}
+
+% \known{val}{length}
+\newcommand*{\Wait}[2]{
+    \bitvector{#1}{#2}{white}{white}{}{0.0}
+}
+
+% \unknown{length}
+\newcommand*{\ProcBatchOne}[2][XXX]{
+    \bitvector{#1}{#2}{orange}{orange}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\ProcBatchTwo}[2][XXX]{
+    \bitvector{#1}{#2}{yellow}{yellow}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Regularization}[2][XXX]{
+    \bitvector{#1}{#2}{red}{red}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Normalization}[2][XXX]{
+    \bitvector{#1}{#2}{green}{green}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Merge}[2][XXX]{
+    \bitvector{#1}{#2}{blue}{blue}{}{1.0}
+}
+
+% \nextwave{name}
+\newcommand{\nextwave}[1]{
+  \path (0,\value{wavenum} * 0.5) node[left] {#1} node[time] (t_cur) {};
+  \addtocounter{wavenum}{-1}
+}
+
+% \begin{wave}[clkname]{num_waves}{clock_cycles}
+\newenvironment{wave}[3][\bf{time}]{
+  \begin{tikzpicture}[draw=black, yscale=1.5,xscale=1.0]
+    \tikzstyle{time}=[coordinate]
+    \setlength{\unitlength}{1cm}
+    \def\wavewidth{#3}
+    \setcounter{wavenum}{0}
+    \nextwave{#1}
+
+    \draw[dotted] (t_cur) +(0,.1) node[above] {t=0\%} -- ++(0,2.8-#2);
+    \clki
+    \foreach \t in {1,...,\wavewidth}{
+      \draw[dotted] (t_cur) +(0,.1) node[above] {\t0\%} -- ++(0,2.8-#2);
+      \clki
+    }
+}{\end{tikzpicture}}
+
+%%% End of timing.sty
+\usepackage{verbatim}
+
+\begin{document}
+\begin{wave}{6}{10}
+\nextwave{23796} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.0574647485947} \ProcBatchTwo[ ]{0.689672889017} \Wait{ }{0.0287306616923} \ProcBatchOne[ ]{0.373556830571} \Wait{ }{1.83909459368} \ProcBatchTwo[ ]{1.32182280087} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.35058086424} 
+\nextwave{24032} \Wait{ }{1.89659016917}\Merge[ ]{0.919504481716} \Wait{ }{0.258623908171} \Normalization[ ]{0.402287492263} \Wait{ }{0.229889821269} \Merge[ ]{0.775871724514} \Wait{ }{0.0287306616923} \Normalization[ ]{0.344822743669} \Wait{ }{1.17815921678} \Merge[ ]{0.71840355071} \Wait{ }{0.0574647485947} \Normalization[ ]{0.287357995074} \Wait{ }{0.804602386207} \Merge[ ]{0.660938802115} \Wait{ }{0.0287032600121} \Normalization[ ]{0.287357995074} \Wait{ }{0.0574647485947} \Merge[ ]{0.660938802115} \Wait{ }{0.0574647485947} \Normalization[ ]{0.344822743669} 
+\nextwave{17464} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.58041588215} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{1.29308871397} \Wait{ }{0.689672889017} \ProcBatchTwo[ ]{0.775840897624} \Wait{ }{0.0861988354971} \ProcBatchTwo[ ]{1.35061169113} \Wait{ }{0.0574373469145} \ProcBatchOne[ ]{0.488513729441} \Wait{ }{0.919531883396} \ProcBatchTwo[ ]{1.29314694254} 
+\nextwave{12172} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.72410686792} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.63793885932} \Wait{ }{0.258623908171} \ProcBatchTwo[ ]{1.43681052663} \Wait{ }{0.0861680086069} \ProcBatchOne[ ]{1.23562396537} \Wait{ }{0.862067134802} \ProcBatchTwo[ ]{1.32185020255} 
+\nextwave{10536} \Wait{ }{0.0574921502749}\ProcBatchTwo[ ]{1.0631988927} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{0.689672889017} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.632177313532} \ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.60341582495} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.11496032408} \ProcBatchOne[ ]{1.40807643973} 
+\end{wave}
+
+\vspace{-0.4cm}
+\begin{flushleft}
+$\qquad$\bf{memory usage}
+\end{flushleft}
+\vspace{-.55cm}
+$\qquad\qquad\quad\,$
+\begin{tikzpicture}[x=1cm,y=0.4cm]
+
+  \def\xmin{0}
+  \def\xmax{12.0}
+  \def\ymin{0}
+  \def\ymax{14}
+
+  % axes
+  \foreach \y in {0,...,10}
+	  \draw[dotted] (\xmin + \y,\ymin) -- (\xmin + \y,\ymax) node[above] {};
+
+%%%%% START_MARKER_2 %%%%%
+  \foreach \y in {2,4,...,12}
+    \node at (\xmin,\y) [left] {\y};
+
+  \draw[color=blue] plot[smooth,mark=*,mark size=1pt] file {data.dat}
+   node [right] {};
+
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,5 @@
+# Download data from https://s3-eu-west-1.amazonaws.com/artm/vw.mmro.txt.7z
+bigartm.exe --read-vw-corpus D:\datasets\vw.mmro.txt --batch-size 50 --topics 100 --passes 1 
+bigartm.exe --read-vw-corpus D:\datasets\vw.mmro.txt --batch-size 50 --topics 100 --passes 1 --update-every 5
+bigartm.exe --read-vw-corpus D:\datasets\vw.mmro.txt --batch-size 50 --topics 100 --passes 1 --update-every 5 --async
+bigartm.exe --read-vw-corpus D:\datasets\vw.mmro.txt --batch-size 50 --topics 100 --passes 1 --update-every 5 --model-v06

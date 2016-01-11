@@ -120,12 +120,12 @@ def parse_log(log_file_name):
                                                                                            global_start_time,
                                                                                            read_batch=read_batch)
                         task_name = '{0}-{1}'.format(task_type, process_name)
-                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name)
+                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name, model_name)
 
                         if min_time_stamp is None:
                             min_time_stamp = start_time
 
-                        if model_name not in models_list:
+                        if (model_name is not None) and (model_name not in models_list):
                             models_list.append(model_name)
                         break
 
@@ -156,10 +156,10 @@ def parse_log(log_file_name):
     for process_name in process_info.keys(): 
         process_info[process_name].sort(cmp=_make_comparator(lambda x, y: x.start_time > y.start_time), reverse=True)
 
-    return process_info, max_time_stamp, min_time_stamp
+    return process_info, max_time_stamp, min_time_stamp, models_list
 
 
-process_info, max_time_stamp, min_time_stamp = parse_log(input_log_file)
+process_info, max_time_stamp, min_time_stamp, models_list = parse_log(input_log_file)
 for _, tasks in process_info.iteritems():
     for task in tasks:
         task.start_time -= min_time_stamp
@@ -198,6 +198,7 @@ with open(input_tex_file, 'r') as fin:
                         else:
                             val = (process_info[p_name][idx].complete_time - process_info[p_name][idx].start_time) * coef
                             if process_info[p_name][idx].task_type == BATCH_PROC_TASK:
+                                index = models_list.index(process_info[p_name][idx].model_name)
                                 if index % 2:
                                     process_str += '\\ProcBatchOne[ ]{{{0}}} '.format(val)
                                 else:

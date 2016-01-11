@@ -1,0 +1,120 @@
+Log file created at: 2016/01/11 11:36:04
+Running on machine: SLB-GXDXS22
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0111 11:36:04.032829 15864 perplexity.cc:25] Perplexity score calculator created: stream_name=@global, model_type=0
+I0111 11:36:04.033828 20976 merger.cc:123] Merger thread started
+I0111 11:36:04.033828 18080 processor.cc:960] Processor thread started
+I0111 11:36:04.033828 16916 processor.cc:960] Processor thread started
+I0111 11:36:04.033828 14388 processor.cc:960] Processor thread started
+I0111 11:36:04.033828 15864 c_interface.cc:222] Creating MasterModel (id=1)...
+I0111 11:36:04.033828 10108 processor.cc:960] Processor thread started
+I0111 11:36:04.036829 15864 c_interface.cc:333] Pass GatherDictionaryArgs: dictionary_target_name=main_dictionary, data_path=ff997016-3ae2-4063-ae4c-0ca53aeac356, symmetric_cooc_values=0 to void (__cdecl artm::core::MasterComponent::*)(class artm::GatherDictionaryArgs const & __ptr64) __ptr64
+I0111 11:36:04.038830 15864 dictionary.cc:183] Found 22 batches in 'ff997016-3ae2-4063-ae4c-0ca53aeac356' folder
+I0111 11:36:04.052830 14388 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.052830 10108 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.052830 18080 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.052830 16916 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.142839 15864 dictionary.cc:232] Find 7805 unique tokens in 1061 items
+I0111 11:36:04.166842 15864 c_interface.cc:333] Pass InitializeModelArgs: model_name=pwt, dictionary_name=main_dictionary, topics_count=16, topic_name_size=16 to void (__cdecl artm::core::MasterComponent::*)(class artm::InitializeModelArgs const & __ptr64) __ptr64
+I0111 11:36:04.166842 15864 merger.cc:422] InitializeModel() with 16 topics and 7805 tokens
+I0111 11:36:04.216847 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 288451 bytes
+I0111 11:36:04.230849 15864 c_interface.cc:333] Pass FitOfflineMasterModelArgs, batch_filename_size=22, batch_weight_size=22, passes=1 to void (__cdecl artm::core::MasterComponent::*)(class artm::FitOfflineMasterModelArgs const & __ptr64) __ptr64
+I0111 11:36:04.230849 15864 master_component.cc:1003] ProcessBatchesArgs: nwt_target_name=nwt, batch_filename_size=22, batch_weight_size=22, pwt_source_name=pwt, inner_iterations_count=10, stream_name=@global, reuse_theta=no, opt_for_avx=yes, use_sparse_bow=yes, reset_scores=yes, predict_class_id=
+I0111 11:36:04.239850 18080 processor.cc:983] Processing queue has data, processing started
+I0111 11:36:04.239850 14388 processor.cc:983] Processing queue has data, processing started
+I0111 11:36:04.239850 10108 processor.cc:983] Processing queue has data, processing started
+I0111 11:36:04.239850 16916 processor.cc:983] Processing queue has data, processing started
+I0111 11:36:04.240849 18080 processor.cc:1013] Processor: start processing batch 0ad9ce9c-5e00-401a-b5ca-bdd75c5f3cbd into model nwt
+I0111 11:36:04.243849 10108 processor.cc:1013] Processor: start processing batch 0b05215d-9e3d-402c-adcb-30ada1810193 into model nwt
+I0111 11:36:04.243849 16916 processor.cc:1013] Processor: start processing batch 0f4d2ff5-60e8-49b5-9664-02416d673421 into model nwt
+I0111 11:36:04.244850 14388 processor.cc:1013] Processor: start processing batch 08522427-7b10-47db-8aa7-5450dc606b29 into model nwt
+I0111 11:36:04.267853 18080 processor.cc:1192] Processor: complete processing batch 0ad9ce9c-5e00-401a-b5ca-bdd75c5f3cbd into model nwt
+I0111 11:36:04.267853 18080 common.h:120] 28ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\0ad9ce9c-5e00-401a-b5ca-bdd75c5f3cbd.batch) [including 1ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 13ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.270853 18080 processor.cc:1013] Processor: start processing batch 1f53a5d8-12d6-4a4a-ade9-1313139d224b into model nwt
+I0111 11:36:04.297855 10108 processor.cc:1192] Processor: complete processing batch 0b05215d-9e3d-402c-adcb-30ada1810193 into model nwt
+I0111 11:36:04.299855 10108 common.h:120] 60ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\0b05215d-9e3d-402c-adcb-30ada1810193.batch) [including 4ms in LoadMessage; 5ms in InitializeSparseNdw; 7ms in InitializeModelIncrement; 27ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.299855 16916 processor.cc:1192] Processor: complete processing batch 0f4d2ff5-60e8-49b5-9664-02416d673421 into model nwt
+I0111 11:36:04.300855 16916 common.h:120] 61ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\0f4d2ff5-60e8-49b5-9664-02416d673421.batch) [including 4ms in LoadMessage; 4ms in InitializeSparseNdw; 7ms in InitializeModelIncrement; 28ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.301856 10108 processor.cc:1013] Processor: start processing batch 2854f4a1-8ef3-4d3d-91fd-920676277c95 into model nwt
+I0111 11:36:04.302855 16916 processor.cc:1013] Processor: start processing batch 2fbe3e8c-1b9f-4cb6-a57c-7f050c00c07f into model nwt
+I0111 11:36:04.303855 14388 processor.cc:1192] Processor: complete processing batch 08522427-7b10-47db-8aa7-5450dc606b29 into model nwt
+I0111 11:36:04.304857 14388 common.h:120] 65ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\08522427-7b10-47db-8aa7-5450dc606b29.batch) [including 5ms in LoadMessage; 4ms in InitializeSparseNdw; 7ms in InitializeModelIncrement; 30ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.306856 14388 processor.cc:1013] Processor: start processing batch 31c7c241-2b84-450a-8e20-13acc5c615e6 into model nwt
+I0111 11:36:04.311856 18080 processor.cc:1192] Processor: complete processing batch 1f53a5d8-12d6-4a4a-ade9-1313139d224b into model nwt
+I0111 11:36:04.312856 18080 common.h:120] 45ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\1f53a5d8-12d6-4a4a-ade9-1313139d224b.batch) [including 3ms in LoadMessage; 1ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 21ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.313856 18080 processor.cc:1013] Processor: start processing batch 517c2a87-c6e4-446c-91e3-f308e7ec6484 into model nwt
+I0111 11:36:04.321857 14388 processor.cc:1192] Processor: complete processing batch 31c7c241-2b84-450a-8e20-13acc5c615e6 into model nwt
+I0111 11:36:04.322857 14388 common.h:120] 18ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\31c7c241-2b84-450a-8e20-13acc5c615e6.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 7ms in InferThetaAndUpdateNwtSparse; 4ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.323858 14388 processor.cc:1013] Processor: start processing batch 58111893-0ba9-4818-b7e2-d6f3e57f24bc into model nwt
+I0111 11:36:04.336859 18080 processor.cc:1192] Processor: complete processing batch 517c2a87-c6e4-446c-91e3-f308e7ec6484 into model nwt
+I0111 11:36:04.337859 18080 common.h:120] 25ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\517c2a87-c6e4-446c-91e3-f308e7ec6484.batch) [including 1ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 11ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.338860 16916 processor.cc:1192] Processor: complete processing batch 2fbe3e8c-1b9f-4cb6-a57c-7f050c00c07f into model nwt
+I0111 11:36:04.339859 18080 processor.cc:1013] Processor: start processing batch 5c744643-8341-4c8a-aa53-511425081d8f into model nwt
+I0111 11:36:04.339859 16916 common.h:120] 39ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\2fbe3e8c-1b9f-4cb6-a57c-7f050c00c07f.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 19ms in InferThetaAndUpdateNwtSparse; 10ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.341859 16916 processor.cc:1013] Processor: start processing batch 6f79a68a-0e91-43ef-be5d-ad077eda227f into model nwt
+I0111 11:36:04.345860 10108 processor.cc:1192] Processor: complete processing batch 2854f4a1-8ef3-4d3d-91fd-920676277c95 into model nwt
+I0111 11:36:04.346860 10108 common.h:120] 47ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\2854f4a1-8ef3-4d3d-91fd-920676277c95.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 24ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.348860 10108 processor.cc:1013] Processor: start processing batch 74c18419-3943-4898-98ca-b0c5282310b3 into model nwt
+I0111 11:36:04.348860 14388 processor.cc:1192] Processor: complete processing batch 58111893-0ba9-4818-b7e2-d6f3e57f24bc into model nwt
+I0111 11:36:04.349860 14388 common.h:120] 27ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\58111893-0ba9-4818-b7e2-d6f3e57f24bc.batch) [including 1ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 12ms in InferThetaAndUpdateNwtSparse; 7ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.351861 14388 processor.cc:1013] Processor: start processing batch 87022564-3bbe-49fb-927b-29d208965489 into model nwt
+I0111 11:36:04.362861 18080 processor.cc:1192] Processor: complete processing batch 5c744643-8341-4c8a-aa53-511425081d8f into model nwt
+I0111 11:36:04.363862 18080 common.h:120] 26ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\5c744643-8341-4c8a-aa53-511425081d8f.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 11ms in InferThetaAndUpdateNwtSparse; 5ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.364862 18080 processor.cc:1013] Processor: start processing batch 895c3954-8a2e-4f37-b435-9afa90aaf71d into model nwt
+I0111 11:36:04.375864 18080 processor.cc:1192] Processor: complete processing batch 895c3954-8a2e-4f37-b435-9afa90aaf71d into model nwt
+I0111 11:36:04.375864 18080 common.h:120] 12ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\895c3954-8a2e-4f37-b435-9afa90aaf71d.batch) [including 1ms in LoadMessage; 0ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 4ms in InferThetaAndUpdateNwtSparse; 3ms in CalculateScore(Perplexity); 1ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.377863 18080 processor.cc:1013] Processor: start processing batch 9d201bc2-be7b-4634-accb-ddb1502f5294 into model nwt
+I0111 11:36:04.381863 16916 processor.cc:1192] Processor: complete processing batch 6f79a68a-0e91-43ef-be5d-ad077eda227f into model nwt
+I0111 11:36:04.382863 16916 common.h:120] 43ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\6f79a68a-0e91-43ef-be5d-ad077eda227f.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 21ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.384865 16916 processor.cc:1013] Processor: start processing batch ae68e6cd-bf20-41bb-8657-64c08dcc8e59 into model nwt
+I0111 11:36:04.391865 10108 processor.cc:1192] Processor: complete processing batch 74c18419-3943-4898-98ca-b0c5282310b3 into model nwt
+I0111 11:36:04.392864 10108 common.h:120] 46ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\74c18419-3943-4898-98ca-b0c5282310b3.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.394865 14388 processor.cc:1192] Processor: complete processing batch 87022564-3bbe-49fb-927b-29d208965489 into model nwt
+I0111 11:36:04.395865 10108 processor.cc:1013] Processor: start processing batch d381b4da-af37-40e9-a610-ad086f61dbc8 into model nwt
+I0111 11:36:04.395865 14388 common.h:120] 46ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\87022564-3bbe-49fb-927b-29d208965489.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 11ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 3ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.397866 14388 processor.cc:1013] Processor: start processing batch d76a0b2e-3f3c-4db7-9f29-97358d6477f1 into model nwt
+I0111 11:36:04.401865 18080 processor.cc:1192] Processor: complete processing batch 9d201bc2-be7b-4634-accb-ddb1502f5294 into model nwt
+I0111 11:36:04.402865 18080 common.h:120] 26ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\9d201bc2-be7b-4634-accb-ddb1502f5294.batch) [including 1ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 11ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.404866 18080 processor.cc:1013] Processor: start processing batch ded57936-148d-4115-beed-aa21202efd99 into model nwt
+I0111 11:36:04.420867 14388 processor.cc:1192] Processor: complete processing batch d76a0b2e-3f3c-4db7-9f29-97358d6477f1 into model nwt
+I0111 11:36:04.421867 14388 common.h:120] 26ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\d76a0b2e-3f3c-4db7-9f29-97358d6477f1.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 11ms in InferThetaAndUpdateNwtSparse; 6ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 1ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.423867 14388 processor.cc:1013] Processor: start processing batch e9ad2f5c-430e-4604-81fc-b1d9be1fe538 into model nwt
+I0111 11:36:04.428869 16916 processor.cc:1192] Processor: complete processing batch ae68e6cd-bf20-41bb-8657-64c08dcc8e59 into model nwt
+I0111 11:36:04.429868 16916 common.h:120] 47ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\ae68e6cd-bf20-41bb-8657-64c08dcc8e59.batch) [including 2ms in LoadMessage; 0ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 23ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.431869 16916 processor.cc:1013] Processor: start processing batch ed6bfa78-2b9a-4e14-84a5-f860a134ec81 into model nwt
+I0111 11:36:04.443869 10108 processor.cc:1192] Processor: complete processing batch d381b4da-af37-40e9-a610-ad086f61dbc8 into model nwt
+I0111 11:36:04.444870 10108 common.h:120] 52ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\d381b4da-af37-40e9-a610-ad086f61dbc8.batch) [including 3ms in LoadMessage; 2ms in InitializeSparseNdw; 3ms in InitializeModelIncrement; 25ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.448870 18080 processor.cc:1192] Processor: complete processing batch ded57936-148d-4115-beed-aa21202efd99 into model nwt
+I0111 11:36:04.450870 18080 common.h:120] 48ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\ded57936-148d-4115-beed-aa21202efd99.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 24ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 2ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.463871 10108 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.465873 14388 processor.cc:1192] Processor: complete processing batch e9ad2f5c-430e-4604-81fc-b1d9be1fe538 into model nwt
+I0111 11:36:04.467872 14388 common.h:120] 46ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\e9ad2f5c-430e-4604-81fc-b1d9be1fe538.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 21ms in InferThetaAndUpdateNwtSparse; 12ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.469872 18080 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.478873 16916 processor.cc:1192] Processor: complete processing batch ed6bfa78-2b9a-4e14-84a5-f860a134ec81 into model nwt
+I0111 11:36:04.480873 16916 common.h:120] 51ms in ProcessBatch(ff997016-3ae2-4063-ae4c-0ca53aeac356\ed6bfa78-2b9a-4e14-84a5-f860a134ec81.batch) [including 2ms in LoadMessage; 1ms in InitializeSparseNdw; 2ms in InitializeModelIncrement; 25ms in InferThetaAndUpdateNwtSparse; 13ms in CalculateScore(Perplexity); 3ms in CalculateScore(SparsityTheta); 2ms in CalculateScore(ThetaSnippet); ]
+I0111 11:36:04.481873 15864 master_component.cc:1052] NormalizeModelArgs: pwt_target_name=pwt, nwt_source_name=nwt, rwt_source_name=
+I0111 11:36:04.481873 15864 master_component.cc:634] MasterComponent: start normalizing model nwt
+I0111 11:36:04.486874 14388 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.495875 15864 master_component.cc:664] MasterComponent: complete normalizing model nwt
+I0111 11:36:04.495875 15864 master_component.cc:1068] DisposeModel rwt
+I0111 11:36:04.495875 15864 merger.cc:241] Merger::RequestScore(score_name=Perplexity)
+I0111 11:36:04.495875 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 60 bytes
+I0111 11:36:04.499876 16916 processor.cc:976] No data in processing queue, waiting...
+I0111 11:36:04.499876 15864 merger.cc:241] Merger::RequestScore(score_name=SparsityPhi)
+I0111 11:36:04.499876 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 32 bytes
+I0111 11:36:04.502876 15864 merger.cc:241] Merger::RequestScore(score_name=SparsityTheta)
+I0111 11:36:04.502876 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 34 bytes
+I0111 11:36:04.507876 15864 merger.cc:241] Merger::RequestScore(score_name=TopTokens)
+I0111 11:36:04.544880 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 5136 bytes
+I0111 11:36:04.937919 15864 merger.cc:241] Merger::RequestScore(score_name=ThetaSnippet)
+I0111 11:36:04.937919 15864 c_interface.cc:138] ArtmCopyRequestResultEx(request_type=0) copied 729 bytes
+I0111 11:36:05.065932 18080 processor.cc:968] Processor thread stopped
+I0111 11:36:05.065932 18080 processor.cc:969] Total number of processed batches: 7
+I0111 11:36:05.066932 16916 processor.cc:968] Processor thread stopped
+I0111 11:36:05.066932 16916 processor.cc:969] Total number of processed batches: 5
+I0111 11:36:05.067932 14388 processor.cc:968] Processor thread stopped
+I0111 11:36:05.067932 14388 processor.cc:969] Total number of processed batches: 6
+I0111 11:36:05.068933 10108 processor.cc:968] Processor thread stopped
+I0111 11:36:05.068933 10108 processor.cc:969] Total number of processed batches: 4
+I0111 11:36:05.069932 20976 merger.cc:126] Merger thread stopped
+I0111 11:36:05.076933 15864 c_interface.cc:284] Disposing MasterComponent (id=1)...
