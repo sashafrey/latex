@@ -1,6 +1,3 @@
-# Usage:
-# python create_proc_plot.py <input log file name> base_plot.tex plot.tex
-
 import datetime
 import time
 import sys
@@ -104,6 +101,7 @@ def parse_log(log_file_name):
     max_time_stamp = -1
     min_time_stamp = None
     models_list = []
+    main_thread_name = None
     process_info = {}  # dict, key --- process name, value --- list of tasks
     with open(log_file_name, 'r') as fin:
         incomplete_tasks = {}
@@ -125,7 +123,7 @@ def parse_log(log_file_name):
                         if min_time_stamp is None:
                             min_time_stamp = start_time
 
-                        if (model_name is not None) and (model_name not in models_list):
+                        if model_name not in models_list and model_name is not None:
                             models_list.append(model_name)
                         break
 
@@ -136,6 +134,8 @@ def parse_log(log_file_name):
                                                                                               global_start_time,
                                                                                               read_batch=read_batch)
                         task_name = '{0}-{1}'.format(task_type, process_name)
+                        main_thread_name = process_name  # this would be 'main' in the last task
+
                         if (task_name not in incomplete_tasks) or\
                              (read_batch and incomplete_tasks[task_name].batch_name != batch_name and\
                                              incomplete_tasks[task_name].model_name != model_name):
@@ -156,27 +156,36 @@ def parse_log(log_file_name):
     for process_name in process_info.keys(): 
         process_info[process_name].sort(cmp=_make_comparator(lambda x, y: x.start_time > y.start_time), reverse=True)
 
-    return process_info, max_time_stamp, min_time_stamp, models_list
+    return process_info, models_list, max_time_stamp, min_time_stamp, main_thread_name
 
 
-process_info, max_time_stamp, min_time_stamp, models_list = parse_log(input_log_file)
+process_info, models_list, max_time_stamp, min_time_stamp, main_thread_name = parse_log(input_log_file)
 for _, tasks in process_info.iteritems():
     for task in tasks:
         task.start_time -= min_time_stamp
         task.complete_time -= min_time_stamp
 max_time_stamp -= min_time_stamp
 
+
 # write info to latex file
 coef = 10 / max_time_stamp
 with open(input_tex_file, 'r') as fin:
     with open(output_tex_file, 'w') as fout:
         for line in fin:
-            if '%%%%% START_MARKER_1 %%%%%' not in line:
+            if '%%%%% START_MARKER %%%%%' not in line:
                 fout.write(line)
             else:
-                fout.write('\\begin{{wave}}{{{}}}{{10}}\n'.format(len(process_info.keys()) + 1))
-                for p_name in process_info.keys():
-                    process_str = '\\nextwave{{{}}} '.format(p_name)
+                fout.write('\\begin{{wave}}{{{0}}}{{9}}{{{1:.2}}}\n'.format(len(process_info.keys()) + 1, max_time_stamp))
+                process_names_list = process_info.keys()
+                process_names_list.remove(main_thread_name)
+                process_names_list += [main_thread_name]
+
+                batch_counter = 0
+                for p_i, p_name in enumerate(process_names_list):
+                    name_to_print = 'Main'
+                    if p_i < (len(process_names_list) - 1):
+                        name_to_print = 'Proc-{}'.format(p_i + 1)
+                    process_str = '\\nextwave{{{}}} '.format(name_to_print)
                     process_str += '\\Wait{{ }}{{{}}}'.format(process_info[p_name][0].start_time * coef)
                     for idx, _ in enumerate(process_info[p_name]):
                         if idx != len(process_info[p_name]) - 1:
@@ -185,29 +194,26 @@ with open(input_tex_file, 'r') as fin:
                             
                             if process_info[p_name][idx].task_type == BATCH_PROC_TASK:
                                 index = models_list.index(process_info[p_name][idx].model_name)
-                                if index % 2:
-                                    process_str += '\\ProcBatchOne[ ]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
-                                else:
-                                    process_str += '\\ProcBatchTwo[ ]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
+                                process_str += '\\ProcBatch{0}[{1}]{{{2}}} \\Wait{{ }}{{{3}}} '.format(
+                                    'One' if index % 2 else 'Two', batch_counter, val_1, val_2)
+                                batch_counter += 1
                             elif process_info[p_name][idx].task_type == REGULARIZING_TASK:
-                                process_str += '\\Regularization[ ]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
+                                process_str += '\\Regularization[R]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
                             elif process_info[p_name][idx].task_type == NORMALIZING_TASK:
-                                process_str += '\\Normalization[ ]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
+                                process_str += '\\Normalization[N]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
                             elif process_info[p_name][idx].task_type == MERGING_TASK:
-                                process_str += '\\Merge[ ]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
+                                process_str += '\\Merge[M]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
                         else:
                             val = (process_info[p_name][idx].complete_time - process_info[p_name][idx].start_time) * coef
                             if process_info[p_name][idx].task_type == BATCH_PROC_TASK:
-                                index = models_list.index(process_info[p_name][idx].model_name)
-                                if index % 2:
-                                    process_str += '\\ProcBatchOne[ ]{{{0}}} '.format(val)
-                                else:
-                                    process_str += '\\ProcBatchTwo[ ]{{{0}}} '.format(val)
+                                process_str += '\\ProcBatch{0}[{1}]{{{2}}} '.format(
+                                    'One' if index % 2 else 'Two', batch_counter, val)
+                                batch_counter += 1
                             elif process_info[p_name][idx].task_type == REGULARIZING_TASK:
-                                process_str += '\\Regularization[ ]{{{0}}} '.format(val)
+                                process_str += '\\Regularization[R]{{{0}}} '.format(val)
                             elif process_info[p_name][idx].task_type == NORMALIZING_TASK:
-                                process_str += '\\Normalization[ ]{{{0}}} '.format(val)
+                                process_str += '\\Normalization[N]{{{0}}} '.format(val)
                             elif process_info[p_name][idx].task_type == MERGING_TASK:
-                                process_str += '\\Merge[ ]{{{0}}} '.format(val)
+                                process_str += '\\Merge[M]{{{0}}} '.format(val)
 
                     fout.write('{}\n'.format(process_str))

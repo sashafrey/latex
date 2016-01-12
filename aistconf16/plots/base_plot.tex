@@ -1,15 +1,22 @@
-\documentclass{article}
+\documentclass{standalone}
 \usepackage{verbatim}
 \usepackage{tikz}
+\usepackage{xcolor}
 \usetikzlibrary{patterns}
 
 \pagenumbering{gobble}
 \newcounter{wavenum}
 
+\definecolor{DarkRed}{rgb}{0.5, 0.2, 0.2}
+\definecolor{LightRed}{rgb}{0.7, 0.4, 0.4}
+\definecolor{DarkGreen}{rgb}{0.1, 0.4, 0.1}
+\definecolor{DarkBlue}{rgb}{0.3, 0.3, 0.65}
+\definecolor{LightBlue}{rgb}{0.8, 0.8, 1.0}
+
 \setlength{\unitlength}{1cm}
 % advance clock one cycle, not to be called directly
 \newcommand*{\clki}{
-  \draw (t_cur) -- ++(0,.0) -- ++(.5,0) -- ++(0,-.0) -- ++(.5,0) -- ++(0,.0)
+  \draw[opacity=0.0] (t_cur) -- ++(0,.0) -- ++(.5,0) -- ++(0,-.0) -- ++(.5,0) -- ++(0,.0)
     node[time] (t_cur) {};
 }
 
@@ -29,10 +36,10 @@
 }
 
 \newcommand*{\bitvector}[6]{
-  \fill[fill=#3, pattern=#5, pattern color=#4,fill opacity=#6]
-                         (t_cur) -- ++( .0, .2) -- ++(#2-.0,0) -- ++(.0, -.18)
-                         -- ++(-.0,-.18) -- ++(.0-#2,0) -- cycle;
-  \path (t_cur) -- node[anchor=mid] {#1} ++(#2,0) node[time] (t_cur) {};
+  \fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6]
+                         (t_cur) -- ++( .0, .11) -- ++(#2-.0,0) -- ++(.0, -.12)
+                         -- ++(-.0,-.12) -- ++(.0-#2,0) -- cycle;
+  \path (t_cur) -- node[anchor=mid] {\footnotesize #1} ++(#2,0) node[time] (t_cur) {};
 }
 
 % \known{val}{length}
@@ -42,83 +49,60 @@
 
 % \unknown{length}
 \newcommand*{\ProcBatchOne}[2][XXX]{
-    \bitvector{#1}{#2}{orange}{orange}{}{1.0}
+	\bitvector{#1}{#2}{DarkRed}{DarkRed}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\ProcBatchTwo}[2][XXX]{
-    \bitvector{#1}{#2}{yellow}{yellow}{}{1.0}
+	\bitvector{#1}{#2}{LightRed}{LightRed}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\Regularization}[2][XXX]{
-    \bitvector{#1}{#2}{red}{red}{}{1.0}
+	\bitvector{#1}{#2}{DarkGreen}{DarkGreen}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\Normalization}[2][XXX]{
-    \bitvector{#1}{#2}{green}{green}{}{1.0}
+	\bitvector{#1}{#2}{DarkBlue}{DarkBlue}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\Merge}[2][XXX]{
-    \bitvector{#1}{#2}{blue}{blue}{}{1.0}
+	\bitvector{#1}{#2}{LightBlue}{LightBlue}{}{1.0}
 }
 
 % \nextwave{name}
 \newcommand{\nextwave}[1]{
-  \path (0,\value{wavenum} * 0.5) node[left] {#1} node[time] (t_cur) {};
+  \path (0,\value{wavenum} * 0.35) node[left] {\footnotesize #1} node[time] (t_cur) {};
   \addtocounter{wavenum}{-1}
 }
 
 % \begin{wave}[clkname]{num_waves}{clock_cycles}
-\newenvironment{wave}[3][\bf{time}]{
-  \begin{tikzpicture}[draw=black, yscale=1.5,xscale=1.0]
-    \tikzstyle{time}=[coordinate]
-    \setlength{\unitlength}{1cm}
-    \def\wavewidth{#3}
-    \setcounter{wavenum}{0}
-    \nextwave{#1}
-
-    \draw[dotted] (t_cur) +(0,.1) node[above] {t=0\%} -- ++(0,2.8-#2);
-    \clki
-    \foreach \t in {1,...,\wavewidth}{
-      \draw[dotted] (t_cur) +(0,.1) node[above] {\t0\%} -- ++(0,2.8-#2);
-      \clki
-    }
+\newenvironment{wave}[4][\footnotesize\bf{time} $\:$]{
+	\begin{tikzpicture}[draw=black, yscale=1.5,xscale=1.0]
+	\tikzstyle{time}=[coordinate]
+	\setlength{\unitlength}{1cm}
+	\def\wavewidth{#3}
+	\setcounter{wavenum}{0}
+	\nextwave{#1}
+	
+	\draw[dotted] (t_cur) +(0,-0.1) node[above] {\footnotesize 0\%} -- ++(0,4.0-#2);
+	\clki
+	\foreach \t in {1,...,\wavewidth}{
+		\draw[dotted] (t_cur) +(0,-0.1) node[above] {\footnotesize \t0\%} -- ++(0,4.0-#2);
+		\clki
+	}
+	\foreach \t in {#4,...,#4}{
+		\draw[dotted] (t_cur) +(0,-0.1) node[above right] {\footnotesize \t$\,$sec.} -- ++(0,4.0-#2);
+		\clki
+	}
 }{\end{tikzpicture}}
 
 %%% End of timing.sty
 \usepackage{verbatim}
 
 \begin{document}
-%%%%% START_MARKER_1 %%%%%
+%%%%% START_MARKER %%%%%
 \end{wave}
-
-\vspace{-0.4cm}
-\begin{flushleft}
-$\qquad$\bf{memory usage}
-\end{flushleft}
-\vspace{-.55cm}
-$\qquad\qquad\quad\,$
-\begin{tikzpicture}[x=1cm,y=0.4cm]
-
-  \def\xmin{0}
-  \def\xmax{12.0}
-  \def\ymin{0}
-  \def\ymax{14}
-
-  % axes
-  \foreach \y in {0,...,10}
-	  \draw[dotted] (\xmin + \y,\ymin) -- (\xmin + \y,\ymax) node[above] {};
-
-%%%%% START_MARKER_2 %%%%%
-  \foreach \y in {2,4,...,12}
-    \node at (\xmin,\y) [left] {\y};
-
-  \draw[color=blue] plot[smooth,mark=*,mark size=1pt] file {data.dat}
-   node [right] {};
-
-\end{tikzpicture}
-
 \end{document}
