@@ -342,12 +342,13 @@ which are all based on the above formulas but differ in the way how operations a
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
 initialize $(\phi_{wt})$\;
+form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 \Repeat{$(\phi_{wt})$ converges}{
     %$\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
     %\ForAll{documents $d \in D$} {
     %    $(\tilde n_{wt}) := (\tilde n_{wt}) + \kw{ProcessDocument}(d, \Phi)$\;
     %}
-    $(n_{wt}) := \mathlarger\sum\limits_{d \in D} \; \kw{ProcessDocument}(d, \Phi)$\;
+    $(n_{wt}) := \mathlarger\sum\limits_{b=1, \dots, B} \; \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi)$\;
     $(\phi_{wt}) := \norm_{w \in W} (n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
@@ -369,19 +370,23 @@ initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
 $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \end{algorithm2e}
 
-\begin{figure}
-\centering
-\begin{wave}{6}{10}
-\nextwave{15864} \Wait{ }{9.45095925655}\Normalization[ ]{0.549040743454}
-\nextwave{16916} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.19608818345} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.41181771905} \Wait{ }{0.117593825681} \ProcBatchOne[ ]{1.56862506795} \Wait{ }{0.117715360024} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.8431057073}
-\nextwave{14388} \Wait{ }{0.156886813664}\ProcBatchOne[ ]{2.31368200913} \Wait{ }{0.117677964842} \ProcBatchOne[ ]{0.588212197093} \Wait{ }{0.0784644416221} \ProcBatchOne[ ]{0.980370801281} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.68626096322} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{0.901906359658} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.64712690476}
-\nextwave{18080} \Wait{ }{0.0}\ProcBatchOne[ ]{1.05887263809} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.60779652159} \Wait{ }{0.0784223720419} \ProcBatchOne[ ]{0.901985824421} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{0.901948429239} \Wait{ }{0.0784597672243} \ProcBatchOne[ ]{0.43140952259} \Wait{ }{0.0783849768594} \ProcBatchOne[ ]{0.941157278061} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.72546981204}
-\nextwave{10108} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.11766581141} \Wait{ }{0.156886813664} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.6862983584} \Wait{ }{0.156844744084} \ProcBatchOne[ ]{1.88231923052}
-\end{wave}
-\caption{Gantt chart for Offline algorithm} \label{fig:gantt:offline}
-\end{figure}
+%\begin{figure}
+%\centering
+%\begin{wave}{6}{10}
+%\nextwave{15864} \Wait{ }{9.45095925655}\Normalization[ ]{0.549040743454}
+%\nextwave{16916} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.19608818345} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.41181771905} \Wait{ }{0.117593825681} \ProcBatchOne[ ]{1.56862506795} \Wait{ }{0.117715360024} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.8431057073}
+%\nextwave{14388} \Wait{ }{0.156886813664}\ProcBatchOne[ ]{2.31368200913} \Wait{ }{0.117677964842} \ProcBatchOne[ ]{0.588212197093} \Wait{ }{0.0784644416221} \ProcBatchOne[ ]{0.980370801281} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.68626096322} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{0.901906359658} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.64712690476}
+%\nextwave{18080} \Wait{ }{0.0}\ProcBatchOne[ ]{1.05887263809} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.60779652159} \Wait{ }{0.0784223720419} \ProcBatchOne[ ]{0.901985824421} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{0.901948429239} \Wait{ }{0.0784597672243} \ProcBatchOne[ ]{0.43140952259} \Wait{ }{0.0783849768594} \ProcBatchOne[ ]{0.941157278061} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.72546981204}
+%\nextwave{10108} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.11766581141} \Wait{ }{0.156886813664} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.6862983584} \Wait{ }{0.156844744084} \ProcBatchOne[ ]{1.88231923052}
+%\end{wave}
+%\caption{Gantt chart for Offline algorithm} \label{fig:gantt:offline}
+%\end{figure}
 
-Offline EM-Algorithm is given by Fig. \ref{alg:Offline} and \ref{alg:ProcessDocument}).
+The offline algorithm is given by
+Fig. \ref{alg:Offline} (\kw{Offline algorithm}) and
+Fig. \ref{alg:ProcessDocument} (\kw{ProcessDocument}).
+
+
 Fig. \ref{fig:gantt:offline} illustrates how it works.
 Orange boxes correspond to the time spent in processing an individual batch.
 Green box correspond to the time spent to normalize $n_{wt}$ values and produce a new $p_{wt}$ matrix.
@@ -443,17 +448,17 @@ initialize $(\phi^0_{wt})$\;
 }
 \end{algorithm2e}
 
-\begin{figure}
-\centering
-\begin{wave}{6}{10}
-\nextwave{23752} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.732105963895} \Wait{ }{0.865238135943} \ProcBatchOne[ ]{0.249592576998} \Wait{ }{1.58067431606} \ProcBatchTwo[ ]{0.831946168002} \Wait{ }{1.61398215054} \ProcBatchOne[ ]{0.532441422221} \Wait{ }{1.49750587905} \ProcBatchTwo[ ]{0.748759881136}
-\nextwave{4448} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.798654200062} \Wait{ }{0.81531010062} \ProcBatchOne[ ]{0.399344949889} \Wait{ }{1.41430174232} \ProcBatchTwo[ ]{0.665555744411} \Wait{ }{0.0665502194838} \ProcBatchTwo[ ]{0.881892053184} \Wait{ }{0.831930301462} \ProcBatchOne[ ]{0.831946168002}
-\nextwave{21464} \Wait{ }{0.898512254026}\Merge[ ]{0.366070831805} \Wait{ }{0.0332562682254} \Normalization[ ]{0.183044340832} \Wait{ }{1.21462133411} \Merge[ ]{0.366086698346} \Wait{ }{0.0332562682254} \Normalization[ ]{0.166390423591} \Wait{ }{1.86357472754} \Merge[ ]{0.366052981948} \Wait{ }{0.033258251543} \Normalization[ ]{0.183042357514} \Wait{ }{1.28118742013} \Merge[ ]{0.482529253438} \Wait{ }{0.0499121687835} \Normalization[ ]{0.199680408214} \Wait{ }{1.38102762424} \Merge[ ]{0.665557727729} \Wait{ }{0.0332741180832} \Normalization[ ]{0.199664541674}
-\nextwave{16912} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.715485763053} \Wait{ }{0.881858336786} \ProcBatchOne[ ]{0.199646691816} \Wait{ }{0.0499458851814} \ProcBatchOne[ ]{0.765364215438} \Wait{ }{0.798672049919} \ProcBatchTwo[ ]{1.01499050883} \Wait{ }{1.39766369162} \ProcBatchOne[ ]{0.366052981948} \Wait{ }{0.0332919679409} \ProcBatchOne[ ]{0.698813995954} \Wait{ }{0.998354441451} \ProcBatchTwo[ ]{1.09815894584}
-\nextwave{22756} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.449272985212} \Wait{ }{0.033258251543} \ProcBatchTwo[ ]{0.382706899188} \Wait{ }{0.798656183379} \ProcBatchOne[ ]{0.698831845812} \Wait{ }{1.0981767957} \ProcBatchTwo[ ]{0.898512254026} \Wait{ }{1.54741606451} \ProcBatchOne[ ]{0.865238135943}
-\end{wave}
-\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
-\end{figure}
+%\begin{figure}
+%\centering
+%\begin{wave}{6}{10}
+%\nextwave{23752} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.732105963895} \Wait{ }{0.865238135943} \ProcBatchOne[ ]{0.249592576998} \Wait{ }{1.58067431606} \ProcBatchTwo[ ]{0.831946168002} \Wait{ }{1.61398215054} \ProcBatchOne[ ]{0.532441422221} \Wait{ }{1.49750587905} \ProcBatchTwo[ ]{0.748759881136}
+%\nextwave{4448} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.798654200062} \Wait{ }{0.81531010062} \ProcBatchOne[ ]{0.399344949889} \Wait{ }{1.41430174232} \ProcBatchTwo[ ]{0.665555744411} \Wait{ }{0.0665502194838} \ProcBatchTwo[ ]{0.881892053184} \Wait{ }{0.831930301462} \ProcBatchOne[ ]{0.831946168002}
+%\nextwave{21464} \Wait{ }{0.898512254026}\Merge[ ]{0.366070831805} \Wait{ }{0.0332562682254} \Normalization[ ]{0.183044340832} \Wait{ }{1.21462133411} \Merge[ ]{0.366086698346} \Wait{ }{0.0332562682254} \Normalization[ ]{0.166390423591} \Wait{ }{1.86357472754} \Merge[ ]{0.366052981948} \Wait{ }{0.033258251543} \Normalization[ ]{0.183042357514} \Wait{ }{1.28118742013} \Merge[ ]{0.482529253438} \Wait{ }{0.0499121687835} \Normalization[ ]{0.199680408214} \Wait{ }{1.38102762424} \Merge[ ]{0.665557727729} \Wait{ }{0.0332741180832} \Normalization[ ]{0.199664541674}
+%\nextwave{16912} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.715485763053} \Wait{ }{0.881858336786} \ProcBatchOne[ ]{0.199646691816} \Wait{ }{0.0499458851814} \ProcBatchOne[ ]{0.765364215438} \Wait{ }{0.798672049919} \ProcBatchTwo[ ]{1.01499050883} \Wait{ }{1.39766369162} \ProcBatchOne[ ]{0.366052981948} \Wait{ }{0.0332919679409} \ProcBatchOne[ ]{0.698813995954} \Wait{ }{0.998354441451} \ProcBatchTwo[ ]{1.09815894584}
+%\nextwave{22756} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.449272985212} \Wait{ }{0.033258251543} \ProcBatchTwo[ ]{0.382706899188} \Wait{ }{0.798656183379} \ProcBatchOne[ ]{0.698831845812} \Wait{ }{1.0981767957} \ProcBatchTwo[ ]{0.898512254026} \Wait{ }{1.54741606451} \ProcBatchOne[ ]{0.865238135943}
+%\end{wave}
+%\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
+%\end{figure}
 
 A reasonable approach to speedup the online algorithm is to introduce concurrency in the $\kw{ProcessBatches}$ subroutine.
 Indeed, multiple threads can simply process batches $D_{\eta (i - 1) + 1}, \dots, D_{\eta i}$ in parallel,
@@ -489,17 +494,17 @@ $(\hat n^1_{wt}) := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)
 }
 \end{algorithm2e}
 
-\begin{figure}
-\centering
-\begin{wave}{6}{10}
-\nextwave{23796} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.0574647485947} \ProcBatchTwo[ ]{0.689672889017} \Wait{ }{0.0287306616923} \ProcBatchOne[ ]{0.373556830571} \Wait{ }{1.83909459368} \ProcBatchTwo[ ]{1.32182280087} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.35058086424}
-\nextwave{24032} \Wait{ }{1.89659016917}\Merge[ ]{0.919504481716} \Wait{ }{0.258623908171} \Normalization[ ]{0.402287492263} \Wait{ }{0.229889821269} \Merge[ ]{0.775871724514} \Wait{ }{0.0287306616923} \Normalization[ ]{0.344822743669} \Wait{ }{1.17815921678} \Merge[ ]{0.71840355071} \Wait{ }{0.0574647485947} \Normalization[ ]{0.287357995074} \Wait{ }{0.804602386207} \Merge[ ]{0.660938802115} \Wait{ }{0.0287032600121} \Normalization[ ]{0.287357995074} \Wait{ }{0.0574647485947} \Merge[ ]{0.660938802115} \Wait{ }{0.0574647485947} \Normalization[ ]{0.344822743669}
-\nextwave{17464} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.58041588215} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{1.29308871397} \Wait{ }{0.689672889017} \ProcBatchTwo[ ]{0.775840897624} \Wait{ }{0.0861988354971} \ProcBatchTwo[ ]{1.35061169113} \Wait{ }{0.0574373469145} \ProcBatchOne[ ]{0.488513729441} \Wait{ }{0.919531883396} \ProcBatchTwo[ ]{1.29314694254}
-\nextwave{12172} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.72410686792} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.63793885932} \Wait{ }{0.258623908171} \ProcBatchTwo[ ]{1.43681052663} \Wait{ }{0.0861680086069} \ProcBatchOne[ ]{1.23562396537} \Wait{ }{0.862067134802} \ProcBatchTwo[ ]{1.32185020255}
-\nextwave{10536} \Wait{ }{0.0574921502749}\ProcBatchTwo[ ]{1.0631988927} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{0.689672889017} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.632177313532} \ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.60341582495} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.11496032408} \ProcBatchOne[ ]{1.40807643973}
-\end{wave}
-\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
-\end{figure}
+%\begin{figure}
+%\centering
+%\begin{wave}{6}{10}
+%\nextwave{23796} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.0574647485947} \ProcBatchTwo[ ]{0.689672889017} \Wait{ }{0.0287306616923} \ProcBatchOne[ ]{0.373556830571} \Wait{ }{1.83909459368} \ProcBatchTwo[ ]{1.32182280087} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.35058086424}
+%\nextwave{24032} \Wait{ }{1.89659016917}\Merge[ ]{0.919504481716} \Wait{ }{0.258623908171} \Normalization[ ]{0.402287492263} \Wait{ }{0.229889821269} \Merge[ ]{0.775871724514} \Wait{ }{0.0287306616923} \Normalization[ ]{0.344822743669} \Wait{ }{1.17815921678} \Merge[ ]{0.71840355071} \Wait{ }{0.0574647485947} \Normalization[ ]{0.287357995074} \Wait{ }{0.804602386207} \Merge[ ]{0.660938802115} \Wait{ }{0.0287032600121} \Normalization[ ]{0.287357995074} \Wait{ }{0.0574647485947} \Merge[ ]{0.660938802115} \Wait{ }{0.0574647485947} \Normalization[ ]{0.344822743669}
+%\nextwave{17464} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.58041588215} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{1.29308871397} \Wait{ }{0.689672889017} \ProcBatchTwo[ ]{0.775840897624} \Wait{ }{0.0861988354971} \ProcBatchTwo[ ]{1.35061169113} \Wait{ }{0.0574373469145} \ProcBatchOne[ ]{0.488513729441} \Wait{ }{0.919531883396} \ProcBatchTwo[ ]{1.29314694254}
+%\nextwave{12172} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.72410686792} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.63793885932} \Wait{ }{0.258623908171} \ProcBatchTwo[ ]{1.43681052663} \Wait{ }{0.0861680086069} \ProcBatchOne[ ]{1.23562396537} \Wait{ }{0.862067134802} \ProcBatchTwo[ ]{1.32185020255}
+%\nextwave{10536} \Wait{ }{0.0574921502749}\ProcBatchTwo[ ]{1.0631988927} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{0.689672889017} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.632177313532} \ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.60341582495} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.11496032408} \ProcBatchOne[ ]{1.40807643973}
+%\end{wave}
+%\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
+%\end{figure}
 
 Adding delay and grouping several batches into a batchset negatively impact convergence,
 but let utilize full CPU capacity of the machine.
@@ -540,7 +545,7 @@ In our case the same idea is applied to aggregating data in shared memory.
 
 \begin{figure}[t]
 \begin{centering}
-\includegraphics[height=39mm]{diagramm_artm_core.eps}
+%\includegraphics[height=39mm]{diagramm_artm_core.eps}
 \caption{Diagram of parallelization components}
 \label{fig:diagramm_artm_core}
 \end{centering}
@@ -548,22 +553,22 @@ In our case the same idea is applied to aggregating data in shared memory.
 
 \begin{figure}[t]
 \begin{centering}
-\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
+%\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
 \caption{Diagram of parallelization components (new architecture)}
 \label{fig:diagramm_artm_core_v07}
 \end{centering}
 \end{figure}
 
-\begin{figure}
-\centering
-\begin{wave}{6}{10}
-\nextwave{10596} \Wait{ }{0.122939567821}\ProcBatchTwo[ ]{1.96726757211} \Wait{ }{0.122895601513} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.122939567821} \ProcBatchOne[ ]{1.80334651997} \Wait{ }{0.0819190023361} \ProcBatchOne[ ]{1.02457130407} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.721305389}
-\nextwave{17976} \Wait{ }{0.0409814843221}\ProcBatchTwo[ ]{1.02465435154} \Wait{ }{0.0819190023361} \ProcBatchTwo[ ]{1.27048952087} \Wait{ }{0.122934682676} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.06554790325} \Wait{ }{0.0819629686442} \ProcBatchOne[ ]{1.55738433686} \Wait{ }{0.0409814843221} \ProcBatchTwo[ ]{0.532817917932} \Wait{ }{0.0819141171907} \ProcBatchTwo[ ]{0.655757485752}
-\nextwave{15212} \Wait{ }{0.082002049807}\ProcBatchTwo[ ]{1.84424495682} \Wait{ }{0.122939567821} \ProcBatchTwo[ ]{1.8032634725} \Wait{ }{0.123022615292} \ProcBatchOne[ ]{2.09011920732} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.6393473055} \Wait{ }{0.286855734819} \ProcBatchTwo[ ]{1.92620304032}
-\nextwave{16956} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.573799402254} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{2.45902095825} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.84420099051} \Wait{ }{0.409839268948} \ProcBatchOne[ ]{2.04922565561} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{1.02457130407}
-\end{wave}
-\caption{Gantt chart for old online algorithm (TBD: include merger thread here)} \label{fig:gantt:oldonline}
-\end{figure}
+%\begin{figure}
+%\centering
+%\begin{wave}{6}{10}
+%\nextwave{10596} \Wait{ }{0.122939567821}\ProcBatchTwo[ ]{1.96726757211} \Wait{ }{0.122895601513} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.122939567821} \ProcBatchOne[ ]{1.80334651997} \Wait{ }{0.0819190023361} \ProcBatchOne[ ]{1.02457130407} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.721305389}
+%\nextwave{17976} \Wait{ }{0.0409814843221}\ProcBatchTwo[ ]{1.02465435154} \Wait{ }{0.0819190023361} \ProcBatchTwo[ ]{1.27048952087} \Wait{ }{0.122934682676} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.06554790325} \Wait{ }{0.0819629686442} \ProcBatchOne[ ]{1.55738433686} \Wait{ }{0.0409814843221} \ProcBatchTwo[ ]{0.532817917932} \Wait{ }{0.0819141171907} \ProcBatchTwo[ ]{0.655757485752}
+%\nextwave{15212} \Wait{ }{0.082002049807}\ProcBatchTwo[ ]{1.84424495682} \Wait{ }{0.122939567821} \ProcBatchTwo[ ]{1.8032634725} \Wait{ }{0.123022615292} \ProcBatchOne[ ]{2.09011920732} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.6393473055} \Wait{ }{0.286855734819} \ProcBatchTwo[ ]{1.92620304032}
+%\nextwave{16956} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.573799402254} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{2.45902095825} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.84420099051} \Wait{ }{0.409839268948} \ProcBatchOne[ ]{2.04922565561} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{1.02457130407}
+%\end{wave}
+%\caption{Gantt chart for old online algorithm (TBD: include merger thread here)} \label{fig:gantt:oldonline}
+%\end{figure}
 
 \section{Experiments}
 \label{sec:Experiments}
@@ -571,55 +576,55 @@ In our case the same idea is applied to aggregating data in shared memory.
 Fig. \ref{fig:compare16}, \ref{fig:compare12} compare the perplexity as a function of time spend by four algorithms ---
 offline,
 online,
-asynchronousonline,
+asynchronous Online,
 and old non-deterministic implementation of the online algorithm.
 Each point in the figure corresponds to a moment when the library finished a complete scan of the collection.
 Each algorithm was given a fixed budget (30 minutes in the first chart, 40 minutes in the second chart).
 Lower perplexity means better result.
 
-\begin{figure}
-\centering
-\begin{tikzpicture}
-    \begin{axis}[
-        xlabel=Time (min),
-        ylabel=Perplexity,
-        major grid style={draw=lightgray},
-        ymajorgrids=true,
-        xmajorgrids=true,
-        ymax=5000,
-        ymin=3800
-    ]
-	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline16.dat};
-	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old16.dat};
-    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new16.dat};
-    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async16.dat};
-    \legend{Offline\\Online old\\Online new\\Online async\\}
-    \end{axis}
-\end{tikzpicture}
-    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{tikzpicture}
-    \begin{axis}[
-        xlabel=Time (min),
-        ylabel=Perplexity,
-        major grid style={draw=lightgray},
-        ymajorgrids=true,
-        xmajorgrids=true,
-        ymax=5000,
-        ymin=3800
-    ]
-	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline12.dat};
-	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old12.dat};
-    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new12.dat};
-    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async12.dat};
-    \legend{Offline\\Online old\\Online new\\Online async\\}
-    \end{axis}
-\end{tikzpicture}
-\caption{12 cores, 40 minutes limit} \label{fig:compare12}
-\end{figure}
+%\begin{figure}
+%\centering
+%\begin{tikzpicture}
+%    \begin{axis}[
+%        xlabel=Time (min),
+%        ylabel=Perplexity,
+%        major grid style={draw=lightgray},
+%        ymajorgrids=true,
+%        xmajorgrids=true,
+%        ymax=5000,
+%        ymin=3800
+%    ]
+%	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline16.dat};
+%	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old16.dat};
+%    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new16.dat};
+%    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async16.dat};
+%    \legend{Offline\\Online old\\Online new\\Online async\\}
+%    \end{axis}
+%\end{tikzpicture}
+%    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\begin{tikzpicture}
+%    \begin{axis}[
+%        xlabel=Time (min),
+%        ylabel=Perplexity,
+%        major grid style={draw=lightgray},
+%        ymajorgrids=true,
+%        xmajorgrids=true,
+%        ymax=5000,
+%        ymin=3800
+%    ]
+%	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline12.dat};
+%	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old12.dat};
+%    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new12.dat};
+%    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async12.dat};
+%    \legend{Offline\\Online old\\Online new\\Online async\\}
+%    \end{axis}
+%\end{tikzpicture}
+%\caption{12 cores, 40 minutes limit} \label{fig:compare12}
+%\end{figure}
 
 \section{Conclusions}
 \label{sec:Conclusions}
