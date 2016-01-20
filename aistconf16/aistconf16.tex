@@ -250,15 +250,6 @@ provide a compressed representation of the $(n_{dw})$ matrix:
 n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in D, w \in W,
 \]
 where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a document $d$.
-%Matrices $\Phi$ and $\Theta$ are \emph{stochastic}, e.g. their elements are non-negative and all columns are normalized to unity.
-%In the sequel we will use ``norm'' operator to transform
-%a~real vector into a discrete distribution.
-%For example some arbitrary positive values $n_{td}$ and $n_{wt}$
-%can be turned into $\theta_{td}$ and $\phi_{wt}$ as follows:
-%\begin{align}
-%    \theta_{td} = \norm_{t\in T} n_{td} = n_{td} \big/ \sum_{s\in T} n_{sd}; \\
-%    \phi_{wt} = \norm_{w \in W} n_{wt} = n_{wt} \big/ \sum_{v \in W} n_{vt}.
-%\end{align}
 
 To learn $\Phi$ and $\Theta$ from $(n_{dw})$ ARTM maximizes
 the log-likelihood, regularized via an additional penalty term $R(\Phi, \Theta)$:
@@ -343,12 +334,14 @@ which are all based on the above formulas but differ in the way how operations a
 \BlankLine
 initialize $(\phi_{wt})$\;
 form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+\label{alg:Offline:FormBatches}
 \Repeat{$(\phi_{wt})$ converges}{
     %$\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
     %\ForAll{documents $d \in D$} {
     %    $(\tilde n_{wt}) := (\tilde n_{wt}) + \kw{ProcessDocument}(d, \Phi)$\;
     %}
     $(n_{wt}) := \mathlarger\sum\limits_{b=1, \dots, B} \; \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi)$\;
+    \label{alg:Offline:Normalize}
     $(\phi_{wt}) := \norm_{w \in W} (n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
@@ -357,78 +350,104 @@ form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 \label{alg:ProcessDocument}
 \BlankLine
 \KwIn{document $d \in D$, matrix $\Phi=(\phi_{wt})$;}
-\KwOut{matrix $(\tilde n_{wt})$;}
+\KwOut{matrix $(\tilde n_{wt})$, vector $\theta_{td}$;}
 \BlankLine
 initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
 \Repeat{$\theta_d$ converges}{
+    \label{alg:ProcessDocument:innerLoopBegin}
     $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $w\in d$ and $t \in T$\;
     $\theta_{td} := \norm_{t\in T}
         \bigl(
             \sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         \bigr)$ for all $t \in T$\;
 }
+\label{alg:ProcessDocument:innerLoopEnd}
 $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \end{algorithm2e}
 
-%\begin{figure}
-%\centering
-%\begin{wave}{6}{10}
-%\nextwave{15864} \Wait{ }{9.45095925655}\Normalization[ ]{0.549040743454}
-%\nextwave{16916} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.19608818345} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.41181771905} \Wait{ }{0.117593825681} \ProcBatchOne[ ]{1.56862506795} \Wait{ }{0.117715360024} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.8431057073}
-%\nextwave{14388} \Wait{ }{0.156886813664}\ProcBatchOne[ ]{2.31368200913} \Wait{ }{0.117677964842} \ProcBatchOne[ ]{0.588212197093} \Wait{ }{0.0784644416221} \ProcBatchOne[ ]{0.980370801281} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.68626096322} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{0.901906359658} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.64712690476}
-%\nextwave{18080} \Wait{ }{0.0}\ProcBatchOne[ ]{1.05887263809} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.60779652159} \Wait{ }{0.0784223720419} \ProcBatchOne[ ]{0.901985824421} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{0.901948429239} \Wait{ }{0.0784597672243} \ProcBatchOne[ ]{0.43140952259} \Wait{ }{0.0783849768594} \ProcBatchOne[ ]{0.941157278061} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.72546981204}
-%\nextwave{10108} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.11766581141} \Wait{ }{0.156886813664} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.6862983584} \Wait{ }{0.156844744084} \ProcBatchOne[ ]{1.88231923052}
-%\end{wave}
-%\caption{Gantt chart for Offline algorithm} \label{fig:gantt:offline}
-%\end{figure}
+\begin{figure}
+\centering
+\begin{wave}{6}{10}
+\nextwave{15864} \Wait{ }{9.45095925655}\Normalization[ ]{0.549040743454}
+\nextwave{16916} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.19608818345} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.41181771905} \Wait{ }{0.117593825681} \ProcBatchOne[ ]{1.56862506795} \Wait{ }{0.117715360024} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.8431057073}
+\nextwave{14388} \Wait{ }{0.156886813664}\ProcBatchOne[ ]{2.31368200913} \Wait{ }{0.117677964842} \ProcBatchOne[ ]{0.588212197093} \Wait{ }{0.0784644416221} \ProcBatchOne[ ]{0.980370801281} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.68626096322} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{0.901906359658} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.64712690476}
+\nextwave{18080} \Wait{ }{0.0}\ProcBatchOne[ ]{1.05887263809} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.60779652159} \Wait{ }{0.0784223720419} \ProcBatchOne[ ]{0.901985824421} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{0.901948429239} \Wait{ }{0.0784597672243} \ProcBatchOne[ ]{0.43140952259} \Wait{ }{0.0783849768594} \ProcBatchOne[ ]{0.941157278061} \Wait{ }{0.117673290444} \ProcBatchOne[ ]{1.72546981204}
+\nextwave{10108} \Wait{ }{0.117635895262}\ProcBatchOne[ ]{2.11766581141} \Wait{ }{0.156886813664} \ProcBatchOne[ ]{1.72546981204} \Wait{ }{0.117635895262} \ProcBatchOne[ ]{1.6862983584} \Wait{ }{0.156844744084} \ProcBatchOne[ ]{1.88231923052}
+\end{wave}
+\caption{Gantt chart for Offline algorithm} \label{fig:gantt:offline}
+\end{figure}
 
-The offline algorithm is given by
+The algorithm is given by
 Fig. \ref{alg:Offline} (\kw{Offline algorithm}) and
 Fig. \ref{alg:ProcessDocument} (\kw{ProcessDocument}).
 
+Subroutine \kw{ProcessDocument($d, \Phi$)} corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta} from the fixed-point solution of the ARTM optimization problem \eqref{eq:ARTM}.
+\kw{ProcessDocument} requires a $\Phi$ matrix
+and a vector $n_{dw}$ of term frequencies for a given document $d \in D$,
+and as a result it returns the topical distribution $\theta_{td}$ for the document,
+and a matrix $(\hat n_{wt})$ of size $|d| \times |T|$,
+where $|d|$ gives the number of distinct terms in the document.
+The \kw{ProcessDocument} might be also useful as a separate routine which finds $\theta_{td}$ distribution for a new document,
+but in the \kw{Offline algorithm} it is rather used as a building block in an iterative EM-algorithm that learns the $\Phi$ matrix.
 
-Fig. \ref{fig:gantt:offline} illustrates how it works.
-Orange boxes correspond to the time spent in processing an individual batch.
-Green box correspond to the time spent to normalize $n_{wt}$ values and produce a new $p_{wt}$ matrix.
+The \kw{Offline algorithm} performs multiple scans over the collection, calls \kw{ProcessDocument}
+for each document $d \in D$ from the collection,
+and then aggregates the resulting $(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
+After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{eq:Mstep:phi}$.
 
-Key step of the algorithm is $\kw{ProcessDocument}$ subroutine
-that generates a matrix $\hat n_{wt}$ of size $n_d \times |T|$.
-These values describe contribution of the tokens from the document into the final $\Phi$ matrix.
-Then the offline algorithm aggregates $\hat n_{wt}$ values across all documents in the collection.
-After normalization they form a new $\Phi$ matrix for the next iteration.
+Step \ref{alg:Offline:FormBatches}, where we split collection $D$ into batches $(D_b)$, is not strictly necessary in the \kw{Offline algorithm},
+and it rather reflects an internal implementation detail.
+For performance reasons the outer loop over batches $b = 1, \dots, B$ is parallelized across multiple threads,
+and within each batch the inner loop $d \in D_b$ is executed in a single thread.
+Each batch is stored in a separate disk file on disk to allow out-of-core streaming of the collection.
+For typical collections it is reasonable to have around $1000$ documents per batch,
+however for ultimate performance we encourage users to experiment with this parameter.
+Too small batches can cause disk IO overhead due to lots of small reads,
+while too large batches will result in bigger tasks that will not be distributed evenly across computation threads.
+
 Note that $\theta_{td}$ values appear only within $\kw{ProcessDocument}$ subroutine.
-This makes the algorithm efficient in its memory usage,
-allowing implementation to not store the entire theta matrix at any given time.
+This leads to efficient memory usage because the implementation never stores the entire theta matrix at any given time.
 Instead, $\theta_{td}$ values are recalculated from scratch on every pass through the collection.
 
-\section{Online}
+Fig. \ref{fig:gantt:offline} illustrates a run-time behavior of the \kw{Offline algorithm}.
+It shows a Gantt chart, where boxes correspond to the time spent in processing an individual batch.
+The final box, executed on the main thread, correspond to the time spent in the step \ref{alg:Offline:Normalize}
+to normalize $n_{wt}$ values and produce a new $\Phi$ matrix.
 
-Online EM-Algorithm is given by Fig. \ref{alg:Online}.
-Fig. \ref{fig:gantt:online} illustrates how it works.
-Orange and yellow boxes correspond to the time spent in processing an individual batch.
-The color indicate which version of the $p^i_{wt}$ matrix was used to process each batch
-(orange for even $i$, yellow for odd $i$).
-Blue box correspond to the time spend in merging $n_{wt}$ with $\hat n_wt$,
-Green box is, as before, the time spent to normalize $n_{wt}$ values and produce a new $p_{wt}$ matrix.
+\section{Online algorithm}
+\label{sec:Online}
 
-To improve convergence rate of the algorithm
-the collection is split into ``batches'',
-$D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$,
-and the algorithm is adjusted so that
-matrix $\Phi$
-is re-calculated after every $\eta$ batches.
-This leads to more frequent updates of $\Phi$ matrix, which are performed as the algorithm scans through the collection.
+The \kw{Online algorithm} improves the convergence rate of the \kw{Offline algorithm}
+by re-calculating matrix $\Phi$ after every $\eta$ batches.
 To simplify the notation
 we introduce a trivial subroutine
 \[
 \kw{ProcessBatches}(\{D_b\}, \Phi) = \mathlarger\sum\limits_{D_b} \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi) \\
 \]
-that aggregates the output of $\kw{ProcessDocument}$ across specific batches at a constant $\Phi$ matrix.
-The algorithm is then given by listing \ref{alg:Online}.
-
-Key difference is that the cumulative sum $n_{wt}$ is discounted by a factor $\rho_i < 1$,
-which depends on the iteration. Typical strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
+that aggregates the output of $\kw{ProcessDocument}$ across specific set of batches at a constant $\Phi$ matrix.
+The algorithm is then given by Fig. \ref{alg:Online}.
+Here the split of the collection $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$
+into batches
+plays far more significant role than in the \kw{Offline algorithm},
+because different splitting algorithmically affects the result.
+At step \ref{alg:Online:Merge} the new $n_{wt}^{i+1}$ values are calculated as a convex combination
+of the old values $n_{wt}^{i}$ and the value $\hat n_{wt}^{i}$ produced on the recent batches.
+Old counters $n_{wt}^{i}$ are discounted by a factor $(1 - \rho_i)$,
+which depends on the iteration number. Typical strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
 where typical values for $\tau_0$ are between $64$ and $1024$, for $\kappa$ --- between $0.5$ and $0.7$.
+
+As in the \kw{Offline algorithm}, the outer loop over batches
+$D_{\eta (i - 1) + 1}, \dots, D_{\eta i}$ is executed concurrently across multiple threads.
+The problem with this approach is that all threads have no useful work to do during steps
+\ref{alg:Online:Rho}-\ref{alg:Online:Normalize} of the \kw{Online algorithm}.
+The threads can not start processing the next batches because a new version of $\Phi$ matrix is not ready yet.
+As a result the CPU utilization stays low, and the run-time Gantt chart of the \kw{Online algorithm} typically looks like in Fig. \ref{alg:Online}.
+The color indicate which version of the $p^i_{wt}$ matrix was used to process each batch
+(orange for even $i$, yellow for odd $i$).
+Blue box correspond to the time spend in merging $n_{wt}$ with $\hat n_{wt}$,
+Green box is, as before, the time spent to normalize $n_{wt}$ values and produce a new $p_{wt}$ matrix.
+
+In the next section we present an asynchronous non-blocking modification of the online algorithm that results in better CPU utilization.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[h]
@@ -443,36 +462,54 @@ initialize $(\phi^0_{wt})$\;
 \ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
     $(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
     $\rho_i := (\tau_0 + i)^{-\kappa}$\;
-    $(n^{i}_{wt}) := \rho_i \cdot (n^{i-1}_{wt}) + (1 - \rho_i) \cdot (\hat n^{i}_{wt})$\;
+    \label{alg:Online:Rho}
+    $(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
+    \label{alg:Online:Merge}
     $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i - 1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
+    \label{alg:Online:Normalize}
 }
 \end{algorithm2e}
 
-%\begin{figure}
-%\centering
-%\begin{wave}{6}{10}
-%\nextwave{23752} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.732105963895} \Wait{ }{0.865238135943} \ProcBatchOne[ ]{0.249592576998} \Wait{ }{1.58067431606} \ProcBatchTwo[ ]{0.831946168002} \Wait{ }{1.61398215054} \ProcBatchOne[ ]{0.532441422221} \Wait{ }{1.49750587905} \ProcBatchTwo[ ]{0.748759881136}
-%\nextwave{4448} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.798654200062} \Wait{ }{0.81531010062} \ProcBatchOne[ ]{0.399344949889} \Wait{ }{1.41430174232} \ProcBatchTwo[ ]{0.665555744411} \Wait{ }{0.0665502194838} \ProcBatchTwo[ ]{0.881892053184} \Wait{ }{0.831930301462} \ProcBatchOne[ ]{0.831946168002}
-%\nextwave{21464} \Wait{ }{0.898512254026}\Merge[ ]{0.366070831805} \Wait{ }{0.0332562682254} \Normalization[ ]{0.183044340832} \Wait{ }{1.21462133411} \Merge[ ]{0.366086698346} \Wait{ }{0.0332562682254} \Normalization[ ]{0.166390423591} \Wait{ }{1.86357472754} \Merge[ ]{0.366052981948} \Wait{ }{0.033258251543} \Normalization[ ]{0.183042357514} \Wait{ }{1.28118742013} \Merge[ ]{0.482529253438} \Wait{ }{0.0499121687835} \Normalization[ ]{0.199680408214} \Wait{ }{1.38102762424} \Merge[ ]{0.665557727729} \Wait{ }{0.0332741180832} \Normalization[ ]{0.199664541674}
-%\nextwave{16912} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.715485763053} \Wait{ }{0.881858336786} \ProcBatchOne[ ]{0.199646691816} \Wait{ }{0.0499458851814} \ProcBatchOne[ ]{0.765364215438} \Wait{ }{0.798672049919} \ProcBatchTwo[ ]{1.01499050883} \Wait{ }{1.39766369162} \ProcBatchOne[ ]{0.366052981948} \Wait{ }{0.0332919679409} \ProcBatchOne[ ]{0.698813995954} \Wait{ }{0.998354441451} \ProcBatchTwo[ ]{1.09815894584}
-%\nextwave{22756} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.449272985212} \Wait{ }{0.033258251543} \ProcBatchTwo[ ]{0.382706899188} \Wait{ }{0.798656183379} \ProcBatchOne[ ]{0.698831845812} \Wait{ }{1.0981767957} \ProcBatchTwo[ ]{0.898512254026} \Wait{ }{1.54741606451} \ProcBatchOne[ ]{0.865238135943}
-%\end{wave}
-%\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
-%\end{figure}
-
-A reasonable approach to speedup the online algorithm is to introduce concurrency in the $\kw{ProcessBatches}$ subroutine.
-Indeed, multiple threads can simply process batches $D_{\eta (i - 1) + 1}, \dots, D_{\eta i}$ in parallel,
-given that they synchronize writes $\hat n_{wt}$ values into the resulting matrix.
-The problem with this approach is that all threads will have no useful work to do during steps $5$, $6$ and $7$ of the algorithm.
-The threads can not start processing the next batches because a new version of $\Phi$ matrix is not ready yet.
-In the next section we present a simple modification of the online algorithm that turns it into an asynchronous non-blocking algorithm.
+\begin{figure}
+\centering
+\begin{wave}{6}{10}
+\nextwave{23752} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.732105963895} \Wait{ }{0.865238135943} \ProcBatchOne[ ]{0.249592576998} \Wait{ }{1.58067431606} \ProcBatchTwo[ ]{0.831946168002} \Wait{ }{1.61398215054} \ProcBatchOne[ ]{0.532441422221} \Wait{ }{1.49750587905} \ProcBatchTwo[ ]{0.748759881136}
+\nextwave{4448} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.798654200062} \Wait{ }{0.81531010062} \ProcBatchOne[ ]{0.399344949889} \Wait{ }{1.41430174232} \ProcBatchTwo[ ]{0.665555744411} \Wait{ }{0.0665502194838} \ProcBatchTwo[ ]{0.881892053184} \Wait{ }{0.831930301462} \ProcBatchOne[ ]{0.831946168002}
+\nextwave{21464} \Wait{ }{0.898512254026}\Merge[ ]{0.366070831805} \Wait{ }{0.0332562682254} \Normalization[ ]{0.183044340832} \Wait{ }{1.21462133411} \Merge[ ]{0.366086698346} \Wait{ }{0.0332562682254} \Normalization[ ]{0.166390423591} \Wait{ }{1.86357472754} \Merge[ ]{0.366052981948} \Wait{ }{0.033258251543} \Normalization[ ]{0.183042357514} \Wait{ }{1.28118742013} \Merge[ ]{0.482529253438} \Wait{ }{0.0499121687835} \Normalization[ ]{0.199680408214} \Wait{ }{1.38102762424} \Merge[ ]{0.665557727729} \Wait{ }{0.0332741180832} \Normalization[ ]{0.199664541674}
+\nextwave{16912} \Wait{ }{0.0332919679409}\ProcBatchTwo[ ]{0.715485763053} \Wait{ }{0.881858336786} \ProcBatchOne[ ]{0.199646691816} \Wait{ }{0.0499458851814} \ProcBatchOne[ ]{0.765364215438} \Wait{ }{0.798672049919} \ProcBatchTwo[ ]{1.01499050883} \Wait{ }{1.39766369162} \ProcBatchOne[ ]{0.366052981948} \Wait{ }{0.0332919679409} \ProcBatchOne[ ]{0.698813995954} \Wait{ }{0.998354441451} \ProcBatchTwo[ ]{1.09815894584}
+\nextwave{22756} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.449272985212} \Wait{ }{0.033258251543} \ProcBatchTwo[ ]{0.382706899188} \Wait{ }{0.798656183379} \ProcBatchOne[ ]{0.698831845812} \Wait{ }{1.0981767957} \ProcBatchTwo[ ]{0.898512254026} \Wait{ }{1.54741606451} \ProcBatchOne[ ]{0.865238135943}
+\end{wave}
+\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
+\end{figure}
 
 \section{Asynchronous online algorithm}
 \label{sec:AsyncOnline}
 
-Asynchronous online EM-Algorithm is given by Fig. \ref{alg:AsyncOnline}.
-Fig. \ref{fig:gantt:AsyncOnline} illustrates how it works.
-The color scheme for the boxes is as in Fig. \ref{fig:gantt:AsyncOnline}.
+Asynchronous online algorithm is based on two new routines, \kw{AsyncProcessBatches} and \kw{Await}.
+The first one is equivalent to \kw{ProcessBatches}, except that it just queues the task for an asynchronous execution and returns immediately.
+Its output is a future object (for example, an \kw{std::future} from \kw{C++11} standard),
+which can be later passed to $\kw{Await}$ in order to get the actual result, e.g. in our case the $\hat n_{wt}$ values.
+In between calls to \kw{AsyncProcessBatches} and \kw{Await} the algorithm
+can perform some other useful work, while the background threads are calculating the $\hat n_{wt}$ values.
+
+The resulting algorithm is given by Fig. \ref{alg:AsyncOnline}.
+To calculate $\hat n^{i+1}_{wt}$ it uses $\Phi^{i-1}$ matrix,
+which is one generation older than $\Phi^{i}$ matrix used by the conventional \kw{Online algorithm} \ref{alg:Online}.
+This adds an extra ``offset'' between the moment when $\Phi$ matrix is calculated and the moment when it is used,
+and as a result gives the algorithm additional flexibility to distribute more payload to computation threads.
+Steps \ref{alg:AsyncOnline:FirstStep} and \ref{alg:AsyncOnline:IfStatement} of the algorithm
+are just technical tricks to implement the ``offset'' idea.
+
+Adding an offset should negatively impact the convergence of the asynchronous algorithm \ref{alg:AsyncOnline}
+comparing to the conventional algorithm \ref{Alg:Online}.
+For example, in \kw{AsyncProcessBatches} the initial matrix $\Phi^0$ is used twice,
+and the two last matrices $\Phi^{\lfloor B / \eta \rfloor - 1}$ and $\Phi^{\lfloor B / \eta \rfloor}$ will not be used at all.
+%(except for $\Phi^{\lfloor B / \eta \rfloor}$ which forms the final result of the algorithm).
+One the other hand the asynchronous algorithm gives better CPU utilization,
+as clearly shown by the Gantt chart from Fig. \ref{fig:gantt:AsyncOnline}.
+%The color scheme for the boxes is as in Fig. \ref{fig:gantt:AsyncOnline}.
+
+This tradeoff convergence and CPU utilization is evaluated in the experiments from section \ref{sec:Experiments}.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[h]
@@ -484,68 +521,61 @@ The color scheme for the boxes is as in Fig. \ref{fig:gantt:AsyncOnline}.
 \BlankLine
 form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 initialize $(\phi^0_{wt})$\;
-$(\hat n^1_{wt}) := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
-\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor - 1$} {
-    $(\hat n^{i+1}_{wt}) := \kw{AsyncProcessBatches}(\{D_{\eta i + 1}, \dots, D_{\eta i + \eta}\}, \Phi^{i-1})$\;
-    $\kw{Await}(\hat n^i_{wt})$\;
+$F^1 := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
+\label{alg:AsyncOnline:FirstStep}
+\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
+    \If{$i \neq \lfloor B / \eta \rfloor$}{
+        \label{alg:AsyncOnline:IfStatement}
+        $F^{i+1} := \kw{AsyncProcessBatches}(\{D_{\eta i + 1}, \dots, D_{\eta i + \eta}\}, \Phi^{i-1})$\;
+    }
+    $\hat n^i_{wt} := \kw{Await}(F^i)$\;
     $\rho_i := (\tau_0 + i)^{-\kappa}$\;
-    $(n^{i}_{wt}) := \rho_i \cdot (n^{i-1}_{wt}) + (1 - \rho_i) \cdot (\hat n^{i}_{wt})$\;
+    $(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
     $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i-1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
 
-%\begin{figure}
-%\centering
-%\begin{wave}{6}{10}
-%\nextwave{23796} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.0574647485947} \ProcBatchTwo[ ]{0.689672889017} \Wait{ }{0.0287306616923} \ProcBatchOne[ ]{0.373556830571} \Wait{ }{1.83909459368} \ProcBatchTwo[ ]{1.32182280087} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.35058086424}
-%\nextwave{24032} \Wait{ }{1.89659016917}\Merge[ ]{0.919504481716} \Wait{ }{0.258623908171} \Normalization[ ]{0.402287492263} \Wait{ }{0.229889821269} \Merge[ ]{0.775871724514} \Wait{ }{0.0287306616923} \Normalization[ ]{0.344822743669} \Wait{ }{1.17815921678} \Merge[ ]{0.71840355071} \Wait{ }{0.0574647485947} \Normalization[ ]{0.287357995074} \Wait{ }{0.804602386207} \Merge[ ]{0.660938802115} \Wait{ }{0.0287032600121} \Normalization[ ]{0.287357995074} \Wait{ }{0.0574647485947} \Merge[ ]{0.660938802115} \Wait{ }{0.0574647485947} \Normalization[ ]{0.344822743669}
-%\nextwave{17464} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.58041588215} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{1.29308871397} \Wait{ }{0.689672889017} \ProcBatchTwo[ ]{0.775840897624} \Wait{ }{0.0861988354971} \ProcBatchTwo[ ]{1.35061169113} \Wait{ }{0.0574373469145} \ProcBatchOne[ ]{0.488513729441} \Wait{ }{0.919531883396} \ProcBatchTwo[ ]{1.29314694254}
-%\nextwave{12172} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.72410686792} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.63793885932} \Wait{ }{0.258623908171} \ProcBatchTwo[ ]{1.43681052663} \Wait{ }{0.0861680086069} \ProcBatchOne[ ]{1.23562396537} \Wait{ }{0.862067134802} \ProcBatchTwo[ ]{1.32185020255}
-%\nextwave{10536} \Wait{ }{0.0574921502749}\ProcBatchTwo[ ]{1.0631988927} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{0.689672889017} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.632177313532} \ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.60341582495} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.11496032408} \ProcBatchOne[ ]{1.40807643973}
-%\end{wave}
-%\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
-%\end{figure}
+\begin{figure}
+\centering
+\begin{wave}{6}{10}
+\nextwave{23796} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.0574647485947} \ProcBatchTwo[ ]{0.689672889017} \Wait{ }{0.0287306616923} \ProcBatchOne[ ]{0.373556830571} \Wait{ }{1.83909459368} \ProcBatchTwo[ ]{1.32182280087} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.35058086424}
+\nextwave{24032} \Wait{ }{1.89659016917}\Merge[ ]{0.919504481716} \Wait{ }{0.258623908171} \Normalization[ ]{0.402287492263} \Wait{ }{0.229889821269} \Merge[ ]{0.775871724514} \Wait{ }{0.0287306616923} \Normalization[ ]{0.344822743669} \Wait{ }{1.17815921678} \Merge[ ]{0.71840355071} \Wait{ }{0.0574647485947} \Normalization[ ]{0.287357995074} \Wait{ }{0.804602386207} \Merge[ ]{0.660938802115} \Wait{ }{0.0287032600121} \Normalization[ ]{0.287357995074} \Wait{ }{0.0574647485947} \Merge[ ]{0.660938802115} \Wait{ }{0.0574647485947} \Normalization[ ]{0.344822743669}
+\nextwave{17464} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.58041588215} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{1.29308871397} \Wait{ }{0.689672889017} \ProcBatchTwo[ ]{0.775840897624} \Wait{ }{0.0861988354971} \ProcBatchTwo[ ]{1.35061169113} \Wait{ }{0.0574373469145} \ProcBatchOne[ ]{0.488513729441} \Wait{ }{0.919531883396} \ProcBatchTwo[ ]{1.29314694254}
+\nextwave{12172} \Wait{ }{0.11498772576}\ProcBatchTwo[ ]{1.72410686792} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.63793885932} \Wait{ }{0.258623908171} \ProcBatchTwo[ ]{1.43681052663} \Wait{ }{0.0861680086069} \ProcBatchOne[ ]{1.23562396537} \Wait{ }{0.862067134802} \ProcBatchTwo[ ]{1.32185020255}
+\nextwave{10536} \Wait{ }{0.0574921502749}\ProcBatchTwo[ ]{1.0631988927} \Wait{ }{0.0862262371773} \ProcBatchOne[ ]{0.689672889017} \Wait{ }{0.0861988354971} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.632177313532} \ProcBatchTwo[ ]{0.804602386207} \Wait{ }{0.60341582495} \ProcBatchOne[ ]{1.14942512988} \Wait{ }{0.11496032408} \ProcBatchOne[ ]{1.40807643973}
+\end{wave}
+\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
+\end{figure}
 
-Adding delay and grouping several batches into a batchset negatively impact convergence,
-but let utilize full CPU capacity of the machine.
-In the experiments we demonstrate that on large datasets the resulting algorithm
-is able to achieve better performance quicker that non-parallel or synchronous algorithm.
-
-\section{New architecture}
+\section{Implementation}
 \label{sec:Architecture}
 
-Fig. \ref{fig:diagramm_artm_core} illustrates old architecture of BigARTM used up to version 0.6.
-Fig. \ref{fig:gantt:oldonline} illustrates how the old architecture was used to implement a non-deterministic online algorithm.
-Fig. \ref{fig:diagramm_artm_core_v07} illustrates new architecture of BigARTM used starting from version 0.7.
+The challenging part for the implementation is to aggregate the $\hat n_{wt}$ matrices across multiple batches, given that they are processed in different threads.
+The way BigARTM solves this challenge was changed between versions \kw{v0.6} (see Fig. \ref{fig:diagramm_artm_core}) and \kw{v0.7} (see Fig. \ref{fig:diagramm_artm_core_v07}).
+In the old architecture the $\hat n_{wt}$ matrices were stored in a queue, and then aggregated by a dedicated \emph{Merger thread}.
+This often caused performance bottlenecks, particularly because of small batches or due to a small number of iterations in \kw{ProcessDocument}'s inner loop 
+\ref{alg:ProcessDocument:innerLoopBegin}-\ref{alg:ProcessDocument:innerLoopEnd}.
 
+In the new architecture we removed Merger thread, and $\hat n_{wt}$ are written directly into the final $n_{wt}$ matrix
+concurrently from all processor threads.
+To synchronize the write access we require that
+no threads simultaneously update the same row in $\hat n_{wt}$ matrix,
+yet the data for distinct words can be written in parallel.
+This is enforced by spin locks $l_w$, one per each word in the dictionary $W$.
+At the end of \kw{ProcessDocument} we loop through all $w \in d$, acquire the corresponding lock $l_w$, append $\hat n_{wt}$ to $n_{wt}$ and release the lock.
+This approach is similar to \cite{smola10architecture},
+where the same pattern is used to update a shared stated in a distributed topic modeling architecture.
 
-TBD: explain how \ref{Online} is parallelized in the previous BigARTM version.
-Explain why it was non-deterministic.
-Explain that non-deterministic version has negative impact on convergence.
+In our new architecture we also removed \emph{DataLoader} thread, which previously was loading batches from disk.
+Now this happens directly from processor thread, which simplified the architecture without sacrificing performance.
 
-In the new architecture we removed DataLoader thread,
-which previously was responsible for loading batches from disk.
-In the new architecture data loading happens directly from each processor thread.
-This simplified the architecture without any lose in performance.
-
-We also removed Merger thread, which previously was responsible
-for merging $\hat n_{wt}$ --- model increments, produced on individual batches.
-In a new architecture all increments are added to the final $\hat n_{wt}$ matrix
-concurrently from processor threads.
-To synchronize write access to this data structure we require that
-no threads simultaneously update the same row in $\hat n_{wt}$ matrix.
-Thus, the data for distinct words could be updated in parallel.
-To enforce this behaviour we create one spin lock, $l_w$, for each word in global dictionary $W$.
-After processing a batch the processor threads loops through local batch dictionary,
-and for each $w \in W_b$ acquire the corresponding lock $l_w$.
-%ToDo: measure collision ratio.
-His approach of aggregating results across threads is taken from \cite{smola10architecture},
-where the same pattern was used to update a shared stated in distributed topic modeling architecture.
-In our case the same idea is applied to aggregating data in shared memory.
+In addition, we provided a cleaner API so now the users may use simple \kw{FitOffline}, \kw{FitOnline} methods to learn the model,
+and $\kw{Transform}$ to apply the model to the data.
+Previously the users had to interact with low-level building blocks, such as \kw{ProcessBatches} routine.
 
 \begin{figure}[t]
 \begin{centering}
-%\includegraphics[height=39mm]{diagramm_artm_core.eps}
+\includegraphics[height=39mm]{diagramm_artm_core.eps}
 \caption{Diagram of parallelization components}
 \label{fig:diagramm_artm_core}
 \end{centering}
@@ -553,78 +583,69 @@ In our case the same idea is applied to aggregating data in shared memory.
 
 \begin{figure}[t]
 \begin{centering}
-%\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
+\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
 \caption{Diagram of parallelization components (new architecture)}
 \label{fig:diagramm_artm_core_v07}
 \end{centering}
 \end{figure}
 
-%\begin{figure}
-%\centering
-%\begin{wave}{6}{10}
-%\nextwave{10596} \Wait{ }{0.122939567821}\ProcBatchTwo[ ]{1.96726757211} \Wait{ }{0.122895601513} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.122939567821} \ProcBatchOne[ ]{1.80334651997} \Wait{ }{0.0819190023361} \ProcBatchOne[ ]{1.02457130407} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.721305389}
-%\nextwave{17976} \Wait{ }{0.0409814843221}\ProcBatchTwo[ ]{1.02465435154} \Wait{ }{0.0819190023361} \ProcBatchTwo[ ]{1.27048952087} \Wait{ }{0.122934682676} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.06554790325} \Wait{ }{0.0819629686442} \ProcBatchOne[ ]{1.55738433686} \Wait{ }{0.0409814843221} \ProcBatchTwo[ ]{0.532817917932} \Wait{ }{0.0819141171907} \ProcBatchTwo[ ]{0.655757485752}
-%\nextwave{15212} \Wait{ }{0.082002049807}\ProcBatchTwo[ ]{1.84424495682} \Wait{ }{0.122939567821} \ProcBatchTwo[ ]{1.8032634725} \Wait{ }{0.123022615292} \ProcBatchOne[ ]{2.09011920732} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.6393473055} \Wait{ }{0.286855734819} \ProcBatchTwo[ ]{1.92620304032}
-%\nextwave{16956} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.573799402254} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{2.45902095825} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.84420099051} \Wait{ }{0.409839268948} \ProcBatchOne[ ]{2.04922565561} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{1.02457130407}
-%\end{wave}
-%\caption{Gantt chart for old online algorithm (TBD: include merger thread here)} \label{fig:gantt:oldonline}
-%\end{figure}
-
 \section{Experiments}
 \label{sec:Experiments}
 
-Fig. \ref{fig:compare16}, \ref{fig:compare12} compare the perplexity as a function of time spend by four algorithms ---
-offline,
-online,
-asynchronous Online,
-and old non-deterministic implementation of the online algorithm.
-Each point in the figure corresponds to a moment when the library finished a complete scan of the collection.
-Each algorithm was given a fixed budget (30 minutes in the first chart, 40 minutes in the second chart).
+Fig. \ref{fig:compare16} (\emph{Wikipedia} dataset) and Fig. \ref{fig:compare12} (\emph{Pubmed} dataset)
+show the perplexity as a function of the time spend by the following four algorithms:
+\kw{Offline algorithm} (Fig. \ref{alg:Offline}),
+\kw{Online algorithm} (Fig. \ref{alg:Online}),
+asynchronous online algorithm (Fig. \ref{alg:AsyncOnline}),
+and the old non-deterministic online algorithm from \kw{BigARTM v0.6}, which is further described in Appendix \ref{sec:Appendix}.
+
+Each point in the figures corresponds to a moment when the library finished a complete scan of the collection.
+Each algorithm was given a fixed budget (60 minutes).
 Lower perplexity means better result.
 
-%\begin{figure}
-%\centering
-%\begin{tikzpicture}
-%    \begin{axis}[
-%        xlabel=Time (min),
-%        ylabel=Perplexity,
-%        major grid style={draw=lightgray},
-%        ymajorgrids=true,
-%        xmajorgrids=true,
-%        ymax=5000,
-%        ymin=3800
-%    ]
-%	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline16.dat};
-%	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old16.dat};
-%    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new16.dat};
-%    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async16.dat};
-%    \legend{Offline\\Online old\\Online new\\Online async\\}
-%    \end{axis}
-%\end{tikzpicture}
-%    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
-%\end{figure}
-%
-%\begin{figure}
-%\centering
-%\begin{tikzpicture}
-%    \begin{axis}[
-%        xlabel=Time (min),
-%        ylabel=Perplexity,
-%        major grid style={draw=lightgray},
-%        ymajorgrids=true,
-%        xmajorgrids=true,
-%        ymax=5000,
-%        ymin=3800
-%    ]
-%	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline12.dat};
-%	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old12.dat};
-%    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new12.dat};
-%    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async12.dat};
-%    \legend{Offline\\Online old\\Online new\\Online async\\}
-%    \end{axis}
-%\end{tikzpicture}
-%\caption{12 cores, 40 minutes limit} \label{fig:compare12}
-%\end{figure}
+\begin{figure}
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel=Time (min),
+        ylabel=Perplexity,
+        major grid style={draw=lightgray},
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline16.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old16.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new16.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async16.dat};
+    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \end{axis}
+\end{tikzpicture}
+    \caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel=Time (min),
+        ylabel=Perplexity,
+        major grid style={draw=lightgray},
+        ymajorgrids=true,
+        xmajorgrids=true,
+        ymax=5000,
+        ymin=3800
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {plots/offline12.dat};
+	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {plots/online_old12.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {plots/online_new12.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {plots/online_async12.dat};
+    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \end{axis}
+\end{tikzpicture}
+\caption{12 cores, 40 minutes limit} \label{fig:compare12}
+\end{figure}
 
 \section{Conclusions}
 \label{sec:Conclusions}
@@ -648,5 +669,29 @@ TBD
 
 \end{thebibliography}
 
+\newpage
+\section*{Appendix A}
+\label{sec:Appendix}
+
+TBD: describe non-deterministic online algorithm from \kw{BigARTM $v0.6$} and its gantt chart \ref{fig:gantt:oldonline}.
+
+%Fig. \ref{fig:gantt:oldonline} illustrates how the old architecture was used to implement a non-deterministic online algorithm.
+
+%TBD: explain how \ref{Online} is parallelized in the previous BigARTM version.
+%Explain why it was non-deterministic.
+%Explain that non-deterministic version has negative impact on convergence.
+
+\begin{figure}
+\centering
+\begin{wave}{6}{10}
+\nextwave{10596} \Wait{ }{0.122939567821}\ProcBatchTwo[ ]{1.96726757211} \Wait{ }{0.122895601513} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.122939567821} \ProcBatchOne[ ]{1.80334651997} \Wait{ }{0.0819190023361} \ProcBatchOne[ ]{1.02457130407} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.721305389}
+\nextwave{17976} \Wait{ }{0.0409814843221}\ProcBatchTwo[ ]{1.02465435154} \Wait{ }{0.0819190023361} \ProcBatchTwo[ ]{1.27048952087} \Wait{ }{0.122934682676} \ProcBatchTwo[ ]{1.88526552231} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.06554790325} \Wait{ }{0.0819629686442} \ProcBatchOne[ ]{1.55738433686} \Wait{ }{0.0409814843221} \ProcBatchTwo[ ]{0.532817917932} \Wait{ }{0.0819141171907} \ProcBatchTwo[ ]{0.655757485752}
+\nextwave{15212} \Wait{ }{0.082002049807}\ProcBatchTwo[ ]{1.84424495682} \Wait{ }{0.122939567821} \ProcBatchTwo[ ]{1.8032634725} \Wait{ }{0.123022615292} \ProcBatchOne[ ]{2.09011920732} \Wait{ }{0.082002049807} \ProcBatchOne[ ]{1.6393473055} \Wait{ }{0.286855734819} \ProcBatchTwo[ ]{1.92620304032}
+\nextwave{16956} \Wait{ }{0.0}\ProcBatchTwo[ ]{0.573799402254} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{2.45902095825} \Wait{ }{0.122978648984} \ProcBatchTwo[ ]{1.84420099051} \Wait{ }{0.409839268948} \ProcBatchOne[ ]{2.04922565561} \Wait{ }{0.0819580834989} \ProcBatchTwo[ ]{1.02457130407}
+\end{wave}
+\caption{Gantt chart for old online algorithm (TBD: include merger thread here)} \label{fig:gantt:oldonline}
+\end{figure}
+
 \end{document}
+
 
