@@ -7,45 +7,31 @@
 \pagenumbering{gobble}
 \newcounter{wavenum}
 
-\definecolor{DarkRed}{rgb}{0.5, 0.3, 0.3}
-\definecolor{LightRed}{rgb}{0.65, 0.45, 0.45}
-\definecolor{DarkGreen}{rgb}{0.35, 0.55, 0.35}
-\definecolor{DarkYellow}{rgb}{0.7, 0.7, 0.5}
-\definecolor{Blue}{rgb}{0.65, 0.65, 0.85}
-\definecolor{LightBlue}{rgb}{0.85, 0.85, 1.0}
+\definecolor{DarkRed}{rgb}{0.6, 0.0, 0.0}
+\definecolor{LightRed}{rgb}{0.9, 0.0, 0.0}
+\definecolor{DarkGreen}{rgb}{0.0, 0.6, 0.0}
+\definecolor{Yellow}{rgb}{0.8, 0.8, 0.0}
+\definecolor{DarkBlue}{rgb}{0.0, 0.0, 0.3}
+\definecolor{LightBlue}{rgb}{0.0, 0.0, 1.0}
 
 \setlength{\unitlength}{1cm}
 % advance clock one cycle, not to be called directly
 \newcommand*{\clki}{
-  \draw[opacity=0.0] (t_cur) -- ++(0,.0) -- ++(.5,0) -- ++(0,-.0) -- ++(.5,0) -- ++(0,.0)
-    node[time] (t_cur) {};
-}
-
-\newcommand*{\MergerQueue}[3]{
-  \fill[fill=#3]
-                         (t_cur) -- ++( .0, .04) -- ++(#2-.0,0) -- ++(.0, -.04)
-                         -- ++(-.0,-.04) -- ++(.0-#2,0) -- cycle;
-  \path (t_cur) -- node[anchor=mid] {#1} ++(#2,0) node[time] (t_cur) {};
-}
-
-\newcommand*{\MQFull}[2][XXX]{
-    \MergerQueue{#1}{#2}{red}
-}
-
-\newcommand*{\MQNormal}[2]{
-    \MergerQueue{#1}{#2}{green}
+	\draw[opacity=1.0] (t_cur)
+%%%%% START_MARKER_1 %%%%%
+	node[time] (t_cur) {};
 }
 
 \newcommand*{\bitvector}[6]{
-  \fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6]
-                         (t_cur) -- ++( .0, .11) -- ++(#2-.0,0) -- ++(.0, -.12)
-                         -- ++(-.0,-.12) -- ++(.0-#2,0) -- cycle;
-  \path (t_cur) -- node[anchor=mid] {\footnotesize #1} ++(#2,0) node[time] (t_cur) {};
+	\fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6]
+	(t_cur) -- ++(#2,0) -- ++(.0, -.06)
+	-- ++(.0,-.06) -- ++(-#2,0) -- cycle;
+	\path (t_cur) -- node[anchor=mid] {\tiny #1} ++(#2,0) node[time] (t_cur) {};
 }
 
 % \known{val}{length}
 \newcommand*{\Wait}[2]{
-    \bitvector{#1}{#2}{white}{white}{}{0.0}
+	\bitvector{#1}{#2}{white}{white}{}{0.0}
 }
 
 % \unknown{length}
@@ -65,12 +51,12 @@
 
 % \unknown{length}
 \newcommand*{\Normalization}[2][XXX]{
-	\bitvector{#1}{#2}{DarkYellow}{DarkYellow}{}{1.0}
+	\bitvector{#1}{#2}{Yellow}{Yellow}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\Merge}[2][XXX]{
-	\bitvector{#1}{#2}{Blue}{Blue}{}{1.0}
+	\bitvector{#1}{#2}{DarkBlue}{Blue}{}{1.0}
 }
 
 % \unknown{length}
@@ -80,35 +66,26 @@
 
 % \nextwave{name}
 \newcommand{\nextwave}[1]{
-  \path (0,\value{wavenum} * 0.35) node[left] {\footnotesize #1} node[time] (t_cur) {};
-  \addtocounter{wavenum}{-1}
+	\path (0,\value{wavenum} * 0.16) node[below=0.1cm, left] {\tiny #1} node[time] (t_cur) {};
+	\addtocounter{wavenum}{-1}
 }
 
 % \begin{wave}[clkname]{num_waves}{clock_cycles}
-\newenvironment{wave}[5][\footnotesize\bf{time} $\:$]{
+\newenvironment{wave}[5][]{
 	\begin{tikzpicture}[draw=black, yscale=1.5,xscale=0.7]
 	\tikzstyle{time}=[coordinate]
 	\setlength{\unitlength}{1cm}
 	\def\wavewidth{#3}
 	\setcounter{wavenum}{0}
 	\nextwave{#1}
-	
-	\draw[dotted] (t_cur) +(0,-0.1) node[above] {\footnotesize 0\%} -- ++(0,#5-#2);
-	\clki
-	\foreach \t in {1,...,\wavewidth}{
-		\draw[dotted] (t_cur) +(0,-0.1) node[above] {\footnotesize \t0\%} -- ++(0,#5-#2);
-		\clki
-	}
-	\foreach \t in {#4,...,#4}{
-		\draw[dotted] (t_cur) +(0,-0.1) node[above right] {\footnotesize \t$\,$sec.} -- ++(0,#5-#2);
-		\clki
-	}
+
+%%%%% START_MARKER_2 %%%%%
 }{\end{tikzpicture}}
 
 %%% End of timing.sty
 \usepackage{verbatim}
 
 \begin{document}
-%%%%% START_MARKER %%%%%
+%%%%% START_MARKER_3 %%%%%
 \end{wave}
 \end{document}
