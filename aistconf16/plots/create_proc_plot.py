@@ -7,6 +7,9 @@ input_log_file = sys.argv[1]
 input_tex_file = sys.argv[2]
 output_tex_file = sys.argv[3]
 
+NUM_INTERVALS = 10
+MAX_TIME = float(sys.argv[4])
+
 # define some constants
 BATCH_PROC_TASK = '@batch_proc_task'
 REGULARIZING_TASK = '@regularizing_task'
@@ -180,23 +183,39 @@ max_time_stamp -= min_time_stamp
 
 
 # write info to latex file
-coef = 10 / max_time_stamp
-line_len_value = 5.4 - 0.35 * (len(process_info.keys()) - 1)
+coef = NUM_INTERVALS / max_time_stamp
+line_len_value = 5.7 #5.4 - 0.35 * (len(process_info.keys()) - 1)  # incorrect!
 with open(input_tex_file, 'r') as fin:
     with open(output_tex_file, 'w') as fout:
         for line in fin:
-            if '%%%%% START_MARKER %%%%%' not in line:
+            if '%%%%% START_MARKER_1 %%%%%' not in line and\
+               '%%%%% START_MARKER_2 %%%%%' not in line and\
+               '%%%%% START_MARKER_3 %%%%%' not in line:
                 fout.write(line)
+            elif '%%%%% START_MARKER_1 %%%%%' in line:
+                value = MAX_TIME / (10.0 * NUM_INTERVALS) * coef
+                fout.write('-- ++(0,-0.1) -- ++(0,0.05)\n')
+                for _ in xrange(4):
+                    fout.write('-- ++({},0) ++(0,-0.02) -- ++(0,0.02)\n'.format(value))
+                fout.write('-- ++({},0)  -- ++(0,-0.035) -- ++(0,0.035)\n'.format(value))
+                for _ in xrange(5):
+                    fout.write('-- ++({},0) ++(0,-0.02) -- ++(0,0.02)\n'.format(value))
+                fout.write('-- ++(0,-0.05) -- ++(0,0.1)\n')
+            elif '%%%%% START_MARKER_2 %%%%%' in line:
+                iter = MAX_TIME / (1.0 * NUM_INTERVALS)
+                for i in [int(iter * i) for i in xrange(NUM_INTERVALS + 1)]:
+                    fout.write('\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {{\\tiny {} s.}} -- ++(0,#5-#2);\n'.format(i))
+                    fout.write('\clki\n')
             else:
-                fout.write('\\begin{{wave}}{{{0}}}{{9}}{{{1:.2f}}}{{{2}}}\n'.format(len(process_info.keys()) + 1, max_time_stamp, line_len_value))
+                fout.write('\\begin{{wave}}{{{0}}}{{10}}{{{1:.2f}}}{{{2}}}\n'.format(len(process_info.keys()), max_time_stamp, line_len_value))
                 process_names_list = process_info.keys()
                 process_names_list.remove(main_thread_name)
-                process_names_list += [main_thread_name]
+                process_names_list = [main_thread_name] + process_names_list
 
                 for p_i, p_name in enumerate(process_names_list):
                     name_to_print = 'Main' if not use_merger else 'Merger'
-                    if p_i < (len(process_names_list) - 1):
-                        name_to_print = 'Proc-{}'.format(p_i + 1)
+                    if p_i > 0:
+                        name_to_print = 'Proc-{}'.format(p_i)
                     process_str = '\\nextwave{{{}}} '.format(name_to_print)
                     process_str += '\\Wait{{ }}{{{}}}'.format(process_info[p_name][0].start_time * coef)
                     for idx, _ in enumerate(process_info[p_name]):

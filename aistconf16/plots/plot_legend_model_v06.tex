@@ -1,0 +1,34 @@
+\documentclass{standalone}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{varwidth}
+
+\pagenumbering{gobble}
+\newcounter{wavenum}
+
+\definecolor{DarkRed}{rgb}{0.6, 0.0, 0.0}
+\definecolor{LightRed}{rgb}{0.9, 0.0, 0.0}
+\definecolor{DarkGreen}{rgb}{0.0, 0.6, 0.0}
+\definecolor{Yellow}{rgb}{0.8, 0.8, 0.0}
+\definecolor{DarkBlue}{rgb}{0.0, 0.0, 0.3}
+\definecolor{LightBlue}{rgb}{0.0, 0.0, 1.0}
+
+
+\usepackage{verbatim}
+
+\begin{document}
+\newcommand*{\entry}[1]{\raisebox{0pt}{\tikz{\fill[fill=#1, draw=black](0,0) -- ++( .0, .0) -- ++(0.5,0) -- ++(.0, -.1) -- ++(-.0,-.1) -- ++(-.5,0) -- cycle;;}}}
+
+\begin{tikzpicture}
+\node at (0, 0) {\framebox{\footnotesize
+		{\begin{varwidth}{\linewidth}{
+			\\ \entry{DarkRed} $\quad$ \texttt{Odd batch generation}
+			$\qquad$ \entry{LightRed} $\quad$ \texttt{Even batch generation}
+			\\ \entry{Yellow} $\quad$ \texttt{Normalization}
+			$\qquad\qquad\quad\,\,\,$ \entry{DarkBlue} $\quad$ \texttt{Merging matrix}
+			\\ \entry{LightBlue} $\quad$ \texttt{Merging increments}
+		}\end{varwidth}}
+	}};
+\end{tikzpicture}
+\end{document}
