@@ -325,6 +325,35 @@ to normalize $n_{wt}$ values and produce a new $\Phi$ matrix.
 \section{Online algorithm}
 \label{sec:Online}
 
+\SetAlgoSkip{}
+\begin{algorithm2e}[t]
+	\caption{Online algorithm} %\mbox{regularized} topic modeling
+	\label{alg:Online}
+	\BlankLine
+	\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
+	\KwOut{matrix $\Phi = (\phi_{wt})$;}
+	\BlankLine
+	create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+	initialize $(\phi^0_{wt})$\;
+	\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
+		$(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
+		$\rho_i := (\tau_0 + i)^{-\kappa}$\;
+		\label{alg:Online:Rho}
+		$(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
+		\label{alg:Online:Merge}
+		$(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i - 1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
+		\label{alg:Online:Normalize}
+	}
+\end{algorithm2e}
+\begin{figure}[t!]
+	\centering
+	\begin{tabular}{c}
+		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_non_async_200.pdf} \\
+		\includegraphics[scale=1]{plots/plot_legend_async_non_async.pdf}
+	\end{tabular}
+	\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
+\end{figure}
+
 The \kw{Online algorithm} (Fig. \ref{alg:Online}), originally suggested in \cite{hoffman10online},
 improves the convergence rate of the \kw{Offline algorithm}
 by re-calculating matrix $\Phi$ after every $\eta$ batches.
@@ -358,38 +387,41 @@ Green box is, as before, the time spent to normalize $n_{wt}$ values and produce
 
 In the next section we present an asynchronous non-blocking modification of the online algorithm that results in better CPU utilization.
 
+\section{Asynchronous online algorithm}
+\label{sec:AsyncOnline}
+
 \SetAlgoSkip{}
-\begin{algorithm2e}[h]
-\caption{Online algorithm} %\mbox{regularized} topic modeling
-\label{alg:Online}
-\BlankLine
-\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
-\KwOut{matrix $\Phi = (\phi_{wt})$;}
-\BlankLine
-create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
-initialize $(\phi^0_{wt})$\;
-\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
-    $(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
-    $\rho_i := (\tau_0 + i)^{-\kappa}$\;
-    \label{alg:Online:Rho}
-    $(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
-    \label{alg:Online:Merge}
-    $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i - 1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
-    \label{alg:Online:Normalize}
-}
+\begin{algorithm2e}[t]
+	\caption{Asynchronous online algorithm} %\mbox{regularized} topic modeling
+	\label{alg:AsyncOnline}
+	\BlankLine
+	\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
+	\KwOut{matrix $\Phi = (\phi_{wt})$;}
+	\BlankLine
+	create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+	initialize $(\phi^0_{wt})$\;
+	$F^1 := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
+	\label{alg:AsyncOnline:FirstStep}
+	\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
+		\If{$i \neq \lfloor B / \eta \rfloor$}{
+			\label{alg:AsyncOnline:IfStatement}
+			$F^{i+1} := \kw{AsyncProcessBatches}(\{D_{\eta i + 1}, \dots, D_{\eta i + \eta}\}, \Phi^{i-1})$\;
+		}
+		$\hat n^i_{wt} := \kw{Await}(F^i)$\;
+		$\rho_i := (\tau_0 + i)^{-\kappa}$\;
+		$(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
+		$(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i-1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
+	}
 \end{algorithm2e}
 
 \begin{figure}[t]
 	\centering
 	\begin{tabular}{c}
-		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_non_async_200.pdf} \\
+		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_async_300.pdf} \\
 		\includegraphics[scale=1]{plots/plot_legend_async_non_async.pdf}
 	\end{tabular}
-	\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
+	\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
 \end{figure}
-
-\section{Asynchronous online algorithm}
-\label{sec:AsyncOnline}
 
 Asynchronous online algorithm is based on two new routines, \kw{AsyncProcessBatches} and \kw{Await}.
 The first one is equivalent to \kw{ProcessBatches}, except that it just queues the task for an asynchronous execution and returns immediately.
@@ -417,41 +449,23 @@ as clearly shown by the Gantt chart from Fig. \ref{fig:gantt:AsyncOnline}.
 
 This tradeoff convergence and CPU utilization is evaluated in the experiments from section \ref{sec:Experiments}.
 
-\SetAlgoSkip{}
-\begin{algorithm2e}[h]
-\caption{Asynchronous online algorithm} %\mbox{regularized} topic modeling
-\label{alg:AsyncOnline}
-\BlankLine
-\KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
-\KwOut{matrix $\Phi = (\phi_{wt})$;}
-\BlankLine
-create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
-initialize $(\phi^0_{wt})$\;
-$F^1 := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
-\label{alg:AsyncOnline:FirstStep}
-\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
-    \If{$i \neq \lfloor B / \eta \rfloor$}{
-        \label{alg:AsyncOnline:IfStatement}
-        $F^{i+1} := \kw{AsyncProcessBatches}(\{D_{\eta i + 1}, \dots, D_{\eta i + \eta}\}, \Phi^{i-1})$\;
-    }
-    $\hat n^i_{wt} := \kw{Await}(F^i)$\;
-    $\rho_i := (\tau_0 + i)^{-\kappa}$\;
-    $(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
-    $(\phi^{i}_{wt}) := \norm_{w \in W} (n^{i}_{wt} + \phi^{i-1}_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
-}
-\end{algorithm2e}
-
-\begin{figure}[t]
-	\centering
-	\begin{tabular}{c}
-		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_async_300.pdf} \\
-		\includegraphics[scale=1]{plots/plot_legend_async_non_async.pdf}
-	\end{tabular}
-	\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
-\end{figure}
-
 \section{Implementation}
 \label{sec:Architecture}
+
+\begin{figure}[t]
+	\begin{centering}
+		\includegraphics[height=39mm]{diagramm_artm_core.eps}
+		\caption{Diagram of BigARTM components (old architecture)}
+		\label{fig:diagramm_artm_core}
+	\end{centering}
+\end{figure}
+\begin{figure}[t]
+	\begin{centering}
+		\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
+		\caption{Diagram of BigARTM components (new architecture)}
+		\label{fig:diagramm_artm_core_v07}
+	\end{centering}
+\end{figure}
 
 The challenging part for the implementation is to aggregate the $\hat n_{wt}$ matrices across multiple batches, given that they are processed in different threads.
 The way BigARTM solves this challenge was changed between versions \kw{v0.6} (see Fig. \ref{fig:diagramm_artm_core}) and \kw{v0.7} (see Fig. \ref{fig:diagramm_artm_core_v07}).
@@ -476,48 +490,77 @@ In addition, we provided a cleaner API so now the users may use simple \kw{FitOf
 and $\kw{Transform}$ to apply the model to the data.
 Previously the users had to interact with low-level building blocks, such as \kw{ProcessBatches} routine.
 
-\begin{figure}[t]
-\begin{centering}
-\includegraphics[height=39mm]{diagramm_artm_core.eps}
-\caption{Diagram of parallelization components}
-\label{fig:diagramm_artm_core}
-\end{centering}
-\end{figure}
-
-\begin{figure}[t]
-\begin{centering}
-\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
-\caption{Diagram of parallelization components (new architecture)}
-\label{fig:diagramm_artm_core_v07}
-\end{centering}
-\end{figure}
-
 \section{Experiments}
 \label{sec:Experiments}
 
-Fig. \ref{fig:compare16} (\emph{Wikipedia} dataset) and Fig. \ref{fig:compare12} (\emph{Pubmed} dataset)
-show the perplexity as a function of the time spend by the following four algorithms:
+In this section we compare the effectiveness of the
 \kw{Offline algorithm} (Fig. \ref{alg:Offline}),
 \kw{Online algorithm} (Fig. \ref{alg:Online}),
 asynchronous online algorithm (Fig. \ref{alg:AsyncOnline}),
-and the old non-deterministic online algorithm from \kw{BigARTM v0.6}, which is further described in Appendix \ref{sec:Appendix}.
+and the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described in \cite{vfardi15aist}.
+According to \cite{vfardi15aist}, the later algorithm
+runs ca. $10$ times comparing to Gensim~\cite{rehurek10software},
+and twice faster comparing to 
+Vowpal Wabbit (VW)%
+\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/}}
+in a single thread;
+an with multiple threads BigARTM wins even more.
 
-Each point in the figures corresponds to a moment when the library finished a complete scan of the collection.
-Each algorithm was given a fixed budget (60 minutes).
-Lower perplexity means better result.
+In the experiments we use \emph{Wikipedia} dataset ($|D| = 3.7m$ articles, $|W| = 100k$ words)
+and \emph{Pubmed} dataset ($|D| = 8.2m$ abstracts, $|W| = 141k$ words).
+The experiments ran on Intel Xeon CPU E5-2650 v2 system with 2 processors, 16 physical cores in total (32 with hyper-threading).
+
+
+Fig. \ref{fig:perf} show the \emph{perplexity} as a function of the time spend by the four algorithms listed above.
+%\kw{Offline algorithm} (Fig. \ref{alg:Offline}),
+%\kw{Online algorithm} (Fig. \ref{alg:Online}),
+%asynchronous online algorithm (Fig. \ref{alg:AsyncOnline}),
+%and the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described in \cite{vfardi15aist}.
+The perplexity measure is defined as
+\begin{equation}
+\label{eq:perplexity}
+\mathscr{P}(D, p) =
+%\exp\left(- \frac{1}{n} L(\Phi, \Theta) \right) =
+\exp \biggl( - \frac{1}{n} \sum_{d \in D} \sum_{w \in d} n_{dw} \ln \sum_{t\in T} \phi_{wt} \theta_{td} \biggr),
+\end{equation}
+ where $n = \sum_d n_d$. Lower perplexity means better result.
+Each point on the figures corresponds to a moment when the algorithm finishes a complete scan of the collection.
+Each algorithm was time-boxed to run for a 40 minutes for Wikipedia and 30 minutes for Pubmed.
 
 \begin{figure}[t]
 	\centering
 	\begin{minipage}[b]{0.4\textwidth}
 		\includegraphics[scale=0.65]{plots/perplexity_time_plot_12.pdf}
-		\caption{16 cores with hyper-threading, 30 minutes limit} \label{fig:compare16}
 	\end{minipage}
 	$\qquad\quad$
 	\begin{minipage}[b]{0.4\textwidth}
 		\includegraphics[scale=0.65]{plots/perplexity_time_plot_16.pdf}
-		\caption{12 physical cores, 40 minutes limit} \label{fig:compare12}
+%		\caption{12 physical cores, 40 minutes limit} \label{fig:compare12}
 	\end{minipage}
+	\caption{Perplexity versus time for Wikipedia (left) and Pubmed (right), $|T| = 100$ topics}
+	\label{fig:perf}
 \end{figure}
+
+Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ topics model on Wikipedia and Pubmed datasets.
+TDB: explain memory usage (how many matrices, what is the size of each matrix, how big batches affect memory usage, why old algorithm is so inefficient)
+
+\begin{table}[h]
+	\caption{
+		BigARTM peak memory usage in GB, $|T| = 1000$ topics
+	}
+	\label{tab:memory}
+	\centering\tabcolsep=4.3pt
+	\begin{tabular}[t]{|l|cccc|}
+		\hline
+		& Offline   & Online    & Async     & Old online  \\
+		\hline
+		Pubmed	& {5.17}   	& {4.68}   	& {8.18}   	& {13.4}      \\
+		Wiki	& {1.74}   	& {2.44}   	& {3.93}   	& {7.9}       \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+
 
 \section{Conclusions}
 \label{sec:Conclusions}
@@ -627,24 +670,18 @@ Communications in Computer and Information Science (CCIS), 2015.
 \end{thebibliography}
 
 \newpage
-\section*{Appendix A}
+\section*{Appendix}
 \label{sec:Appendix}
 
-TBD: describe non-deterministic online algorithm from \kw{BigARTM $v0.6$} and its gantt chart \ref{fig:gantt:oldonline}.
+Fig. \ref{fig:gantt:oldonline} illustrates run-time behavior of the old \kw{online algorithm}, implemented in previous BigARTM version (\kw{v0.6}).
 
-%Fig. \ref{fig:gantt:oldonline} illustrates how the old architecture was used to implement a non-deterministic online algorithm.
-
-%TBD: explain how \ref{Online} is parallelized in the previous BigARTM version.
-%Explain why it was non-deterministic.
-%Explain that non-deterministic version has negative impact on convergence.
-
-\begin{figure}[t]
+\begin{figure}[h]
 	\centering
 	\begin{tabular}{c}
 		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_model_v06_300.pdf} \\
 		\includegraphics[scale=1]{plots/plot_legend_model_v06.pdf}
 	\end{tabular}
-	\caption{Gantt chart for old online algorithm (TBD: include merger thread here)} \label{fig:gantt:oldonline}
+	\caption{Gantt chart for execution of the old online algorithm from BigARTM \kw{v0.6}} \label{fig:gantt:oldonline}
 \end{figure}
 
 \end{document}
