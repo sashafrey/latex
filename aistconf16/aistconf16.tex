@@ -60,13 +60,14 @@ In this paper we present a new asynchronous algorithm for learning additively re
 and discuss the main architectural details of our implementation.
 The key property of the new algorithm is that it behaves in a fully deterministic fashion,
 which is typically hard to achieve in a non-blocking parallel implementation. The algorithm
-%has been
 had been
 recently implemented in the BigARTM library (\texttt{http://bigartm.org}).
 Our new algorithm is compatible with all features previously introduced in BigARTM library,
 including multimodality, regularizers and scores calculation.
-Previous BigARTM version was already faster than the alternative open source topic modeling packages such as Vowpal Wabbit or Gensim.
-Yet, in our experiments we show that the new implementation spends even less time to achieve the same perplexity, has better CPU utilization and lower memory usage.
+While the existing BigARTM implementation compares favorably
+with the alternative packages such as Vowpal Wabbit or Gensim,
+the new algorithm brings yet further improvements in CPU utilization,
+memory usage, and spends even less time to achieve the same perplexity.
 
 \vspace{1em}
 \textbf{Keywords:}
@@ -82,6 +83,10 @@ Yet, in our experiments we show that the new implementation spends even less tim
 \end{abstract}
 
 \section{Introduction}
+
+% There is plenty of research on distributed implementation of topic models, and less focus on efficient single-node implementation.
+% Our implementation is designed to be a building block in a distributed computation.
+% Many researchers might not have a budget to access an HPC cluster, and would prefer to run experiments on their local hardware or using a single powerfull EC2 instance.
 
 Deterministic behavior is an important property for any algorithm,
 including those of a stochastic nature.
@@ -158,7 +163,7 @@ the log-likelihood, regularized via an additional penalty term $R(\Phi, \Theta)$
     \;\to\; \max_{\Phi,\Theta}.
 \end{gather}
 With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
-Many Bayesian topic models can be considered
+Many Bayesian topic models, including LDA~\cite{blei03latent}, can be represented
 as special cases of ARTM with different regularizers~$R$,
 as shown in~\cite{voron14mlj,voron14aist}.
 
@@ -232,7 +237,7 @@ which are all based on the above formulas but differ in the way how operations a
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
 initialize $(\phi_{wt})$\;
-form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 \label{alg:Offline:FormBatches}
 \Repeat{$(\phi_{wt})$ converges}{
     %$\tilde n_{wt} := 0$ for all $w \in W$ and $t \in T$\;
@@ -270,7 +275,7 @@ $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_offline_300.pdf} \\
 \includegraphics[scale=1]{plots/plot_legend_offline.pdf}
 \end{tabular}
-\caption{Gantt chart for Offline algorithm} \label{fig:gantt:offline}
+\caption{Gantt chart for execution of the Offline algorithm} \label{fig:gantt:offline}
 \end{figure}
 
 The algorithm is given by
@@ -291,7 +296,14 @@ for each document $d \in D$ from the collection,
 and then aggregates the resulting $(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
 After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{eq:Mstep:phi}$.
 
-Step \ref{alg:Offline:FormBatches}, where we split collection $D$ into batches $(D_b)$, is not strictly necessary in the \kw{Offline algorithm},
+%To split collection into batches and process them concurrently is a common approach,
+%introduced in AD-LDA algorithm \cite{newman09distributed}, and
+%then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
+
+At step \ref{alg:Offline:FormBatches} we split collection $D$ into batches $(D_b)$,
+similarly to AD-LDA \cite{newman09distributed},
+PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
+This step is not strictly necessary for the \kw{Offline algorithm},
 and it rather reflects an internal implementation detail.
 For performance reasons the outer loop over batches $b = 1, \dots, B$ is parallelized across multiple threads,
 and within each batch the inner loop $d \in D_b$ is executed in a single thread.
@@ -313,7 +325,8 @@ to normalize $n_{wt}$ values and produce a new $\Phi$ matrix.
 \section{Online algorithm}
 \label{sec:Online}
 
-The \kw{Online algorithm} improves the convergence rate of the \kw{Offline algorithm}
+The \kw{Online algorithm} (Fig. \ref{alg:Online}), originally suggested in \cite{hoffman10online},
+improves the convergence rate of the \kw{Offline algorithm}
 by re-calculating matrix $\Phi$ after every $\eta$ batches.
 To simplify the notation
 we introduce a trivial subroutine
@@ -329,7 +342,7 @@ because different splitting algorithmically affects the result.
 At step \ref{alg:Online:Merge} the new $n_{wt}^{i+1}$ values are calculated as a convex combination
 of the old values $n_{wt}^{i}$ and the value $\hat n_{wt}^{i}$ produced on the recent batches.
 Old counters $n_{wt}^{i}$ are discounted by a factor $(1 - \rho_i)$,
-which depends on the iteration number. Typical strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
+which depends on the iteration number. A common strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
 where typical values for $\tau_0$ are between $64$ and $1024$, for $\kappa$ --- between $0.5$ and $0.7$.
 
 As in the \kw{Offline algorithm}, the outer loop over batches
@@ -353,7 +366,7 @@ In the next section we present an asynchronous non-blocking modification of the 
 \KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
-form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 initialize $(\phi^0_{wt})$\;
 \ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
     $(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
@@ -412,7 +425,7 @@ This tradeoff convergence and CPU utilization is evaluated in the experiments fr
 \KwIn{collection $D$, parameters $\eta, \tau_0, \kappa$;}
 \KwOut{matrix $\Phi = (\phi_{wt})$;}
 \BlankLine
-form batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
+create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
 initialize $(\phi^0_{wt})$\;
 $F^1 := \kw{AsyncProcessBatches}(\{D_{1}, \dots, D_{\eta}\}, \Phi^0)$\;
 \label{alg:AsyncOnline:FirstStep}
@@ -513,8 +526,8 @@ TBD
 
 \bigskip
 \subsubsection*{Acknowledgements.}
-
-TBD
+\nopagebreak
+The work was supported by Russian Science Foundation (grant 15-18-00091).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\bibliographystyle{splncs03}
@@ -524,7 +537,92 @@ TBD
 %\providecommand{\url}[1]{\texttt{#1}}
 %\providecommand{\urlprefix}{URL }
 
-TBD
+\bibitem{blei12ptm}
+D.~M. Blei.
+\newblock Probabilistic topic models.
+\newblock {\em Communications of the ACM}, 55(4):77--84, 2012.
+
+\bibitem{blei03latent}
+D.~M. Blei, A.~Y. Ng, and M.~I. Jordan.
+\newblock Latent {Dirichlet} allocation.
+\newblock {\em Journal of Machine Learning Research}, 3:993--1022, 2003.
+
+\bibitem{hofmann99plsi}
+T.~Hofmann.
+\newblock Probabilistic latent semantic indexing.
+\newblock In~{\em Proceedings of the 22nd annual international ACM SIGIR
+	conference on Research and development in information retrieval},
+pages 50--57, 1999.
+
+\bibitem{hoffman10online}
+M.~D. Hoffman, D.~M. Blei, and F.~R. Bach.
+\newblock Online learning for latent dirichlet allocation.
+\newblock In {\em NIPS}, pages 856--864. Curran Associates, Inc., 2010.
+
+\bibitem{newman09distributed}
+D.~Newman, A.~Asuncion, P.~Smyth, and M.~Welling.
+\newblock Distributed algorithms for topic models.
+\newblock {\em J. Mach. Learn. Res.}, 10:1801--1828, Dec. 2009.
+
+\bibitem{wang09plda}
+Y.~Wang, H.~Bai, M.~Stanton, W.-Y. Chen, and E.~Y. Chang.
+\newblock {PLDA}: Parallel latent {D}irichlet allocation for large-scale applications.
+\newblock In {\em Proceedings of the 5th International Conference on
+	Algorithmic Aspects in Information and Management}, pages 301--314, 2009.
+
+\bibitem{liu11plda}
+Z.~Liu, Y.~Zhang, E.~Y. Chang, and M.~Sun.
+\newblock {PLDA+:} parallel latent {D}irichlet allocation with data placement and pipeline processing.
+\newblock {\em ACM Trans. Intell. Syst. Technol.}, 2(3):26:1--26:18, May 2011.
+
+\bibitem{rehurek10software}
+R.~\v{R}eh\r{u}\v{r}ek and P.~Sojka.
+\newblock Software framework for topic modelling with large corpora.
+\newblock In {\em Proceedings of the {LREC} 2010 Workshop on New Challenges for
+	{NLP} Frameworks}, pages 45--50, Valletta, Malta, May 2010.
+
+\bibitem{smola10architecture}
+A.~Smola and S.~Narayanamurthy.
+\newblock An architecture for parallel topic models.
+\newblock {\em Proc. VLDB Endow.}, 3(1-2):703--710, Sept. 2010.
+
+\bibitem{voron14dan-eng}
+K.~V. Vorontsov.
+\newblock Additive regularization for topic models of text collections.
+\newblock {\em Doklady Mathematics}, 89(3):301--304, 2014.
+
+\bibitem{voron14mlj}
+K.~V. Vorontsov and A.~A. Potapenko.
+\newblock Additive regularization of topic models.
+\newblock {\em Machine Learning, Special Issue on Data Analysis and Intelligent Optimization}, 2014.
+
+\bibitem{voron14aist}
+K.~V. Vorontsov and A.~A. Potapenko.
+\newblock Tutorial on probabilistic topic modeling: Additive regularization for stochastic matrix factorization.
+\newblock In~{\em AIST'2014, Analysis of Images, Social networks and Texts},
+volume 436, pages 29--46. Springer International Publishing Switzerland,
+Communications in Computer and Information Science (CCIS), 2014.
+
+\bibitem{vfardi15aist}
+K.~Vorontsov, O.~Frei, M.~Apishev, P.~Romov and M.~Dudarenko.
+\newblock BigARTM: Open Source Library for Regularized Multimodal Topic Modeling of Large Collections.
+\newblock In~{\em AIST'2015, Analysis of Images, Social networks and Texts},
+volume 542, pages 370--381. Springer International Publishing Switzerland,
+Communications in Computer and Information Science (CCIS), 2015.
+
+
+% Parameter Server for Distributed Machine Learning
+% https://www.cs.cmu.edu/~muli/file/ps.pdf
+
+%http://www.www2015.it/documents/proceedings/proceedings/p1351.pdf
+%@inproceedings{yuan2015lightlda,
+%	title={LightLDA: Big Topic Models on Modest Computer Clusters},
+%	author={Yuan, Jinhui and Gao, Fei and Ho, Qirong and Dai, Wei and Wei, Jinliang and Zheng, Xun and Xing, Eric Po and Liu, Tie-Yan and Ma, Wei-Ying},
+%	booktitle={Proceedings of the 24th International Conference on World Wide Web},
+%	pages={1351--1361},
+%	year={2015},
+%	organization={International World Wide Web Conferences Steering Committee}
+%}
 
 \end{thebibliography}
 
