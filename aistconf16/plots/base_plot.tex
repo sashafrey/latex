@@ -23,7 +23,7 @@
 }
 
 \newcommand*{\bitvector}[6]{
-	\fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6]
+	\fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6, draw=#4]
 	(t_cur) -- ++(#2,0) -- ++(.0, -.06)
 	-- ++(.0,-.06) -- ++(-#2,0) -- cycle;
 	\path (t_cur) -- node[anchor=mid] {\tiny #1} ++(#2,0) node[time] (t_cur) {};
@@ -36,12 +36,12 @@
 
 % \unknown{length}
 \newcommand*{\ProcBatchOne}[2][XXX]{
-	\bitvector{#1}{#2}{DarkRed}{DarkRed}{}{1.0}
+	\bitvector{#1}{#2}{DarkRed}{gray}{}{1.0}
 }
 
 % \unknown{length}
 \newcommand*{\ProcBatchTwo}[2][XXX]{
-	\bitvector{#1}{#2}{LightRed}{LightRed}{}{1.0}
+	\bitvector{#1}{#2}{LightRed}{gray}{}{1.0}
 }
 
 % \unknown{length}
@@ -56,7 +56,7 @@
 
 % \unknown{length}
 \newcommand*{\Merge}[2][XXX]{
-	\bitvector{#1}{#2}{DarkBlue}{Blue}{}{1.0}
+	\bitvector{#1}{#2}{DarkBlue}{DarkBlue}{}{1.0}
 }
 
 % \unknown{length}

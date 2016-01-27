@@ -21,14 +21,14 @@
 \newcommand*{\entry}[1]{\raisebox{0pt}{\tikz{\fill[fill=#1, draw=black](0,0) -- ++( .0, .0) -- ++(0.5,0) -- ++(.0, -.1) -- ++(-.0,-.1) -- ++(-.5,0) -- cycle;;}}}
 
 \begin{tikzpicture}
-\node at (0, 0) {\framebox{\footnotesize
+\node at (0, 0) {\footnotesize
 		{\begin{varwidth}{\linewidth}{
-			\\ \entry{DarkRed} $\quad$ \texttt{Odd batch}
+			\entry{DarkRed} $\quad$ \texttt{Odd batch}
 			$\qquad$ \entry{LightRed} $\quad$ \texttt{Even batch}
 			$\qquad$ \entry{Yellow} $\quad$ \texttt{Norm}
 			\\ \entry{DarkBlue} $\quad$ \texttt{Merge matrix}
 			$\,\,\,$ \entry{LightBlue} $\quad$ \texttt{Merge increments}
 		}\end{varwidth}}
-	}};
+	};
 \end{tikzpicture}
 \end{document}

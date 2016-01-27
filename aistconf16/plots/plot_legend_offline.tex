@@ -21,11 +21,11 @@
 \newcommand*{\entry}[1]{\raisebox{0pt}{\tikz{\fill[fill=#1, draw=black](0,0) -- ++( .0, .0) -- ++(0.5,0) -- ++(.0, -.1) -- ++(-.0,-.1) -- ++(-.5,0) -- cycle;;}}}
 
 \begin{tikzpicture}
-\node at (0, 0) {\framebox{\footnotesize
+\node at (0, 0) {\footnotesize
 		{\begin{varwidth}{\linewidth}{
-        \\ \entry{LightRed} $\quad$ \texttt{Batch processing}
+        \entry{LightRed} $\quad$ \texttt{Batch processing}
 		$\qquad\qquad$ \entry{Yellow} $\quad$ \texttt{Norm}
 		}\end{varwidth}}
-	}};
+	};
 \end{tikzpicture}
 \end{document}

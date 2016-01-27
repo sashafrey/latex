@@ -204,7 +204,7 @@ with open(input_tex_file, 'r') as fin:
             elif '%%%%% START_MARKER_2 %%%%%' in line:
                 iter = MAX_TIME / (1.0 * NUM_INTERVALS)
                 for i in [int(iter * i) for i in xrange(NUM_INTERVALS + 1)]:
-                    fout.write('\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {{\\tiny {} s.}} -- ++(0,#5-#2);\n'.format(i))
+                    fout.write('\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {{\\tiny {} s.}};\n'.format(i))
                     fout.write('\clki\n')
             else:
                 fout.write('\\begin{{wave}}{{{0}}}{{10}}{{{1:.2f}}}{{{2}}}\n'.format(len(process_info.keys()), max_time_stamp, line_len_value))
