@@ -83,31 +83,58 @@ memory usage, and spends even less time to achieve the same perplexity.
 \end{abstract}
 
 \section{Introduction}
+%
+%\cite{li13parserver}
 
-% There is plenty of research on distributed implementation of topic models, and less focus on efficient single-node implementation.
-% Our implementation is designed to be a building block in a distributed computation.
-% Many researchers might not have a budget to access an HPC cluster, and would prefer to run experiments on their local hardware or using a single powerfull EC2 instance.
+Topic models \cite{blei12ptm} is a powerful machine learning technology for statistical text analysis
+that has been widely used in text mining, information retrieval, network analysis and other areas \cite{daud10knowledge}.
+A lot of research efforts around topic models is now devoted to distributed algorithms such as
+AD-LDA~\cite{newman09distributed}, PLDA~\cite{wang09plda} and PLDA{+}~\cite{liu11plda},
+designed to run on a powerful cluster.
+Largest topic models of web scale can reach millions of topics and vocabulary words, yielding Big Data models with trillions of parameters \cite{yuan15lightlda}.
+However, not all researchers and applications are dealing with text collections of such scale.
+Yet currently there is less research dedicated to an efficient single-node implementation of topic models
+that can run on a powerful workstation or even on a laptop.
+Such implementations are also very useful,
+as shown by popular open-source packages
+Vowpal Wabbit~\cite{langford07vw}, Gensim~\cite{rehurek10software} and Mallet~\cite{McCallum02mallet},
+which are neither distributed nor sometimes even multi-threaded.
 
-Deterministic behavior is an important property for any algorithm,
-including those of a stochastic nature.
-For the end users of a software system run-to-run reproducibility is a must-have property,
-because this is what they expect based on their previous experience.
-Indeed, refreshing a web-pages or re-doing an operation tend to
-produce an identical result, regardless of how much software complexity is hidden behind the scenes.
-For the researches determinism is also important
-because it enables them to reproduce their old experiments
-and study impact of various parameters on the result.
-Finally, for the developers of the algorithm
-determinism allow to reproduce bugs and write simple unit-tests with well-defined results.
+BigARTM~\cite{vfardi15aist} is an open-source library for
+Regularized Multimodal Topic Modeling of Large Collections.
+BigARTM is based on a novel technique of Additive Regularized Topic Models \cite{voron14dan-eng,voron14mlj,voron14aist},
+which gives flexible multi-criteria approach to probabilistic topic modeling.
+ARTM includes all popular models such as 
+\emph{Probabilistic Latent Semantic Analysis}, PLSA~\cite{hofmann99plsi},
+\emph{Latent Dirichlet Allocation}, LDA~\cite{blei03latent}, 
+as well as many other models.
 
-Determinism is particularly hard to achieve
-in concurrent implementations, because in a multi-threaded environment
-it might not be sufficient to just fix a random seed or an initial approximation.
-In this paper we present a deterministic modification of parallel non-blocking algorithm
-for online topic modeling, previously developed for BigARTM library.
-We implement new algorithm in BigARTM and demonstrate that new version converges faster
-than previous algorithm in terms of perplexity,
-yet being more efficient in CPU and memory usage.
+BigARTM is proven to be very fast comparing to the alternative packages~\cite{vfardi15aist},
+and it scales linearly up to 16 cores.
+In this paper we address the remaining limitations of the library,
+including few performance bottlenecks
+and fixing non-deterministic behavior of the Online algorithm.
+
+%Deterministic behavior is an important property for any algorithm,
+%including those of a stochastic nature.
+%For the end users of a software system run-to-run reproducibility is a must-have property,
+%because this is what they expect based on their previous experience.
+%Indeed, refreshing a web-pages or re-doing an operation tend to
+%produce an identical result, regardless of how much software complexity is hidden behind the scenes.
+%For the researches determinism is also important
+%because it enables them to reproduce their old experiments
+%and study impact of various parameters on the result.
+%Finally, for the developers of the algorithm
+%determinism allow to reproduce bugs and write simple unit-tests with well-defined results.
+
+%Determinism is particularly hard to achieve
+%in concurrent implementations, because in a multi-threaded environment
+%it might not be sufficient to just fix a random seed or an initial approximation.
+%In this paper we present a deterministic modification of parallel non-blocking algorithm
+%for online topic modeling, previously developed for BigARTM library.
+%We implement new algorithm in BigARTM and demonstrate that new version converges faster
+%than previous algorithm in terms of perplexity,
+%yet being more efficient in CPU and memory usage.
 
 The rest of the paper is organized as follows.
 In~section~\ref{sec:Notation}
@@ -300,9 +327,7 @@ After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{
 %introduced in AD-LDA algorithm \cite{newman09distributed}, and
 %then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
 
-At step \ref{alg:Offline:FormBatches} we split collection $D$ into batches $(D_b)$,
-similarly to AD-LDA \cite{newman09distributed},
-PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
+At step \ref{alg:Offline:FormBatches} we split collection $D$ into batches $(D_b)$.
 This step is not strictly necessary for the \kw{Offline algorithm},
 and it rather reflects an internal implementation detail.
 For performance reasons the outer loop over batches $b = 1, \dots, B$ is parallelized across multiple threads,
@@ -501,8 +526,7 @@ and the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described
 According to \cite{vfardi15aist}, the later algorithm
 runs ca. $10$ times comparing to Gensim~\cite{rehurek10software},
 and twice faster comparing to 
-Vowpal Wabbit (VW)%
-\footnote{\url{https://github.com/JohnLangford/vowpal_wabbit/}}
+Vowpal Wabbit (VW)~\cite{langford07vw}
 in a single thread;
 an with multiple threads BigARTM wins even more.
 
@@ -565,6 +589,8 @@ TDB: explain memory usage (how many matrices, what is the size of each matrix, h
 \section{Conclusions}
 \label{sec:Conclusions}
 
+%Our implementation is designed to be a building block in a distributed topic model,
+
 TBD
 
 \bigskip
@@ -584,6 +610,21 @@ The work was supported by Russian Science Foundation (grant 15-18-00091).
 D.~M. Blei.
 \newblock Probabilistic topic models.
 \newblock {\em Communications of the ACM}, 55(4):77--84, 2012.
+
+\bibitem{daud10knowledge}
+Daud, A., Li, J., Zhou, L., Muhammad, F.: Knowledge discovery through directed
+probabilistic topic models: a survey. Frontiers of Computer Science in China
+4(2),  280--301 (2010)
+
+%\bibitem{li13parserver}
+%M.~Li, D.~G. Andersen, J.~W. Park, A.~J. Smola, A.~Ahmed, V.~Josifovski, J.~Long, E.~J. Shekita, and B.~Y. Su.
+%\newblock{Scaling distributed machine learning with the parameter server.}
+%\newblock{In Proc. OSDI}, pp. 583-598, 2013.
+
+\bibitem{yuan15lightlda}
+J.~Yuan, F.~Gao, Q.~Ho, W.~Dai, J.~Wei, X.~Zheng, E.~P. Xing, T.Y.~Liu, and W.~Y. Ma.
+\newblock{LightLDA: Big Topic Models on Modest Computer Clusters.}
+\newblock{In Proceedings of the 24th International Conference on World Wide Web}, pp. 1351-1361, 2015.
 
 \bibitem{blei03latent}
 D.~M. Blei, A.~Y. Ng, and M.~I. Jordan.
@@ -624,6 +665,21 @@ R.~\v{R}eh\r{u}\v{r}ek and P.~Sojka.
 \newblock In {\em Proceedings of the {LREC} 2010 Workshop on New Challenges for
 	{NLP} Frameworks}, pages 45--50, Valletta, Malta, May 2010.
 
+%\bibitem{langford11vw}
+%A.~Agarwal, O.~Chapelle, M.~Dudik, J.~Langford
+%\newblock{A Reliable Effective Terascale Linear Learning System}
+%\newblock {arXiv preprint}, arXiv:1110.4198, 2011.
+
+\bibitem{langford07vw}
+J.~Langford, L.~Li, and A.~Strehl.
+\newblock Vowpal wabbit open source project.
+\newblock {\em Technical report}, Yahoo!, 2007.
+
+\bibitem{McCallum02mallet}
+A.~K. McCallum,
+\newblock A Machine Learning for Language Toolkit.
+\newblock {\em http://mallet.cs.umass.edu}, 2002.
+   
 \bibitem{smola10architecture}
 A.~Smola and S.~Narayanamurthy.
 \newblock An architecture for parallel topic models.
@@ -653,19 +709,6 @@ K.~Vorontsov, O.~Frei, M.~Apishev, P.~Romov and M.~Dudarenko.
 volume 542, pages 370--381. Springer International Publishing Switzerland,
 Communications in Computer and Information Science (CCIS), 2015.
 
-
-% Parameter Server for Distributed Machine Learning
-% https://www.cs.cmu.edu/~muli/file/ps.pdf
-
-%http://www.www2015.it/documents/proceedings/proceedings/p1351.pdf
-%@inproceedings{yuan2015lightlda,
-%	title={LightLDA: Big Topic Models on Modest Computer Clusters},
-%	author={Yuan, Jinhui and Gao, Fei and Ho, Qirong and Dai, Wei and Wei, Jinliang and Zheng, Xun and Xing, Eric Po and Liu, Tie-Yan and Ma, Wei-Ying},
-%	booktitle={Proceedings of the 24th International Conference on World Wide Web},
-%	pages={1351--1361},
-%	year={2015},
-%	organization={International World Wide Web Conferences Steering Committee}
-%}
 
 \end{thebibliography}
 
