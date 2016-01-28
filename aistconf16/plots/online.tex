@@ -1,0 +1,128 @@
+\documentclass{standalone}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usetikzlibrary{patterns}
+
+\pagenumbering{gobble}
+\newcounter{wavenum}
+
+\definecolor{DarkRed}{rgb}{0.6, 0.0, 0.0}
+\definecolor{LightRed}{rgb}{0.9, 0.0, 0.0}
+\definecolor{DarkGreen}{rgb}{0.0, 0.6, 0.0}
+\definecolor{Yellow}{rgb}{0.8, 0.8, 0.0}
+\definecolor{DarkBlue}{rgb}{0.0, 0.0, 0.3}
+\definecolor{LightBlue}{rgb}{0.0, 0.0, 1.0}
+
+\setlength{\unitlength}{1cm}
+% advance clock one cycle, not to be called directly
+\newcommand*{\clki}{
+	\draw[opacity=1.0] (t_cur)
+-- ++(0,-0.1) -- ++(0,0.05)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0)  -- ++(0,-0.035) -- ++(0,0.035)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0.110624568699,0) ++(0,-0.02) -- ++(0,0.02)
+-- ++(0,-0.05) -- ++(0,0.1)
+	node[time] (t_cur) {};
+}
+
+\newcommand*{\bitvector}[6]{
+	\fill[fill=#3, pattern=#5, pattern color=#4, fill opacity=#6, draw=#4]
+	(t_cur) -- ++(#2,0) -- ++(.0, -.06)
+	-- ++(.0,-.06) -- ++(-#2,0) -- cycle;
+	\path (t_cur) -- node[anchor=mid] {\tiny #1} ++(#2,0) node[time] (t_cur) {};
+}
+
+% \known{val}{length}
+\newcommand*{\Wait}[2]{
+	\bitvector{#1}{#2}{white}{white}{}{0.0}
+}
+
+% \unknown{length}
+\newcommand*{\ProcBatchOne}[2][XXX]{
+	\bitvector{#1}{#2}{DarkRed}{gray}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\ProcBatchTwo}[2][XXX]{
+	\bitvector{#1}{#2}{LightRed}{gray}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Regularization}[2][XXX]{
+	\bitvector{#1}{#2}{DarkGreen}{DarkGreen}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Normalization}[2][XXX]{
+	\bitvector{#1}{#2}{Yellow}{Yellow}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\Merge}[2][XXX]{
+	\bitvector{#1}{#2}{DarkBlue}{DarkBlue}{}{1.0}
+}
+
+% \unknown{length}
+\newcommand*{\MergeInc}[2][XXX]{
+	\bitvector{#1}{#2}{LightBlue}{LightBlue}{}{1.0}
+}
+
+% \nextwave{name}
+\newcommand{\nextwave}[1]{
+	\path (0,\value{wavenum} * 0.16) node[below=0.1cm, left] {\tiny #1} node[time] (t_cur) {};
+	\addtocounter{wavenum}{-1}
+}
+
+% \begin{wave}[clkname]{num_waves}{clock_cycles}
+\newenvironment{wave}[5][]{
+	\begin{tikzpicture}[draw=black, yscale=1.5,xscale=0.7]
+	\tikzstyle{time}=[coordinate]
+	\setlength{\unitlength}{1cm}
+	\def\wavewidth{#3}
+	\setcounter{wavenum}{0}
+	\nextwave{#1}
+
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 0 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 4 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 8 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 12 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 16 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 20 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 24 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 28 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 32 s.};
+\clki
+\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {\tiny 36 s.};
+\clki
+}{\end{tikzpicture}}
+
+%%% End of timing.sty
+\usepackage{verbatim}
+
+\begin{document}
+\begin{wave}{7}{10}{36.16}{5.7}
+\nextwave{Main} \Wait{ }{0.424778731128}\Merge[]{0.0912608302726} \Wait{ }{0.00553095941046} \Normalization[]{0.0553095281672} \Wait{ }{0.437223126052} \Merge[]{0.0934736228485} \Wait{ }{0.00553095941046} \Normalization[]{0.058074843029} \Wait{ }{0.43805255237} \Merge[]{0.093473886598} \Wait{ }{0.00553095941046} \Normalization[]{0.055309231449} \Wait{ }{0.432522153427} \Merge[]{0.094303016198} \Wait{ }{0.00553095941046} \Normalization[]{0.051991328364} \Wait{ }{0.461282885206} \Merge[]{0.0943024557303} \Wait{ }{0.00553095941046} \Normalization[]{0.057245713429} \Wait{ }{0.445796007638} \Merge[]{0.0940267385708} \Wait{ }{0.00553122315998} \Normalization[]{0.0580745792795} \Wait{ }{0.45049780448} \Merge[]{0.105918050741} \Wait{ }{0.00553095941046} \Normalization[]{0.0636058024394} \Wait{ }{0.424225318687} \Merge[]{0.0926439327808} \Wait{ }{0.00553122315998} \Normalization[]{0.0530970323095} \Wait{ }{0.425331550132} \Merge[]{0.0934733261303} \Wait{ }{0.00553095941046} \Normalization[]{0.0500554068517} \Wait{ }{0.425054975786} \Merge[]{0.0981748921912} \Wait{ }{0.00553095941046} \Normalization[]{0.0547566761945} \Wait{ }{0.420630544538} \Merge[]{0.0976212160012} \Wait{ }{0.00553122315998} \Normalization[]{0.055586069544} \Wait{ }{0.455478417538} \Merge[]{0.088771793038} \Wait{ }{0.00525464881451} \Normalization[]{0.0566926306754} \Wait{ }{0.428098546397} \Merge[]{0.0954098081103} \Wait{ }{0.00857314533592} \Normalization[]{0.058074843029} \Wait{ }{0.4330750054} \Merge[]{0.0915376683676} \Wait{ }{0.00829657099045} \Normalization[]{0.0525439165872} \Wait{ }{0.441649502452} \Merge[]{0.094303016198} \Wait{ }{0.00553095941046} \Normalization[]{0.0580751067785} \Wait{ }{0.429756838565} \Merge[]{0.0931964880353} \Wait{ }{0.00553095941046} \Normalization[]{0.0553097919167} \Wait{ }{0.37444701368} \Merge[]{0.091537404618} \Wait{ }{0.00829657099045} \Normalization[]{0.0525441803367} 
+\nextwave{Proc-1} \Wait{ }{0.0}\ProcBatchTwo[]{0.193030760362} \Wait{ }{0.00359530164773} \ProcBatchTwo[]{0.202986678519} \Wait{ }{0.205198613909} \ProcBatchOne[]{0.205199438126} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.190265148782} \Wait{ }{0.193583579366} \ProcBatchTwo[]{0.197456015827} \Wait{ }{0.00829601052271} \ProcBatchTwo[]{0.181968841541} \Wait{ }{0.202710400892} \ProcBatchOne[]{0.190265412532} \Wait{ }{0.00553122315998} \ProcBatchOne[]{0.202156427984} \Wait{ }{0.190541986877} \ProcBatchTwo[]{0.198561686804} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.193583876084} \Wait{ }{0.231747410298} \ProcBatchOne[]{0.182245119168} \Wait{ }{0.0102330529704} \ProcBatchOne[]{0.189711736342} \Wait{ }{0.201880150356} \ProcBatchTwo[]{0.194413829902} \Wait{ }{0.00829627427223} \ProcBatchTwo[]{0.192478468857} \Wait{ }{0.232577100366} \ProcBatchOne[]{0.184733892653} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.187499504233} \Wait{ }{0.198009131549} \ProcBatchTwo[]{0.184734749839} \Wait{ }{0.00829601052271} \ProcBatchTwo[]{0.188329194301} \Wait{ }{0.192477908389} \ProcBatchOne[]{0.171183497066} \Wait{ }{0.00553122315998} \ProcBatchOne[]{0.184457615026} \Wait{ }{0.220685788195} \ProcBatchTwo[]{0.191925056417} \Wait{ }{0.00553066269224} \ProcBatchTwo[]{0.186393833257} \Wait{ }{0.198008571081} \ProcBatchOne[]{0.214603921965} \Wait{ }{0.0107853444754} \ProcBatchOne[]{0.191372468193} \Wait{ }{0.185564143189} \ProcBatchTwo[]{0.172844261886} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.184458142525} \Wait{ }{0.225663631883} \ProcBatchOne[]{0.175884766408} \Wait{ }{0.00414841736999} \ProcBatchOne[]{0.175608488781} \Wait{ }{0.235342415227} \ProcBatchTwo[]{0.200223012092} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.186116995162} \Wait{ }{0.202156427984} \ProcBatchOne[]{0.175885887344} \Wait{ }{0.00553066269224} \ProcBatchOne[]{0.179203229961} \Wait{ }{0.21764333852} \ProcBatchTwo[]{0.181416253318} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.157079985756} 
+\nextwave{Proc-2} \Wait{ }{0.00553095941046}\ProcBatchTwo[]{0.176437618381} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.212113203327} \Wait{ }{0.205198613909} \ProcBatchOne[]{0.185840981284} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.198561423054} \Wait{ }{0.201603872729} \ProcBatchTwo[]{0.183904763053} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.190265412532} \Wait{ }{0.216537634575} \ProcBatchOne[]{0.201327034634} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.182798234891} \Wait{ }{0.196072913319} \ProcBatchTwo[]{0.198561719772} \Wait{ }{0.00829683473997} \ProcBatchTwo[]{0.199114538776} \Wait{ }{0.215154565035} \ProcBatchOne[]{0.184734156403} \Wait{ }{0.00580753375593} \ProcBatchOne[]{0.193307862207} \Wait{ }{0.214048036872} \ProcBatchTwo[]{0.205475715754} \Wait{ }{0.00829630724092} \ProcBatchTwo[]{0.189712560559} \Wait{ }{0.224280793125} \ProcBatchOne[]{0.173672270551} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.179203229961} \Wait{ }{0.20907131412} \ProcBatchTwo[]{0.184733892653} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.182798234891} \Wait{ }{0.214601713062} \ProcBatchOne[]{0.190541690159} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.184458175494} \Wait{ }{0.193031024112} \ProcBatchTwo[]{0.180862873846} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.184457615026} \Wait{ }{0.208241063584} \ProcBatchOne[]{0.188883430959} \Wait{ }{0.00829683473997} \ProcBatchOne[]{0.191927001569} \Wait{ }{0.220132936222} \ProcBatchTwo[]{0.187500888918} \Wait{ }{0.0110621825704} \ProcBatchTwo[]{0.187776078579} \Wait{ }{0.198009131549} \ProcBatchOne[]{0.192754746484} \Wait{ }{0.00553066269224} \ProcBatchOne[]{0.190542250627} \Wait{ }{0.196625204824} \ProcBatchTwo[]{0.200223275841} \Wait{ }{0.00829630724092} \ProcBatchTwo[]{0.172290025228} \Wait{ }{0.221514621077} \ProcBatchOne[]{0.184181897867} \Wait{ }{0.00829627427223} \ProcBatchOne[]{0.184734189372} \Wait{ }{0.198838261149} \ProcBatchOne[]{0.186394097006} 
+\nextwave{Proc-3} \Wait{ }{0.0110619188209}\ProcBatchTwo[]{0.198285409176} \Wait{ }{0.00829630724092} \ProcBatchTwo[]{0.190265676281} \Wait{ }{0.199667654499} \ProcBatchOne[]{0.196902900105} \Wait{ }{0.00829653802176} \ProcBatchOne[]{0.184733925622} \Wait{ }{0.203262956146} \ProcBatchTwo[]{0.20713483214} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.179203229961} \Wait{ }{0.208241624052} \ProcBatchOne[]{0.206857961076} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.174501960618} \Wait{ }{0.190541986877} \ProcBatchTwo[]{0.206858257794} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.172012626666} \Wait{ }{0.231195118793} \ProcBatchOne[]{0.193030166926} \Wait{ }{0.00580753375593} \ProcBatchOne[]{0.190542250627} \Wait{ }{0.214048300622} \ProcBatchTwo[]{0.191648218322} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.198008834831} \Wait{ }{0.232577660833} \ProcBatchOne[]{0.179203229961} \Wait{ }{0.00829601052271} \ProcBatchOne[]{0.165376260028} \Wait{ }{0.220132936222} \ProcBatchTwo[]{0.181968841541} \Wait{ }{0.00829601052271} \ProcBatchTwo[]{0.171736349038} \Wait{ }{0.214601713062} \ProcBatchOne[]{0.193307301739} \Wait{ }{0.00829627427223} \ProcBatchOne[]{0.173396289642} \Wait{ }{0.204092909964} \ProcBatchTwo[]{0.20298641477} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.17782095167} \Wait{ }{0.192754482735} \ProcBatchOne[]{0.196626589509} \Wait{ }{0.00857340908545} \ProcBatchOne[]{0.200499553469} \Wait{ }{0.197455455359} \ProcBatchTwo[]{0.194138640241} \Wait{ }{0.00359530164773} \ProcBatchTwo[]{0.191924792667} \Wait{ }{0.222897987335} \ProcBatchOne[]{0.184458175494} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.185010730748} \Wait{ }{0.193860153712} \ProcBatchTwo[]{0.208519846832} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.186116698443} \Wait{ }{0.196625765292} \ProcBatchOne[]{0.20630570254} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.176437882131} \Wait{ }{0.189712000091} \ProcBatchOne[]{0.181692563914} 
+\nextwave{Proc-4} \Wait{ }{0.0}\ProcBatchTwo[]{0.190265148782} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.201051581224} \Wait{ }{0.219025583842} \ProcBatchOne[]{0.183075633453} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.184733892653} \Wait{ }{0.208793915557} \ProcBatchTwo[]{0.201603872729} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.190265115813} \Wait{ }{0.19441412662} \ProcBatchOne[]{0.193031024112} \Wait{ }{0.00829601052271} \ProcBatchOne[]{0.188329458051} \Wait{ }{0.198838261149} \ProcBatchTwo[]{0.198561719772} \Wait{ }{0.00829683473997} \ProcBatchTwo[]{0.175054515873} \Wait{ }{0.244745547349} \ProcBatchOne[]{0.211836365232} \Wait{ }{0.00829627427223} \ProcBatchOne[]{0.175885063127} \Wait{ }{0.204645761936} \ProcBatchTwo[]{0.194413269434} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.198008834831} \Wait{ }{0.215984815571} \ProcBatchOne[]{0.173672270551} \Wait{ }{0.0110616221027} \ProcBatchOne[]{0.173672567269} \Wait{ }{0.225663598915} \ProcBatchTwo[]{0.190265115813} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.180032656279} \Wait{ }{0.186946948979} \ProcBatchOne[]{0.185010730748} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.184457878776} \Wait{ }{0.204092942932} \ProcBatchTwo[]{0.183628485426} \Wait{ }{0.0110616221027} \ProcBatchTwo[]{0.187223523324} \Wait{ }{0.199944492594} \ProcBatchOne[]{0.194691228464} \Wait{ }{0.00829683473997} \ProcBatchOne[]{0.202711785577} \Wait{ }{0.194413829902} \ProcBatchTwo[]{0.183353032016} \Wait{ }{0.00553092644177} \ProcBatchTwo[]{0.176161604503} \Wait{ }{0.225663631883} \ProcBatchOne[]{0.176991294571} \Wait{ }{0.00580750078724} \ProcBatchOne[]{0.175608488781} \Wait{ }{0.229811192067} \ProcBatchTwo[]{0.191926704851} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.188882606742} \Wait{ }{0.210453295692} \ProcBatchOne[]{0.186946948979} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.176437585412} \Wait{ }{0.212112675828} \ProcBatchOne[]{0.192478172139} 
+\nextwave{Proc-5} \Wait{ }{0.0221241013914}\ProcBatchTwo[]{0.189988574437} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.201603872729} \Wait{ }{0.191094805881} \ProcBatchOne[]{0.185840981284} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.198561423054} \Wait{ }{0.194136991807} \ProcBatchTwo[]{0.194136991807} \Wait{ }{0.00829627427223} \ProcBatchTwo[]{0.190265148782} \Wait{ }{0.219303246155} \ProcBatchOne[]{0.179203493711} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.185563846471} \Wait{ }{0.20713483214} \ProcBatchTwo[]{0.220685524446} \Wait{ }{0.00829653802176} \ProcBatchTwo[]{0.185287601812} \Wait{ }{0.193031024112} \ProcBatchOne[]{0.193030166926} \Wait{ }{0.00774345526819} \ProcBatchOne[]{0.1980088678} \Wait{ }{0.201880150356} \ProcBatchTwo[]{0.216537634575} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.192477908389} \Wait{ }{0.210453559442} \ProcBatchOne[]{0.198561423054} \Wait{ }{0.00829627427223} \ProcBatchOne[]{0.181968841541} \Wait{ }{0.186947509447} \ProcBatchTwo[]{0.173672270551} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.191094245413} \Wait{ }{0.214601713062} \ProcBatchOne[]{0.190541690159} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.178926952334} \Wait{ }{0.193031024112} \ProcBatchTwo[]{0.197455719109} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.179203493711} \Wait{ }{0.199667951217} \ProcBatchOne[]{0.20879586071} \Wait{ }{0.0107858719745} \ProcBatchOne[]{0.194414687087} \Wait{ }{0.191371643976} \ProcBatchTwo[]{0.205200559062} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.176714159758} \Wait{ }{0.198009131549} \ProcBatchOne[]{0.177544146544} \Wait{ }{0.01244525211} \ProcBatchOne[]{0.176714159758} \Wait{ }{0.221514917795} \ProcBatchTwo[]{0.194692052682} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.186116995162} \Wait{ }{0.210452998974} \ProcBatchOne[]{0.178650938456} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.181968841541} \Wait{ }{0.215154828785} \ProcBatchOne[]{0.197732293454} 
+\nextwave{Proc-6} \Wait{ }{0.0}\ProcBatchTwo[]{0.199667951217} \Wait{ }{0.00967937678045} \ProcBatchTwo[]{0.20990044372} \Wait{ }{0.185563582721} \ProcBatchOne[]{0.180310318592} \Wait{ }{0.00829627427223} \ProcBatchOne[]{0.201327034634} \Wait{ }{0.217367060893} \ProcBatchTwo[]{0.193031024112} \Wait{ }{0.00829601052271} \ProcBatchTwo[]{0.187499767983} \Wait{ }{0.20271069761} \ProcBatchOne[]{0.195796075224} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.17726727548} \Wait{ }{0.20990044372} \ProcBatchTwo[]{0.195796371942} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.176714159758} \Wait{ }{0.223727974121} \ProcBatchOne[]{0.190264852064} \Wait{ }{0.00857284861771} \ProcBatchOne[]{0.199944789312} \Wait{ }{0.201880150356} \ProcBatchTwo[]{0.191648218322} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.203539794241} \Wait{ }{0.227046701423} \ProcBatchOne[]{0.190264852064} \Wait{ }{0.00553095941046} \ProcBatchOne[]{0.176437585412} \Wait{ }{0.20354009096} \ProcBatchTwo[]{0.184734749839} \Wait{ }{0.00553066269224} \ProcBatchTwo[]{0.180032623311} \Wait{ }{0.20353982721} \ProcBatchOne[]{0.185010730748} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.189988838186} \Wait{ }{0.198561983522} \ProcBatchTwo[]{0.194690107529} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.176161604503} \Wait{ }{0.211006411415} \ProcBatchOne[]{0.176714983975} \Wait{ }{0.00829686770866} \ProcBatchOne[]{0.193033496763} \Wait{ }{0.217366764175} \ProcBatchTwo[]{0.185288953528} \Wait{ }{0.00829657099045} \ProcBatchTwo[]{0.189989134904} \Wait{ }{0.220132375755} \ProcBatchOne[]{0.184458735962} \Wait{ }{0.00553066269224} \ProcBatchOne[]{0.179479804307} \Wait{ }{0.215983958385} \ProcBatchTwo[]{0.197457664262} \Wait{ }{0.00829683473997} \ProcBatchTwo[]{0.180585772002} \Wait{ }{0.202156427984} \ProcBatchOne[]{0.184181897867} \Wait{ }{0.00829657099045} \ProcBatchOne[]{0.184734156403} \Wait{ }{0.20160360898} \ProcBatchTwo[]{0.172566863323} \Wait{ }{0.00553095941046} \ProcBatchTwo[]{0.16261035173} 
+\end{wave}
+\end{document}

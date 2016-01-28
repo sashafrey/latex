@@ -323,8 +323,8 @@ $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \begin{figure}[t]
 \centering
 \begin{tabular}{c}
-\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_offline_300.pdf} \\
-\includegraphics[scale=1]{plots/plot_legend_offline.pdf}
+\includegraphics[height=4cm, width=12cm]{plots/offline.pdf} \\
+\includegraphics[scale=1]{plots/legend_offline.pdf}
 \end{tabular}
 \caption{Gantt chart for execution of the Offline algorithm} \label{fig:gantt:offline}
 \end{figure}
@@ -397,8 +397,8 @@ to normalize $n_{wt}$ values and produce a new $\Phi$ matrix.
 \begin{figure}[t!]
 	\centering
 	\begin{tabular}{c}
-		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_non_async_200.pdf} \\
-		\includegraphics[scale=1]{plots/plot_legend_async_non_async.pdf}
+		\includegraphics[height=4cm, width=12cm]{plots/online.pdf} \\
+		\includegraphics[scale=1]{plots/legend_online.pdf}
 	\end{tabular}
 	\caption{Gantt chart for new online algorithm} \label{fig:gantt:online}
 \end{figure}
@@ -466,8 +466,8 @@ In the next section we present an asynchronous non-blocking modification of the 
 \begin{figure}[t]
 	\centering
 	\begin{tabular}{c}
-		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_async_300.pdf} \\
-		\includegraphics[scale=1]{plots/plot_legend_async_non_async.pdf}
+		\includegraphics[height=4cm, width=12cm]{plots/async.pdf} \\
+		\includegraphics[scale=1]{plots/legend_online.pdf}
 	\end{tabular}
 	\caption{Gantt chart for async online algorithm} \label{fig:gantt:AsyncOnline}
 \end{figure}
@@ -745,10 +745,19 @@ Fig. \ref{fig:gantt:oldonline} illustrates run-time behavior of the old \kw{onli
 \begin{figure}[h]
 	\centering
 	\begin{tabular}{c}
-		\includegraphics[height=4cm, width=12cm]{plots/plot_nytimes_model_v06_300.pdf} \\
-		\includegraphics[scale=1]{plots/plot_legend_model_v06.pdf}
+		\includegraphics[height=4cm, width=12cm]{plots/old.pdf} \\
+		\includegraphics[scale=1]{plots/legend_old.pdf}
 	\end{tabular}
 	\caption{Gantt chart for execution of the old online algorithm from BigARTM \kw{v0.6}} \label{fig:gantt:oldonline}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{tabular}{c}
+		\includegraphics[height=4cm, width=12cm]{plots/old_slow.pdf} \\
+		\includegraphics[scale=1]{plots/legend_old.pdf}
+	\end{tabular}
+	\caption{Gantt chart for execution of the old online algorithm from BigARTM \kw{v0.6}} \label{fig:gantt:oldonlineslow}
 \end{figure}
 
 \end{document}
