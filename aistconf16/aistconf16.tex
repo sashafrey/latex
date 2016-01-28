@@ -46,10 +46,10 @@
     Murat Apishev\inst{2}
 }
 \institute{\noindent
-    Schlumberger Information Solutions,
+    Moscow Institute of Physics and Technology,
     ~~\email{oleksandr.frei@gmail.com}
     \and
-    Lomonosov Moscow State University,
+    National Research University Higher School of Economics,
     ~~\email{great-mel@yandex.ru}
 }
 
@@ -88,29 +88,45 @@ memory usage, and spends even less time to achieve the same perplexity.
 
 Topic models \cite{blei12ptm} is a powerful machine learning technology for statistical text analysis
 that has been widely used in text mining, information retrieval, network analysis and other areas \cite{daud10knowledge}.
-A lot of research efforts around topic models is now devoted to distributed algorithms such as
+Today a lot of research efforts around topic models is devoted to distributed implementations of
+\emph{Latent Dirichlet Allocation} (LDA)~\cite{blei03latent},
+a specific Bayesian topic model that uses Dirichlet conjugate prior.
+This lead to numerous implementations such as
 AD-LDA~\cite{newman09distributed}, PLDA~\cite{wang09plda} and PLDA{+}~\cite{liu11plda},
-designed to run on a powerful cluster.
-Largest topic models of web scale can reach millions of topics and vocabulary words, yielding Big Data models with trillions of parameters \cite{yuan15lightlda}.
-However, not all researchers and applications are dealing with text collections of such scale.
-Yet currently there is less research dedicated to an efficient single-node implementation of topic models
-that can run on a powerful workstation or even on a laptop.
+all designed to run on a big cluster.
+Largest topic models of web scale can reach millions of topics and vocabulary words, 
+yielding Big Data models with trillions of parameters \cite{yuan15lightlda}.
+Yet not all researchers and application are dealing with so large web-scale collections,
+and they require an efficient implementation that can run on a powerful workstation or even laptop.
 Such implementations are also very useful,
 as shown by popular open-source packages
 Vowpal Wabbit~\cite{langford07vw}, Gensim~\cite{rehurek10software} and Mallet~\cite{McCallum02mallet},
 which are neither distributed nor sometimes even multi-threaded.
 
+Scaling down a distributed algorithm can be challenging.
+LightLDA~\cite{yuan15lightlda} is a major step in this direction,
+however it is focused on the LDA model.
+Our goal is to develop a flexible framework that can learn a wide variety of topic models.
+
 BigARTM~\cite{vfardi15aist} is an open-source library for
-Regularized Multimodal Topic Modeling of Large Collections.
-BigARTM is based on a novel technique of Additive Regularized Topic Models \cite{voron14dan-eng,voron14mlj,voron14aist},
+regularized multimodal topic modeling of large collections.
+BigARTM is based on a novel technique of additive regularized topic models (ARTM) \cite{voron14dan-eng,voron14mlj,voron14aist},
 which gives flexible multi-criteria approach to probabilistic topic modeling.
 ARTM includes all popular models such as 
-\emph{Probabilistic Latent Semantic Analysis}, PLSA~\cite{hofmann99plsi},
-\emph{Latent Dirichlet Allocation}, LDA~\cite{blei03latent}, 
-as well as many other models.
+LDA~\cite{blei03latent}, 
+PLSA~\cite{hofmann99plsi},
+and many others.
+Key feature of ARTM is that it provides a cohesive framework that allows users to combine
+different topic models that previously did not fit together.
 
-BigARTM is proven to be very fast comparing to the alternative packages~\cite{vfardi15aist},
-and it scales linearly up to 16 cores.
+BigARTM is proven to be very fast comparing to the alternative packages.
+According to~\cite{vfardi15aist}, BigARTM
+runs approx. $10$ times faster comparing to Gensim~\cite{rehurek10software}
+and twice faster than
+Vowpal Wabbit (VW)~\cite{langford07vw}
+in a single thread.
+With multiple threads BigARTM wins even more
+as it scales linearly at least up to 16 threads.
 In this paper we address the remaining limitations of the library,
 including few performance bottlenecks
 and fixing non-deterministic behavior of the Online algorithm.
@@ -171,8 +187,8 @@ $n_{dw}$ denote the number of occurrences of a term $w \in W$ in a document $d \
 $n_{dw}$ values form a sparse matrix of size $|W| \times |D|$,
 known as \emph{bag-of-words} representation of the collection.
 
-Given an $(n_{dw})$ matrix, an additively-regularized topic model (ARTM) finds two matrices:
-$\Phi = \{\phi_{wt}\}$ and $\Theta = \{\theta_{td}\}$,
+Given an $(n_{dw})$ matrix, a probabilistic topic model finds two matrices:
+$\Phi~=~\{\phi_{wt}\}$ and $\Theta = \{\theta_{td}\}$,
 of sizes $|W| \times |T|$ and $|T| \times |D|$ respectively,
 where $|T|$ is a used-defined number of \emph{topics} in the model.
 Matrices $\Phi$ and $\Theta$
@@ -182,13 +198,15 @@ n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in
 \]
 where $n_d = \sum_{w \in W} n_{dw}$ denotes the total number of terms in a document $d$.
 
-To learn $\Phi$ and $\Theta$ from $(n_{dw})$ ARTM maximizes
+To learn $\Phi$ and $\Theta$ from $(n_{dw})$ an additively-regularized topic model (ARTM) maximizes
 the log-likelihood, regularized via an additional penalty term $R(\Phi, \Theta)$:
 \begin{gather}
 \label{eq:ARTM}
     \sum_{d\in D}\sum_{w\in W} n_{dw} \ln \sum_{t\in T} \phi_{wt} \theta_{td} + R(\Phi, \Theta)
     \;\to\; \max_{\Phi,\Theta}.
 \end{gather}
+Regularization penalty $R(\Phi, \Theta)$ may incorporate external knowledge
+of the expert about the collection.
 With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
 Many Bayesian topic models, including LDA~\cite{blei03latent}, can be represented
 as special cases of ARTM with different regularizers~$R$,
@@ -196,6 +214,7 @@ as shown in~\cite{voron14mlj,voron14aist}.
 
 In \cite{voron14dan-eng} it is shown that the \mbox{local} maximum $(\Phi,\Theta)$
 of the problem~\eqref{eq:ARTM} satisfies
+the following system of equations:
 \begin{align}
     \label{eq:Estep}
     p_{tdw} &= \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr);
@@ -203,8 +222,10 @@ of the problem~\eqref{eq:ARTM} satisfies
     \label{eq:Mstep:phi}
     \phi_{wt} &= \norm_{w\in W}
         \biggl(
-            \sum_{d\in D} n_{dw} p_{tdw} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
+            n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}}
         \biggr);
+        \quad
+            n_{wt} = \sum_{d\in D} n_{dw} p_{tdw};
 %    \phi_{wt} &= \norm_{w\in W}
 %        \biggl(
 %            n_{wt} + r_{wt}
@@ -217,27 +238,30 @@ of the problem~\eqref{eq:ARTM} satisfies
     \label{eq:Mstep:theta}
     \theta_{td} &= \norm_{t\in T}
         \biggl(
-            \sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+            n_{td} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
         \biggr);
+        \quad\quad
+            n_{td} = \sum_{w\in d} n_{dw} p_{tdw};
 %    \theta_{td} &= \norm_{t\in T}
 %        \biggl(
 %            n_{td} + r_{td}
 %        \biggr);
-%    \quad
-%    n_{td} = \sum_{w\in d} n_{dw} p_{tdw};
 %    \quad
 %    r_{td} = \theta_{td} \frac{\partial R}{\partial \theta_{td}};
         %\sum_{m=1}^M \tau_m \!\!\sum_{w\in W^m}\!\!\! n_{dw} p_{tdw};
 \end{align}
 where operator
 $\norm_{i \in I} x_i = \frac{\max\{x_i,0\}}{\sum\limits_{j\in I} \max\{x_j,0\}}$
-transforms a~vector $(x_i)_{i \in I}$ to a~discrete distribution.
+transforms a~vector $(x_i)_{i \in I}$ to a~discrete distribution,
+$n_{wt}$ counters represent term frequency of word $w$ in topic $t$.
+% Hard to make up a similar explanation for $n_{td}$. Thesse counters represent "document frequency"? No...
 
 Learning of $\Phi$ and $\Theta$ from \eqref{eq:Estep}--\eqref{eq:Mstep:theta} can be done by EM-algorithm,
-which starts from a random initial approximation and iterates
+which starts from a random values in $\Phi$ and $\Theta$, and iterates
 E-step \eqref{eq:Estep} and
 M-steps \eqref{eq:Mstep:phi},\eqref{eq:Mstep:theta}
 until convergence.
+% Simple-iteration method - skip for now
 In the sequel we discuss several variations of such EM-algorithm,
 which are all based on the above formulas but differ in the way how operations are ordered and grouped together.
 
@@ -309,8 +333,8 @@ The algorithm is given by
 Fig. \ref{alg:Offline} (\kw{Offline algorithm}) and
 Fig. \ref{alg:ProcessDocument} (\kw{ProcessDocument}).
 
-Subroutine \kw{ProcessDocument($d, \Phi$)} corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta} from the fixed-point solution of the ARTM optimization problem \eqref{eq:ARTM}.
-\kw{ProcessDocument} requires a $\Phi$ matrix
+Subroutine \kw{ProcessDocument($d, \Phi$)} corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta} from the solution of the ARTM optimization problem \eqref{eq:ARTM}.
+\kw{ProcessDocument} requires a fixed $\Phi$ matrix
 and a vector $n_{dw}$ of term frequencies for a given document $d \in D$,
 and as a result it returns the topical distribution $\theta_{td}$ for the document,
 and a matrix $(\hat n_{wt})$ of size $|d| \times |T|$,
