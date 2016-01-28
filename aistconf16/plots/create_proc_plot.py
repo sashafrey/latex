@@ -47,12 +47,13 @@ COMPLETE_TASK_TYPE = {
 
 
 class Task(object):
-    def __init__(self, task_type=None, start_time=None, complete_time=None, batch_name=None, model_name=None, rhs=None):
+    def __init__(self, task_type=None, start_time=None, complete_time=None, batch_name=None, model_name=None, model_index=None, rhs=None):
         self.task_type = task_type
         self.start_time = start_time
         self.complete_time = complete_time
         self.batch_name = batch_name
         self.model_name = model_name
+        self.model_index = model_index
 
         if rhs is not None:
             self.task_type = rhs.task_type
@@ -60,10 +61,11 @@ class Task(object):
             self.complete_time = rhs.complete_time
             self.batch_name = rhs.batch_name
             self.model_name = rhs.model_name
+            self.model_index = rhs.model_index
             
     def __str__(self):
-        return '{0}\n {1}\n {2}\n {3}\n {4}\n'.format(self.task_type, self.start_time, self.complete_time,
-                                                      self.batch_name, self.model_name)
+        return '{0}\n {1}\n {2}\n {3}\n {4}\n {5}\n'.format(self.task_type, self.start_time, self.complete_time,
+                                                      self.batch_name, self.model_name, self.model_index)
 
 
 def parse_log(log_file_name):
@@ -131,13 +133,16 @@ def parse_log(log_file_name):
                                                                                            global_start_time,
                                                                                            read_batch=read_batch)
                         task_name = '{0}-{1}'.format(task_type, process_name)
-                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name, model_name)
 
                         if min_time_stamp is None:
                             min_time_stamp = start_time
 
-                        if model_name not in models_list and model_name is not None:
+                        model_index = None
+                        if model_name is not None and (len(models_list) == 0 or model_name != models_list[-1]):
                             models_list.append(model_name)
+
+                        model_index = len(models_list) - 1
+                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name, model_name, model_index)
                         break
 
                 for task_name, task_type in COMPLETE_TASK_TYPE.iteritems():
@@ -181,7 +186,6 @@ for _, tasks in process_info.iteritems():
 
 max_time_stamp -= min_time_stamp
 
-
 # write info to latex file
 coef = NUM_INTERVALS / max_time_stamp
 line_len_value = 5.7 #5.4 - 0.35 * (len(process_info.keys()) - 1)  # incorrect!
@@ -204,7 +208,7 @@ with open(input_tex_file, 'r') as fin:
             elif '%%%%% START_MARKER_2 %%%%%' in line:
                 iter = MAX_TIME / (1.0 * NUM_INTERVALS)
                 for i in [int(iter * i) for i in xrange(NUM_INTERVALS + 1)]:
-                    fout.write('\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {{\\tiny {} s.}};\n'.format(i))
+                    fout.write('\draw[dotted] (t_cur) +(0,-.1) node[above=0.05cm] {{\\tiny {}s}};\n'.format(i))
                     fout.write('\clki\n')
             else:
                 fout.write('\\begin{{wave}}{{{0}}}{{10}}{{{1:.2f}}}{{{2}}}\n'.format(len(process_info.keys()), max_time_stamp, line_len_value))
@@ -224,9 +228,8 @@ with open(input_tex_file, 'r') as fin:
                             val_2 = (process_info[p_name][idx + 1].start_time - process_info[p_name][idx].complete_time) * coef
                             
                             if process_info[p_name][idx].task_type == BATCH_PROC_TASK:
-                                index = models_list.index(process_info[p_name][idx].model_name)
                                 process_str += '\\ProcBatch{0}[]{{{1}}} \\Wait{{ }}{{{2}}} '.format(
-                                    'One' if index % 2 else 'Two', val_1, val_2)
+                                    'One' if process_info[p_name][idx].model_index % 2 else 'Two', val_1, val_2)
                             elif process_info[p_name][idx].task_type == REGULARIZING_TASK:
                                 process_str += '\\Regularization[]{{{0}}} \\Wait{{ }}{{{1}}} '.format(val_1, val_2)
                             elif process_info[p_name][idx].task_type == NORMALIZING_TASK:
@@ -239,7 +242,7 @@ with open(input_tex_file, 'r') as fin:
                             val = (process_info[p_name][idx].complete_time - process_info[p_name][idx].start_time) * coef
                             if process_info[p_name][idx].task_type == BATCH_PROC_TASK:
                                 process_str += '\\ProcBatch{0}[]{{{1}}} '.format(
-                                    'One' if index % 2 else 'Two', val)
+                                    'One' if process_info[p_name][idx].model_index % 2 else 'Two', val)
                             elif process_info[p_name][idx].task_type == REGULARIZING_TASK:
                                 process_str += '\\Regularization[]{{{0}}} '.format(val)
                             elif process_info[p_name][idx].task_type == NORMALIZING_TASK:
