@@ -47,12 +47,13 @@ COMPLETE_TASK_TYPE = {
 
 
 class Task(object):
-    def __init__(self, task_type=None, start_time=None, complete_time=None, batch_name=None, model_name=None, rhs=None):
+    def __init__(self, task_type=None, start_time=None, complete_time=None, batch_name=None, model_name=None, rhs=None, model_generation=None):
         self.task_type = task_type
         self.start_time = start_time
         self.complete_time = complete_time
         self.batch_name = batch_name
         self.model_name = model_name
+        self.model_generation = model_generation
 
         if rhs is not None:
             self.task_type = rhs.task_type
@@ -60,10 +61,11 @@ class Task(object):
             self.complete_time = rhs.complete_time
             self.batch_name = rhs.batch_name
             self.model_name = rhs.model_name
+            self.model_generation = rhs.model_generation
             
     def __str__(self):
-        return '{0}\n {1}\n {2}\n {3}\n {4}\n'.format(self.task_type, self.start_time, self.complete_time,
-                                                      self.batch_name, self.model_name)
+        return '{0}\n {1}\n {2}\n {3}\n {4}\n {5}\n'.format(self.task_type, self.start_time, self.complete_time,
+                                                      self.batch_name, self.model_name, self.model_generation)
 
 
 def parse_log(log_file_name):
@@ -112,6 +114,8 @@ def parse_log(log_file_name):
     main_thread_name = None
     use_merger = False
     process_info = {}  # dict, key --- process name, value --- list of tasks
+    model_generation = 0
+    previous_model_name = ''
     with open(log_file_name, 'r') as fin:
         incomplete_tasks = {}
         global_start_time = None
@@ -130,8 +134,14 @@ def parse_log(log_file_name):
                         process_name, start_time, batch_name, model_name = _read_task_info(line,
                                                                                            global_start_time,
                                                                                            read_batch=read_batch)
+
+                        if read_batch:
+                            if model_name != previous_model_name
+                                model_generation += 1
+                            previous_model_name = model_name
+
                         task_name = '{0}-{1}'.format(task_type, process_name)
-                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name, model_name)
+                        incomplete_tasks[task_name] = Task(task_type, start_time, -1, batch_name, model_name, model_generation)
 
                         if min_time_stamp is None:
                             min_time_stamp = start_time
