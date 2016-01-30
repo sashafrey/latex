@@ -393,6 +393,7 @@ where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 	initialize $(\phi^0_{wt})$\;
 	\ForAll{update $i = 1, \dots, \lfloor B / \eta \rfloor$} {
 		$(\hat n^i_{wt}) := \kw{ProcessBatches}(\{D_{\eta (i - 1) + 1}, \dots, D_{\eta i}\}, \Phi^{i - 1})$\;
+		\label{alg:OnlineARTM:ProcessBatches}
 		$\rho_i := (\tau_0 + i)^{-\kappa}$\;
 		\label{alg:OnlineARTM:Rho}
 		$(n^{i}_{wt}) := (1 - \rho_i) \cdot (n^{i-1}_{wt}) + \rho_i \cdot (\hat n^{i}_{wt})$\;
@@ -437,12 +438,12 @@ The problem with this approach is that all threads have no useful work to do dur
 \ref{alg:OnlineARTM:Rho}-\ref{alg:OnlineARTM:Normalize} of the \kw{Online ARTM}.
 The threads can not start processing the next batches because a new version of $\Phi$ matrix is not ready yet.
 As a result the CPU utilization stays low, and the run-time Gantt chart of the \kw{Online ARTM} typically looks like in Fig. \ref{fig:gantt:OnlineARTM}.
-The color indicate which version of the $\Phi$ matrix was used to process each batch
-(orange for even $i$, yellow for odd $i$).
-Blue box correspond to the time spend in merging $n_{wt}$ with $\hat n_{wt}$.
-Green box is, as before, the time spent to normalize $n_{wt}$ counters into the new $\Phi$ matrix.
+Boxes \kw{Even batch} and \kw{Odd batch} both correspond to step \ref{alg:OnlineARTM:ProcessBatches},
+and indicate the version of the $\Phi^i$ matrix (even $i$ or odd $i$).
+\kw{Merge} correspond to the time spend in merging $n_{wt}$ with $\hat n_{wt}$.
+\kw{Norm} is, as before, the time spent to normalize $n_{wt}$ counters into the new $\Phi$ matrix.
 
-In the next two sections we present two asynchronous modification of the online algorithm that results in better CPU utilization.
+In the next two sections we present asynchronous modifications of the online algorithm that results in better CPU utilization.
 The first of them (\kw{Async~ARTM}) has non-deterministic behavior and few performance bottlenecks.
 The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 
@@ -467,10 +468,38 @@ The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 	\caption{Gantt chart for \kw{Async ARTM} from \kw{BigARTM v0.6} --- performance issues} \label{fig:gantt:AsyncARTM:slow}
 \end{figure}
 
-The \kw{Async} algorithm is the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described in \cite{vfardi15aist}.
-Fig. \ref{fig:gantt:AsyncARTM}, \ref{fig:gantt:AsyncARTM:slow} illustrates run-time behavior of the \kw{Async} algorithm.
+The \kw{Async} algorithm was implemented in \kw{BigARTM v0.6} as described in \cite{vfardi15aist}.
+Basic idea is to trigger asynchronous execution of the \kw{Offline ARTM} algorithm
+and store the resulting $\hat n_{wt}$ matrices into a queue.
+Then, whenever the number of elements in the queue becomes a multiple of $\eta$,
+the \kw{Async} algorithm performs steps \ref{alg:OnlineARTM:Rho}-\ref{alg:OnlineARTM:Normalize}
+of the \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}).
+For performance reasons merging of the $\hat n_{wt}$ counters happens in a background by a dedicated \emph{Merger} thread.
 
-TBD: write this chapter.
+First problem of the \kw{Async} algorithm is that it does not define the order
+in which $\hat n_{wt}$ are merged.
+This order is usually different from the original order of the batches,
+and typically it changes from run to run.
+This affects the final $\Phi$ matrix which also changes from run to run.
+
+Another issue with \kw{Async} algorithm is that
+queuing $\hat n_{wt}$ counters may considerably increase the memory usage,
+and also lead to performance bottlenecks in the \emph{Merger} thread.
+In some cases the execution of the \kw{Async} algorithm is
+as efficient as for the \kw{Offline} algorithm,
+as shown on Fig. \ref{fig:gantt:AsyncARTM}.
+However, certain combination of the parameters
+(particularly, small batch size or small number of iterations in \kw{ProcessDocument}'s inner loop 
+\ref{alg:ProcessDocument:innerLoopBegin}-\ref{alg:ProcessDocument:innerLoopEnd})
+might overload the merger thread.
+Then the Gantt chart may look as on Fig. \ref{fig:gantt:AsyncARTM:slow},
+where most threads are waiting because there is no space left in the queue
+to place $n_{wt}$ counters.
+
+In the next section we resolve the aforementioned problems
+in the \kw{DetAsync} algorithm,
+which produces a deterministic result from run to run
+and achieves high CPU utilization without requiring user to tweak the parameters.
 
 \section{DetAsync: deterministic asynchronous online algorithm}
 \label{sec:DetAsyncARTM}
@@ -522,8 +551,8 @@ and as a result gives the algorithm additional flexibility to distribute more pa
 Steps \ref{alg:DetAsyncARTM:FirstStep} and \ref{alg:DetAsyncARTM:IfStatement} of the algorithm
 are just technical tricks to implement the ``offset'' idea.
 
-Adding an offset should negatively impact the convergence of the \kw{DetAsync~ARTM} algorithm
-comparing to \kw{Online ARTM}.
+Adding an offset should negatively impact the convergence of the \kw{DetAsync} algorithm
+comparing to the \kw{Online} algorithm.
 For example, in \kw{AsyncProcessBatches} the initial matrix $\Phi^0$ is used twice,
 and the two last matrices $\Phi^{\lfloor B / \eta \rfloor - 1}$ and $\Phi^{\lfloor B / \eta \rfloor}$ will not be used at all.
 %(except for $\Phi^{\lfloor B / \eta \rfloor}$ which forms the final result of the algorithm).
@@ -550,13 +579,15 @@ This tradeoff between convergence and CPU utilization is evaluated in the experi
 	\end{centering}
 \end{figure}
 
-The challenging part for the implementation is to aggregate the $\hat n_{wt}$ matrices across multiple batches, given that they are processed in different threads.
-The way BigARTM solves this challenge was changed between versions \kw{v0.6} (see Fig. \ref{fig:diagramm_artm_core}) and \kw{v0.7} (see Fig. \ref{fig:diagramm_artm_core_v07}).
-In the old architecture the $\hat n_{wt}$ matrices were stored in a queue, and then aggregated by a dedicated \emph{Merger thread}.
-This often caused performance bottlenecks, particularly because of small batches or due to a small number of iterations in \kw{ProcessDocument}'s inner loop 
-\ref{alg:ProcessDocument:innerLoopBegin}-\ref{alg:ProcessDocument:innerLoopEnd}.
+The challenging part for the implementation is to aggregate the $\hat n_{wt}$ matrices across multiple batches,
+given that they are processed in different threads.
+The way BigARTM solves this challenge was changed between versions \kw{v0.6} (Fig. \ref{fig:diagramm_artm_core})
+and \kw{v0.7} (Fig. \ref{fig:diagramm_artm_core_v07}).
 
-In the new architecture we removed Merger thread, and $\hat n_{wt}$ are written directly into the final $n_{wt}$ matrix
+In the old architecture the $\hat n_{wt}$ matrices were stored in a queue,
+and then aggregated by a dedicated \emph{Merger thread}.
+In the new architecture we removed Merger thread,
+and $\hat n_{wt}$ are written directly into the final $n_{wt}$ matrix
 concurrently from all processor threads.
 To synchronize the write access we require that
 no threads simultaneously update the same row in $\hat n_{wt}$ matrix,
@@ -620,7 +651,6 @@ Each algorithm was time-boxed to run for a 40 minutes for Wikipedia and 30 minut
 \end{figure}
 
 Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ and $|T|=100$ topics model on Wikipedia and Pubmed datasets.
-TDB: explain memory usage (how many matrices, what is the size of each matrix, how big batches affect memory usage, why old algorithm is so inefficient)
 
 \begin{table}[h]
 	\caption{
