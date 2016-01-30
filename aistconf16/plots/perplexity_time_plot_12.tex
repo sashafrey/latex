@@ -1,0 +1,32 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \begin{axis}[
+	    xlabel=Time (min),
+	    ylabel=Perplexity,
+	    major grid style={draw=lightgray},
+	    ymajorgrids=true,
+	    xmajorgrids=true,
+	    xmin=0,
+	    xmax=30,
+	    ymax=2500,
+	    ymin=1860
+    ]
+	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {offline12.dat};
+    \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {online_new12.dat};
+	\addplot[olive, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old12.dat};
+    \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {online_async12.dat};
+    \legend{Offline\\Online\\Async\\DetAsync\\}
+
+    \end{axis}
+\end{tikzpicture}
+
+\end{document}

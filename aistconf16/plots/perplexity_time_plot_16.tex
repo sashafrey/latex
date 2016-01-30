@@ -19,10 +19,10 @@
 	    ymin=3800
     ]
 	\addplot[red, mark=*] table[x index=0,y index=1,col sep=space] {offline16.dat};
-	\addplot[green, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old16.dat};
     \addplot[blue, mark=square*] table[x index=0,y index=1,col sep=space] {online_new16.dat};
+	\addplot[olive, mark=triangle*] table[x index=0,y index=1,col sep=space] {online_old16.dat};
     \addplot[orange, mark=diamond*] table[x index=0,y index=1,col sep=space] {online_async16.dat};
-    \legend{Offline\\Online old\\Online new\\Online async\\}
+    \legend{Offline\\Online\\Async\\DetAsync\\}
 
     \end{axis}
 \end{tikzpicture}

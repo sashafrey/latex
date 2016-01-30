@@ -32,7 +32,7 @@
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\cL}{\mathscr{L}}
 \newcommand{\cP}{\mathscr{P}}
-\newcommand{\kw}[1]{\textsf{#1}}
+\newcommand{\kw}[1]{\mbox{\textsf{#1}}}
 \SetKwFor{ForAll}{\textbf{for all}}{}{}
 
 \begin{document}
@@ -277,10 +277,29 @@ within each modality.
 In the sequel we list all algorithms for one modality,
 but our implementation in BigARTM supports the general case.
 
-\section{Offline algorithm (\kw{OfflineARTM})}
+\section{Offline algorithm}
 \label{sec:OfflineARTM}
 
 \SetAlgoSkip{}
+\begin{algorithm2e}[t]
+	\caption{\kw{ProcessDocument}($d, \Phi$)}
+	\label{alg:ProcessDocument}
+	\BlankLine
+	\KwIn{document $d \in D$, matrix $\Phi=(\phi_{wt})$;}
+	\KwOut{matrix $(\tilde n_{wt})$, vector $\theta_{td}$;}
+	\BlankLine
+	initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
+	\Repeat{$\theta_d$ converges}{
+		\label{alg:ProcessDocument:innerLoopBegin}
+		$p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $w\in d$ and $t \in T$\;
+		$\theta_{td} := \norm_{t\in T}
+		\bigl(
+		\sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
+		\bigr)$ for all $t \in T$\;
+	}
+	\label{alg:ProcessDocument:innerLoopEnd}
+	$\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
+\end{algorithm2e}
 \begin{algorithm2e}[t]
 \caption{Offline ARTM}
 \label{alg:OfflineARTM}
@@ -302,25 +321,6 @@ create batches $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$\;
     $(\phi_{wt}) := \norm_{w \in W} (n_{wt} + \phi_{wt} \frac{\partial R}{\partial \phi_{wt}})$\;
 }
 \end{algorithm2e}
-\begin{algorithm2e}[t]
-\caption{\kw{ProcessDocument}($d, \Phi$)}
-\label{alg:ProcessDocument}
-\BlankLine
-\KwIn{document $d \in D$, matrix $\Phi=(\phi_{wt})$;}
-\KwOut{matrix $(\tilde n_{wt})$, vector $\theta_{td}$;}
-\BlankLine
-initialize $\theta_{td} := \frac{1}{|T|}$ for all $t \in T$\;
-\Repeat{$\theta_d$ converges}{
-    \label{alg:ProcessDocument:innerLoopBegin}
-    $p_{tdw} := \norm_{t\in T} \bigl(\phi_{wt}\theta_{td}\bigr)$ for all $w\in d$ and $t \in T$\;
-    $\theta_{td} := \norm_{t\in T}
-        \bigl(
-            \sum_{w\in d} n_{dw} p_{tdw} + \theta_{td} \frac{\partial R}{\partial \theta_{td}}
-        \bigr)$ for all $t \in T$\;
-}
-\label{alg:ProcessDocument:innerLoopEnd}
-$\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
-\end{algorithm2e}
 
 \begin{figure}[t]
 \centering
@@ -331,9 +331,10 @@ $\tilde n_{wt} := n_{dw} p_{tdw}$ for all $w \in d$ and $t \in T$\;
 \caption{Gantt chart for \kw{Offline ARTM} (Alg. \ref{alg:OfflineARTM})} \label{fig:gantt:OfflineARTM}
 \end{figure}
 
-\kw{Offline ARTM} is described by Alg. \ref{alg:OfflineARTM} and \ref{alg:ProcessDocument}.
-
-The subroutine \kw{ProcessDocument($d, \Phi$)} corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta} from the solution of the ARTM optimization problem \eqref{eq:ARTM}.
+\kw{Offline ARTM} (Alg. \ref{alg:OfflineARTM}) relies on subroutine
+\kw{ProcessDocument} (Alg. \ref{alg:ProcessDocument}),
+which corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta}
+from the solution of the ARTM optimization problem \eqref{eq:ARTM}.
 \kw{ProcessDocument} requires a fixed $\Phi$ matrix
 and a vector $n_{dw}$ of term frequencies for a given document $d \in D$,
 and as a result it returns the topical distribution $\theta_{td}$ for the document,
@@ -377,7 +378,7 @@ correspond to the time spent in the step \ref{alg:OfflineARTM:Normalize} in Alg.
 where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 
 
-\section{Online algorithm (\kw{Online ARTM})}
+\section{Online algorithm}
 \label{sec:OnlineARTM}
 
 \SetAlgoSkip{}
@@ -409,7 +410,7 @@ where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 	\caption{Gantt chart for \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM})} \label{fig:gantt:OnlineARTM}
 \end{figure}
 
-The \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}) generalize
+The \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}) generalizes
 the Online variational Bayes algorithm,
 suggested in \cite{hoffman10online} for the LDA model.
 Online algorithm improves the convergence rate of the \kw{Offline ARTM}
@@ -445,7 +446,7 @@ In the next two sections we present two asynchronous modification of the online 
 The first of them (\kw{Async~ARTM}) has non-deterministic behavior and few performance bottlenecks.
 The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 
-\section{Asynchronous Online Algorithm (\kw{Async ARTM})}
+\section{Async: asynchronous online algorithm}
 \label{sec:AsyncARTM}
 
 \begin{figure}[h]
@@ -466,14 +467,12 @@ The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 	\caption{Gantt chart for \kw{Async ARTM} from \kw{BigARTM v0.6} --- performance issues} \label{fig:gantt:AsyncARTM:slow}
 \end{figure}
 
-The \kw{Async ARTM} algorithm is the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described in \cite{vfardi15aist}.
-Fig. \ref{fig:gantt:AsyncARTM}, \ref{fig:gantt:AsyncARTM:slow} illustrates run-time behavior of the \kw{Async ARTM} algorithm.
+The \kw{Async} algorithm is the old non-deterministic online algorithm from \kw{BigARTM v0.6}, described in \cite{vfardi15aist}.
+Fig. \ref{fig:gantt:AsyncARTM}, \ref{fig:gantt:AsyncARTM:slow} illustrates run-time behavior of the \kw{Async} algorithm.
 
 TBD: write this chapter.
 
-% Hack: omit Algorithm word to save one line.
-%\section{Deterministic Asynchronous Online Algorithm (\kw{DetAsync ARTM})}
-\section{Deterministic Asynchronous Online (\kw{DetAsync ARTM})}
+\section{DetAsync: deterministic asynchronous online algorithm}
 \label{sec:DetAsyncARTM}
 
 \SetAlgoSkip{}
@@ -538,14 +537,14 @@ This tradeoff between convergence and CPU utilization is evaluated in the experi
 
 \begin{figure}[t]
 	\begin{centering}
-		\includegraphics[height=39mm]{diagramm_artm_core.eps}
+		\includegraphics[height=40mm]{diagramm_artm_core.eps}
 		\caption{Diagram of BigARTM components (old architecture)}
 		\label{fig:diagramm_artm_core}
 	\end{centering}
 \end{figure}
 \begin{figure}[t]
 	\begin{centering}
-		\includegraphics[height=54mm]{diagramm_artm_core_v07.eps}
+		\includegraphics[height=47mm]{diagramm_artm_core_v07.eps}
 		\caption{Diagram of BigARTM components (new architecture)}
 		\label{fig:diagramm_artm_core_v07}
 	\end{centering}
@@ -577,12 +576,12 @@ Previously the users had to interact with low-level building blocks, such as \kw
 \section{Experiments}
 \label{sec:Experiments}
 
-In this section we compare the effectiveness of the
-\kw{Offline ARTM} (Alg. \ref{alg:OfflineARTM}),
-\kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}),
-\kw{Async ARTM} \cite{vfardi15aist} and
-\kw{DetAsync ARTM} (Alg. \ref{alg:DetAsyncARTM}).
-According to \cite{vfardi15aist} \kw{Async ARTM} algorithm
+In this section we compare the effectiveness of
+\kw{Offline} (Alg. \ref{alg:OfflineARTM}),
+\kw{Online} (Alg. \ref{alg:OnlineARTM}),
+\kw{Async} \cite{vfardi15aist} and
+\kw{DetAsync} (Alg. \ref{alg:DetAsyncARTM}) algorithms.
+According to \cite{vfardi15aist} \kw{Async} algorithm
 runs approx. $10$ times comparing to Gensim~\cite{rehurek10software},
 and twice faster comparing to 
 Vowpal Wabbit (VW)~\cite{langford07vw}
@@ -616,7 +615,7 @@ Each algorithm was time-boxed to run for a 40 minutes for Wikipedia and 30 minut
 		\includegraphics[scale=0.65]{plots/perplexity_time_plot_16.pdf}
 %		\caption{12 physical cores, 40 minutes limit} \label{fig:compare12}
 	\end{minipage}
-	\caption{Perplexity versus time for Wikipedia (left) and Pubmed (right), $|T| = 100$ topics}
+	\caption{Perplexity versus time for Pubmed (left) and Wikipedia (right), $|T| = 100$ topics}
 	\label{fig:perf}
 \end{figure}
 
@@ -625,7 +624,7 @@ TDB: explain memory usage (how many matrices, what is the size of each matrix, h
 
 \begin{table}[h]
 	\caption{
-		BigARTM peak memory usage in GB, $|T| = 1000$ topics
+		BigARTM peak memory usage, GB
 	}
 	\label{tab:memory}
 	\centering\tabcolsep=4.3pt
@@ -646,15 +645,22 @@ TDB: explain memory usage (how many matrices, what is the size of each matrix, h
 \section{Conclusions}
 \label{sec:Conclusions}
 
-%Our implementation is designed to be a building block in a distributed topic model,
-
-TBD
+We presented a deterministic asynchronous algorithm for learning
+additively regularized topic models (ARTM).
+The algorithm is flexible and covers a reach class of multi-objective topic models,
+much wider than Latent Dirichlet Allocation (LDA).
+We provided an efficient implementation of the algorithm in BigARTM open-source library,
+and our solution converges an order of magnitude faster than
+the alternative open-source packages.
+In the future we will focus on memory efficiency
+to benefit from sparsity of word-topic ($\Phi$) and topic-document ($\Theta$) matrices,
+and extend our implementation to run on a small cluster.
 
 \bigskip
 \subsubsection*{Acknowledgements.}
 \nopagebreak
 The work was supported by Russian Science Foundation (grant 15-18-00091).
-We would like to thank Prof. K.~V. Vorontsov for constant attention to our research
+Also we would like to thank Prof. K.~V. Vorontsov for constant attention to our research
 and detailed feedback to this paper.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
