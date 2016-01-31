@@ -267,13 +267,16 @@ until convergence.
 In the sequel we discuss several variations of such EM-algorithm,
 which are all based on the above formulas but differ in the way how operations are ordered and grouped together.
 
-In additional to plain text many collections has additional data,
-such as authors, class or category labels, date-time stamps.
+In addition to plain text many collections has other data,
+such as authors, class or category labels, date-time stamps,
+or even associated images, audio or video clips, usage data, etc.
 In \cite{voron15nonbayesian} this data can be represented as \emph{modalities},
 where the overall vocabulary $W$ is split into $M$ subsets
 $W = W^1 \sqcup \dots \sqcup W^M$, one subset per modality,
 and in \eqref{eq:Mstep:phi} matrix $\Phi$ is normalized independently 
-within each modality. 
+within each modality.
+Incorporating modalities into topic model improves its quality
+and makes it applicable for classification, cross-modal retrieval, or making recommendations.
 In the sequel we list all algorithms for one modality,
 but our implementation in BigARTM supports the general case.
 
@@ -341,11 +344,11 @@ and as a result it returns the topical distribution $\theta_{td}$ for the docume
 and a matrix $(\hat n_{wt})$ of size $|d| \times |T|$,
 where $|d|$ gives the number of distinct terms in the document.
 The \kw{ProcessDocument} might be also useful as a separate routine which finds $\theta_{td}$ distribution for a new document,
-but in the \kw{Offline ARTM} it is rather used as a building block in an iterative EM-algorithm that learns the $\Phi$ matrix.
+but in the \kw{Offline} algorithm it is rather used as a building block in an iterative EM-algorithm that learns the $\Phi$ matrix.
 
-\kw{Offline ARTM} performs multiple scans over the collection, calls \kw{ProcessDocument}
+\kw{Offline} algorithm performs scans over the collection, calling \kw{ProcessDocument}
 for each document $d \in D$ from the collection,
-and then aggregates the resulting $(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
+and then aggregating the resulting $(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
 After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{eq:Mstep:phi}$.
 
 %To split collection into batches and process them concurrently is a common approach,
@@ -353,7 +356,7 @@ After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{
 %then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
 
 At step \ref{alg:OfflineARTM:FormBatches} we split collection $D$ into batches $(D_b)$.
-This step is not strictly necessary for \kw{Offline ARTM},
+This step is not strictly necessary for \kw{Offline} algorithm,
 and it rather reflects an internal implementation detail.
 For performance reasons the outer loop over batches $b = 1, \dots, B$ is parallelized across multiple threads,
 and within each batch the inner loop over documents~$d \in D_b$
@@ -368,7 +371,7 @@ Note that $\theta_{td}$ values appear only within $\kw{ProcessDocument}$ subrout
 This leads to efficient memory usage because the implementation never stores the entire theta matrix at any given time.
 Instead, $\theta_{td}$ values are recalculated from scratch on every pass through the collection.
 
-Fig. \ref{fig:gantt:OfflineARTM} shows a Gantt chart of the \kw{Offline ARTM} execution.
+Fig. \ref{fig:gantt:OfflineARTM} shows a Gantt chart of the \kw{Offline} algorithm.
 Here and in the sequel Gantt charts are built for a single EM-iteration on
 \kw{NYTimes} dataset\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Bag+of+Words}}
 ($|D|=300$K, $|W|=102$K) with $|T|=16$ topics.
@@ -380,6 +383,27 @@ where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 
 \section{Online algorithm}
 \label{sec:OnlineARTM}
+
+The \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}) generalizes
+the Online variational Bayes algorithm,
+suggested in \cite{hoffman10online} for the LDA model.
+\kw{Online ARTM} improves the convergence rate of the \kw{Offline ARTM}
+by re-calculating matrix $\Phi$ after every $\eta$ batches.
+To simplify the notation
+we introduce a trivial subroutine
+\[
+\kw{ProcessBatches}(\{D_b\}, \Phi) = \mathlarger\sum\limits_{D_b} \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi) \\
+\]
+that aggregates the output of $\kw{ProcessDocument}$ across a given set of batches at a constant $\Phi$ matrix.
+Here the split of the collection $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$
+into batches
+plays far more significant role than in the \kw{Offline} algorithm,
+because different splitting algorithmically affects the result.
+At step \ref{alg:OnlineARTM:Merge} the new $n_{wt}^{i+1}$ values are calculated as a convex combination
+of the old values $n_{wt}^{i}$ and the value $\hat n_{wt}^{i}$ produced on the recent batches.
+Old counters $n_{wt}^{i}$ are discounted by a factor $(1 - \rho_i)$,
+which depends on the iteration number. A common strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
+where typical values for $\tau_0$ are between $64$ and $1024$, for $\kappa$ --- between $0.5$ and $0.7$.
 
 \SetAlgoSkip{}
 \begin{algorithm2e}[t]
@@ -411,33 +435,12 @@ where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 	\caption{Gantt chart for \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM})} \label{fig:gantt:OnlineARTM}
 \end{figure}
 
-The \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}) generalizes
-the Online variational Bayes algorithm,
-suggested in \cite{hoffman10online} for the LDA model.
-Online algorithm improves the convergence rate of the \kw{Offline ARTM}
-by re-calculating matrix $\Phi$ after every $\eta$ batches.
-To simplify the notation
-we introduce a trivial subroutine
-\[
-\kw{ProcessBatches}(\{D_b\}, \Phi) = \mathlarger\sum\limits_{D_b} \mathlarger\sum\limits_{d \in D_b} \; \kw{ProcessDocument}(d, \Phi) \\
-\]
-that aggregates the output of $\kw{ProcessDocument}$ across a given set of batches at a constant $\Phi$ matrix.
-Here the split of the collection $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$
-into batches
-plays far more significant role than in the \kw{Offline ARTM},
-because different splitting algorithmically affects the result.
-At step \ref{alg:OnlineARTM:Merge} the new $n_{wt}^{i+1}$ values are calculated as a convex combination
-of the old values $n_{wt}^{i}$ and the value $\hat n_{wt}^{i}$ produced on the recent batches.
-Old counters $n_{wt}^{i}$ are discounted by a factor $(1 - \rho_i)$,
-which depends on the iteration number. A common strategy is to use $\rho_i = (\tau_0 + i)^{-\kappa}$,
-where typical values for $\tau_0$ are between $64$ and $1024$, for $\kappa$ --- between $0.5$ and $0.7$.
-
-As in the \kw{Offline ARTM}, the outer loop over batches
+As in the \kw{Offline} algorithm, the outer loop over batches
 $D_{\eta (i - 1) + 1}, \dots, D_{\eta i}$ is executed concurrently across multiple threads.
 The problem with this approach is that all threads have no useful work to do during steps
-\ref{alg:OnlineARTM:Rho}-\ref{alg:OnlineARTM:Normalize} of the \kw{Online ARTM}.
+\ref{alg:OnlineARTM:Rho}-\ref{alg:OnlineARTM:Normalize} of the \kw{Online} algorithm.
 The threads can not start processing the next batches because a new version of $\Phi$ matrix is not ready yet.
-As a result the CPU utilization stays low, and the run-time Gantt chart of the \kw{Online ARTM} typically looks like in Fig. \ref{fig:gantt:OnlineARTM}.
+As a result the CPU utilization stays low, and the run-time Gantt chart of the \kw{Online} algorithm typically looks like in Fig. \ref{fig:gantt:OnlineARTM}.
 Boxes \kw{Even batch} and \kw{Odd batch} both correspond to step \ref{alg:OnlineARTM:ProcessBatches},
 and indicate the version of the $\Phi^i$ matrix (even $i$ or odd $i$).
 \kw{Merge} correspond to the time spend in merging $n_{wt}$ with $\hat n_{wt}$.
@@ -469,7 +472,7 @@ The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 \end{figure}
 
 The \kw{Async} algorithm was implemented in \kw{BigARTM v0.6} as described in \cite{vfardi15aist}.
-Basic idea is to trigger asynchronous execution of the \kw{Offline ARTM} algorithm
+Basic idea is to trigger asynchronous execution of the \kw{Offline} algorithm
 and store the resulting $\hat n_{wt}$ matrices into a queue.
 Then, whenever the number of elements in the queue becomes a multiple of $\eta$,
 the \kw{Async} algorithm performs steps \ref{alg:OnlineARTM:Rho}-\ref{alg:OnlineARTM:Normalize}
@@ -545,7 +548,7 @@ In between calls to \kw{AsyncProcessBatches} and \kw{Await} the algorithm
 can perform some other useful work, while the background threads are calculating the $(\hat n_{wt})$ matrix.
 
 To calculate $\hat n^{i+1}_{wt}$ it uses $\Phi^{i-1}$ matrix,
-which is one generation older than $\Phi^{i}$ matrix used by the \kw{Online ARTM}.
+which is one generation older than $\Phi^{i}$ matrix used by the \kw{Online} algorithm.
 This adds an extra ``offset'' between the moment when $\Phi$ matrix is calculated and the moment when it is used,
 and as a result gives the algorithm additional flexibility to distribute more payload to computation threads.
 Steps \ref{alg:DetAsyncARTM:FirstStep} and \ref{alg:DetAsyncARTM:IfStatement} of the algorithm
@@ -607,6 +610,37 @@ Previously the users had to interact with low-level building blocks, such as \kw
 \section{Experiments}
 \label{sec:Experiments}
 
+
+\begin{figure}[t]
+	\centering
+	\begin{minipage}[b]{0.4\textwidth}
+		\includegraphics[scale=0.65]{plots/perplexity_time_plot_12.pdf}
+	\end{minipage}
+	$\qquad\quad$
+	\begin{minipage}[b]{0.4\textwidth}
+		\includegraphics[scale=0.65]{plots/perplexity_time_plot_16.pdf}
+	\end{minipage}
+	\caption{Perplexity versus time for Pubmed (left) and Wikipedia (right), $|T| = 100$ topics}
+	\label{fig:perf}
+\end{figure}
+\begin{table}[t]
+	\caption{
+		BigARTM peak memory usage, GB
+	}
+	\label{tab:memory}
+	\centering\tabcolsep=4.3pt
+	\begin{tabular}[t]{|l|ccccc|}
+		\hline
+		& $|T|$ & Offline   & Online    & DetAsync     & Async (\kw{v0.6})  \\
+		\hline
+		Pubmed & {1000}	& {5.17}   	& {4.68}   	& {8.18}   	& {13.4}      \\
+		Pubmed & {100}	& {1.86}   	& {1.62}   	& {2.17}   	& {3.71}      \\
+		Wiki   & {1000}	& {1.74}   	& {2.44}   	& {3.93}   	& {7.9}       \\ 
+		Wiki   & {100}	& {0.54}   	& {0.53}   	& {0.83}   	& {1.28}       \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
 In this section we compare the effectiveness of
 \kw{Offline} (Alg. \ref{alg:OfflineARTM}),
 \kw{Online} (Alg. \ref{alg:OnlineARTM}),
@@ -636,55 +670,34 @@ The perplexity measure is defined as
 Each point on the figures corresponds to a moment when the algorithm finishes a complete scan of the collection.
 Each algorithm was time-boxed to run for a 40 minutes for Wikipedia and 30 minutes for Pubmed.
 
-\begin{figure}[t]
-	\centering
-	\begin{minipage}[b]{0.4\textwidth}
-		\includegraphics[scale=0.65]{plots/perplexity_time_plot_12.pdf}
-	\end{minipage}
-	$\qquad\quad$
-	\begin{minipage}[b]{0.4\textwidth}
-		\includegraphics[scale=0.65]{plots/perplexity_time_plot_16.pdf}
-%		\caption{12 physical cores, 40 minutes limit} \label{fig:compare12}
-	\end{minipage}
-	\caption{Perplexity versus time for Pubmed (left) and Wikipedia (right), $|T| = 100$ topics}
-	\label{fig:perf}
-\end{figure}
-
 Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ and $|T|=100$ topics model on Wikipedia and Pubmed datasets.
-
-\begin{table}[h]
-	\caption{
-		BigARTM peak memory usage, GB
-	}
-	\label{tab:memory}
-	\centering\tabcolsep=4.3pt
-	\begin{tabular}[t]{|l|ccccc|}
-		\hline
-		& $|T|$ & Offline   & Online    & DetAsync     & Async (\kw{v0.6})  \\
-		\hline
-		Pubmed & {1000}	& {5.17}   	& {4.68}   	& {8.18}   	& {13.4}      \\
-		Pubmed & {100}	& {1.86}   	& {1.62}   	& {2.17}   	& {3.71}      \\
-		Wiki   & {1000}	& {1.74}   	& {2.44}   	& {3.93}   	& {7.9}       \\ 
-		Wiki   & {100}	& {0.54}   	& {0.53}   	& {0.83}   	& {1.28}       \\ 
-		\hline
-	\end{tabular}
-\end{table}
-
-
 
 \section{Conclusions}
 \label{sec:Conclusions}
 
-We presented a deterministic asynchronous algorithm for learning
+We presented a deterministic asynchronous (\kw{DetAsync}) online algorithm for learning
 additively regularized topic models (ARTM).
-The algorithm is flexible and covers a reach class of multi-objective topic models,
-much wider than Latent Dirichlet Allocation (LDA).
+The algorithm supports all main features of ARTM models,
+including multi-modality, ability to add custom regularizers and combine them with 
+built-in regularizers to produce models that satisfy user requirements.
+This makes the algorithm flexible and allows it to cover
+a much wider class of topic models
+than just Latent Dirichlet Allocation.
+
 We provided an efficient implementation of the algorithm in BigARTM open-source library,
-and our solution converges an order of magnitude faster than
+and our solution runs an order of magnitude faster than
 the alternative open-source packages.
+Comparing to the previous implementation we
+eliminated certain performance bottlenecks,
+achieving optimal CPU utilization without requiring user
+to tweak batch size, number of inner loops per document, and other technical parameters.
+In addition, \kw{DetAsync} algorithm guaranties a deterministic behavior,
+which makes it easier for us to unit-test our implementation
+and makes BigARTM ready for production use-cases.
+
 In the future we will focus on memory efficiency
 to benefit from sparsity of word-topic ($\Phi$) and topic-document ($\Theta$) matrices,
-and extend our implementation to run on a small cluster.
+and extend our implementation to run on a cluster.
 
 \bigskip
 \subsubsection*{Acknowledgements.}
