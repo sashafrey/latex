@@ -267,7 +267,7 @@ until convergence.
 In the sequel we discuss several variations of such EM-algorithm,
 which are all based on the above formulas but differ in the way how operations are ordered and grouped together.
 
-In addition to plain text many collections has other data,
+In addition to plain text many collections has other metadata,
 such as authors, class or category labels, date-time stamps,
 or even associated images, audio or video clips, usage data, etc.
 In \cite{voron15nonbayesian} this data can be represented as \emph{modalities},
@@ -340,7 +340,7 @@ which corresponds to equations \eqref{eq:Estep} and \eqref{eq:Mstep:theta}
 from the solution of the ARTM optimization problem \eqref{eq:ARTM}.
 \kw{ProcessDocument} requires a fixed $\Phi$ matrix
 and a vector $n_{dw}$ of term frequencies for a given document $d \in D$,
-and as a result it returns the topical distribution $\theta_{td}$ for the document,
+and as a result it returns a topical distribution $\theta_{td}$ for the document,
 and a matrix $(\hat n_{wt})$ of size $|d| \times |T|$,
 where $|d|$ gives the number of distinct terms in the document.
 The \kw{ProcessDocument} might be also useful as a separate routine which finds $\theta_{td}$ distribution for a new document,
@@ -500,8 +500,8 @@ where most threads are waiting because there is no space left in the queue
 to place $n_{wt}$ counters.
 
 In the next section we resolve the aforementioned problems
-in the \kw{DetAsync} algorithm,
-which produces a deterministic result from run to run
+by introducing a new \kw{DetAsync} algorithm,
+which has an entirely deterministic behavior
 and achieves high CPU utilization without requiring user to tweak the parameters.
 
 \section{DetAsync: deterministic asynchronous online algorithm}
@@ -554,7 +554,7 @@ and as a result gives the algorithm additional flexibility to distribute more pa
 Steps \ref{alg:DetAsyncARTM:FirstStep} and \ref{alg:DetAsyncARTM:IfStatement} of the algorithm
 are just technical tricks to implement the ``offset'' idea.
 
-Adding an offset should negatively impact the convergence of the \kw{DetAsync} algorithm
+Adding an ``offset'' should negatively impact the convergence of the \kw{DetAsync} algorithm
 comparing to the \kw{Online} algorithm.
 For example, in \kw{AsyncProcessBatches} the initial matrix $\Phi^0$ is used twice,
 and the two last matrices $\Phi^{\lfloor B / \eta \rfloor - 1}$ and $\Phi^{\lfloor B / \eta \rfloor}$ will not be used at all.
@@ -562,7 +562,7 @@ and the two last matrices $\Phi^{\lfloor B / \eta \rfloor - 1}$ and $\Phi^{\lflo
 One the other hand the asynchronous algorithm gives better CPU utilization,
 as clearly shown by the Gantt chart from Fig. \ref{fig:gantt:DetAsyncARTM}.
 %The color scheme for the boxes is as in Fig. \ref{fig:gantt:DetAsyncARTM}.
-This tradeoff between convergence and CPU utilization is evaluated in the experiments from section \ref{sec:Experiments}.
+This tradeoff between convergence and CPU utilization will be evaluated in section~\ref{sec:Experiments}.
 
 \section{Implementation}
 \label{sec:Architecture}
@@ -668,7 +668,7 @@ The perplexity measure is defined as
 \end{equation}
  where $n = \sum_d n_d$. Lower perplexity means better result.
 Each point on the figures corresponds to a moment when the algorithm finishes a complete scan of the collection.
-Each algorithm was time-boxed to run for a 40 minutes for Wikipedia and 30 minutes for Pubmed.
+Each algorithm was time-boxed to run for a 30 minutes.
 
 Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ and $|T|=100$ topics model on Wikipedia and Pubmed datasets.
 
@@ -677,12 +677,12 @@ Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ and $|T|=100$ to
 
 We presented a deterministic asynchronous (\kw{DetAsync}) online algorithm for learning
 additively regularized topic models (ARTM).
-The algorithm supports all main features of ARTM models,
-including multi-modality, ability to add custom regularizers and combine them with 
-built-in regularizers to produce models that satisfy user requirements.
-This makes the algorithm flexible and allows it to cover
-a much wider class of topic models
-than just Latent Dirichlet Allocation.
+The algorithm supports all features of ARTM models,
+including multi-modality, ability to add custom regularizers and
+ability to combine regularizers.
+As a result, the algorithm allows the user to produce topic models with a rich set of desired properties.
+This differenciates ARTM from the existing models, such as LDA or PLSA,
+which give almost no control over the resulting topic model.
 
 We provided an efficient implementation of the algorithm in BigARTM open-source library,
 and our solution runs an order of magnitude faster than
@@ -690,7 +690,7 @@ the alternative open-source packages.
 Comparing to the previous implementation we
 eliminated certain performance bottlenecks,
 achieving optimal CPU utilization without requiring user
-to tweak batch size, number of inner loops per document, and other technical parameters.
+to tweak batch size, number of inner loops per document, and other parameters.
 In addition, \kw{DetAsync} algorithm guaranties a deterministic behavior,
 which makes it easier for us to unit-test our implementation
 and makes BigARTM ready for production use-cases.
