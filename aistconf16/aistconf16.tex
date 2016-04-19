@@ -95,8 +95,8 @@ AD-LDA~\cite{newman09distributed}, PLDA~\cite{wang09plda} and PLDA{+}~\cite{liu1
 all designed to run on a big cluster.
 Topic models of web scale can reach millions of topics and words,
 yielding Big Data models with trillions of parameters \cite{yuan15lightlda}.
-Yet not all researchers and application are dealing with so large web-scale collections,
-and they require an efficient implementation that can run on a powerful workstation or even a laptop.
+Yet not all researchers and applications are dealing with so large web-scale collections.
+Some of them require an efficient implementation that can run on a powerful workstation or even a laptop.
 Such implementations are very useful,
 as shown by the popular open-source packages
 Vowpal Wabbit~\cite{langford07vw}, Gensim~\cite{rehurek10software} and Mallet~\cite{McCallum02mallet},
@@ -220,7 +220,7 @@ as special cases of ARTM with different regularizers~$R$,
 as shown in~\cite{voron14aist,voron15mlj}.
 
 In \cite{voron14dan-eng} it is shown that the \mbox{local} maximum $(\Phi,\Theta)$
-of the problem~\eqref{eq:ARTM} satisfies
+of problem~\eqref{eq:ARTM} satisfies
 the following system of equations:
 \begin{align}
     \label{eq:Estep}
@@ -276,7 +276,7 @@ In addition to plain text, many collections have other metadata,
 such as authors, class or category labels, date-time stamps,
 or even associated images, audio or video clips, usage data, etc.
 In \cite{voron15nonbayesian} this data was represented as \emph{modalities},
-where the overall vocabulary $W$ is split into $M$ subsets
+where the overall vocabulary $W$ is partitioned into $M$ subsets
 $W = W^1 \sqcup \dots \sqcup W^M$, one subset per modality,
 and in \eqref{eq:Mstep:phi} matrix $\Phi$ is normalized independently 
 within each modality.
@@ -347,7 +347,7 @@ from the solution of the ARTM optimization problem \eqref{eq:ARTM}.
 and a vector $n_{dw}$ of term frequencies for a given document $d \in D$,
 and as a result it returns a topical distribution $(\theta_{td})$ for the document,
 and a matrix $(\hat n_{wt})$ of size $|d| \times |T|$,
-where $|d|$ gives the number of distinct words in the document.
+where~$|d|$ denotes the number of distinct words in the document.
 \kw{ProcessDocument} might also be useful as a separate routine which finds $(\theta_{td})$ distribution for a new document,
 but in the \kw{Offline} algorithm it is instead used as a building block in an iterative EM-algorithm that finds the $\Phi$ matrix.
 
@@ -360,13 +360,13 @@ After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{
 %introduced in AD-LDA algorithm \cite{newman09distributed}, and
 %then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
 
-At step \ref{alg:OfflineARTM:FormBatches} we split collection $D$ into batches $(D_b)$.
+At step \ref{alg:OfflineARTM:FormBatches} we partition collection $D$ into batches $(D_b)$.
 This step is not strictly necessary for \kw{Offline} algorithm,
-and it rather reflects an internal implementation detail.
+but it rather reflects an internal implementation detail.
 For performance reasons the outer loop over batches $b = 1, \dots, B$ is parallelized across multiple threads,
 and within each batch the inner loop over documents~$d \in D_b$
 is executed in a single thread.
-Each batch is stored in a separate disk file on disk to allow out-of-core streaming of the collection.
+Each batch is stored in a separate file on disk to allow out-of-core streaming of the collection.
 For typical collections it is reasonable to have around $1000$ documents per batch,
 however for ultimate performance we encourage users to experiment with this parameter.
 Too small batches can cause disk IO overhead due to lots of small reads,
@@ -380,7 +380,7 @@ Fig. \ref{fig:gantt:OfflineARTM} shows a Gantt chart of the \kw{Offline} algorit
 Here and in the sequel Gantt charts are built for a single EM-iteration on
 \kw{NYTimes} dataset\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Bag+of+Words}}
 ($|D|=300$K, $|W|=102$K) with $|T|=16$ topics.
-\kw{ProcessBatch} boxes correspond to the time spent in processing an individual batch.
+\kw{ProcessBatch} boxes corresponds to the time spent in processing an individual batch.
 The final box \kw{Norm}, executed on the main thread,
 correspond to the time spent in the step \ref{alg:OfflineARTM:Normalize} in Alg. \ref{alg:OfflineARTM}
 where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
@@ -403,7 +403,7 @@ that aggregates the output of $\kw{ProcessDocument}$ across a given set of batch
 Here the partition of the collection $D := D_1 \sqcup D_2 \sqcup \dots \sqcup D_B$
 into batches
 plays a far more significant role than in the \kw{Offline} algorithm,
-because different splitting algorithmically affects the result.
+because different partitioning algorithmically affects the result.
 At step \ref{alg:OnlineARTM:Merge} the new $n_{wt}^{i+1}$ values are calculated as a convex combination
 of the old values $n_{wt}^{i}$ and the value $\hat n_{wt}^{i}$ produced on the recent batches.
 Old counters $n_{wt}^{i}$ are scaled by a factor $(1 - \rho_i)$,
@@ -600,7 +600,7 @@ concurrently from all processor threads.
 To synchronize the write access we require that
 no threads simultaneously update the same row in $\hat n_{wt}$ matrix,
 yet the data for distinct words can be written in parallel.
-This is enforced by spin locks $l_w$, one per each word in the dictionary $W$.
+This is enforced by spin locks $l_w$, one per each word in the vocabulary $W$.
 At the end of \kw{ProcessDocument} we loop through all $w \in d$, acquire the corresponding lock $l_w$, append $\hat n_{wt}$ to $n_{wt}$ and release the lock.
 This approach is similar to \cite{smola10architecture},
 where the same pattern is used to update a shared stated in a distributed topic modeling architecture.
@@ -652,18 +652,18 @@ In this section we compare the effectiveness of
 \kw{Async} \cite{vfardi15aist} and
 \kw{DetAsync} (Alg. \ref{alg:DetAsyncARTM}) algorithms.
 According to \cite{vfardi15aist} \kw{Async} algorithm
-runs approx. $10$ times compared to Gensim~\cite{rehurek10software},
+runs approx. $10$ times faster compared to Gensim~\cite{rehurek10software},
 and twice as fast compared to
 Vowpal Wabbit (VW)~\cite{langford07vw}
 in a single thread;
-an with multiple threads BigARTM wins even more.
+and with multiple threads BigARTM wins even more.
 
 In the experiments we use \emph{Wikipedia} dataset ($|D| = 3.7$M articles, $|W| = 100$K words)
 and \emph{Pubmed} dataset ($|D| = 8.2$M abstracts, $|W| = 141$K words).
-The experiments ran on Intel Xeon CPU E5-2650 v2 system with 2 processors, 16 physical cores in total (32 with hyper-threading).
+The experiments were run on Intel Xeon CPU E5-2650 v2 system with 2 processors, 16 physical cores in total (32 with hyper-threading).
 
 
-Fig. \ref{fig:perf} show the \emph{perplexity} as a function of the time spend by the four algorithms listed above.
+Fig. \ref{fig:perf} show the \emph{perplexity} as a function of the time spent by the four algorithms listed above.
 The perplexity measure is defined as
 \begin{equation}
 \label{eq:perplexity}
@@ -673,7 +673,7 @@ The perplexity measure is defined as
 \end{equation}
  where $n = \sum_d n_d$. Lower perplexity means better result.
 Each point on the figures corresponds to a moment when the algorithm finishes a complete scan of the collection.
-Each algorithm was time-boxed to run for a 30 minutes.
+Each algorithm was time-boxed to run for $30$ minutes.
 
 Table \ref{tab:memory} gives peak memory usage for $|T| = 1000$ and $|T|=100$ topics model on Wikipedia and Pubmed datasets.
 
@@ -686,7 +686,7 @@ The algorithm supports all features of ARTM models,
 including multi-modality, ability to add custom regularizers and
 ability to combine regularizers.
 As a result, the algorithm allows the user to produce topic models with a rich set of desired properties.
-This differenciates ARTM from the existing models, such as LDA or PLSA,
+This differentiates ARTM from the existing models, such as LDA or PLSA,
 which give almost no control over the resulting topic model.
 
 We provided an efficient implementation of the algorithm in BigARTM open-source library,
@@ -694,9 +694,9 @@ and our solution runs an order of magnitude faster than
 the alternative open-source packages.
 Compared to the previous implementation we
 eliminated certain performance bottlenecks,
-achieving optimal CPU utilization without requiring user
+achieving optimal CPU utilization without requiring the user
 to tweak batch size and the number of inner loops per document.
-In addition, \kw{DetAsync} algorithm guaranties deterministic behavior,
+In addition, \kw{DetAsync} algorithm guarantees deterministic behavior,
 which makes it easier for us to unit-test our implementation
 and makes BigARTM ready for production use-cases.
 
