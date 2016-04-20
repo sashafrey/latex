@@ -46,10 +46,11 @@
     Murat Apishev\inst{2}
 }
 \institute{\noindent
-    Moscow Institute of Physics and Technology,
+    Moscow Institute of Physics and Technology, Moscow, Russia,
     ~~\email{oleksandr.frei@gmail.com}
     \and
-    Yandex, Higher School of Economics,~~\email{great-mel@yandex.ru}
+    National Research University Higher School of Economics, Moscow, Russia, \\
+    ~~\email{great-mel@yandex.ru}
 }
 
 \maketitle
@@ -71,9 +72,7 @@ memory usage, and spends even less time to achieve the same perplexity.
 \vspace{1em}
 \textbf{Keywords:}
     probabilistic topic modeling,
-    Probabilistic Latent Sematic Analysis,
-    Latent Dirichlet Allocation,
-    Additive Regularization of Topic Models,
+    additive regularization of topic models,
     stochastic matrix factorization,
     EM-algorithm,
     online learning,
@@ -85,8 +84,8 @@ memory usage, and spends even less time to achieve the same perplexity.
 %
 %\cite{li13parserver}
 
-Topic modeling \cite{blei12ptm} is a powerful machine learning tool for statistical text analysis
-that has been widely used in text mining, information retrieval, network analysis and other areas \cite{daud10knowledge}.
+Topic modeling~\cite{blei12ptm} is a powerful machine learning tool for statistical text analysis
+that has been widely used in text mining, information retrieval, network analysis and other areas~\cite{daud10knowledge}.
 Today a lot of research efforts around topic models are devoted to distributed implementations of
 \emph{Latent Dirichlet Allocation} (LDA)~\cite{blei03latent},
 a specific Bayesian topic model that uses Dirichlet conjugate prior.
@@ -94,7 +93,7 @@ This lead to numerous implementations such as
 AD-LDA~\cite{newman09distributed}, PLDA~\cite{wang09plda} and PLDA{+}~\cite{liu11plda},
 all designed to run on a big cluster.
 Topic models of web scale can reach millions of topics and words,
-yielding Big Data models with trillions of parameters \cite{yuan15lightlda}.
+yielding Big Data models with trillions of parameters~\cite{yuan15lightlda}.
 Yet not all researchers and applications are dealing with so large web-scale collections.
 Some of them require an efficient implementation that can run on a powerful workstation or even a laptop.
 Such implementations are very useful,
@@ -105,7 +104,7 @@ which are neither distributed nor sometimes even multi-threaded.
 A similar optimization problem and its distributed implementations exist
 in the Deep Neural Network area, as
 DNN and Topic modeling both use Stochastic Gradient Descent (SGD) optimization.
-The asynchronous SGD \cite{dean2012sgd} does not directly apply to Topic modeling because
+The asynchronous SGD~\cite{dean2012sgd} does not directly apply to Topic modeling because
 it is computationally less efficient to partition a topic model across nodes.
 Limited parallelizability~\cite{seide2014sgd} of speech DNNs across nodes justify our focus on single-node optimizations.
 However, scaling down a distributed algorithm can be challenging.
@@ -115,7 +114,7 @@ Our goal is to develop a flexible framework that can learn a wide variety of top
 
 BigARTM~\cite{vfardi15aist} is an open-source library for
 regularized multimodal topic modeling of large collections.
-BigARTM is based on a novel technique of additive regularized topic models (ARTM)~\cite{voron14dan-eng,voron14aist,voron15mlj,voron15nonbayesian},
+BigARTM is based on a novel technique of additive regularized topic models (ARTM)~\cite{voron14dan-eng,voron15mlj,voron15nonbayesian},
 which gives a flexible multi-criteria approach to probabilistic topic modeling.
 ARTM includes all popular models such as 
 LDA~\cite{blei03latent}, 
@@ -191,14 +190,14 @@ $D$ denote a finite set (collection) of texts and
 $W$ denote a~finite set (vocabulary) of all words from these texts.
 Let
 $n_{dw}$ denote the number of occurrences of a word $w \in W$ in a document $d \in D$;
-$n_{dw}$ values form a sparse matrix of size $|W| \times |D|$,
+$n_{dw}$ values form a sparse matrix of size~$|W| \times |D|$,
 known as \emph{bag-of-words} representation of the collection.
 
 Given an $(n_{dw})$ matrix, a probabilistic topic model finds two matrices:
 $\Phi~=~(\phi_{wt})$ and $\Theta = (\theta_{td})$,
 of sizes $|W| \times |T|$ and $|T| \times |D|$ respectively,
 where $|T|$ is a user-defined number of \emph{topics} in the model (typically $|T| << |W|$).
-Matrices $\Phi$ and $\Theta$
+Matrices~$\Phi$ and $\Theta$
 provide a compressed representation of the $(n_{dw})$ matrix:
 \[
 n_{dw} \approx n_d \sum_{t \in T} \phi_{wt} \theta_{td}, \text { for all } d \in D, w \in W,
@@ -217,9 +216,9 @@ of the expert about the collection.
 With no regularization (${R=0}$) it corresponds to PLSA~\cite{hofmann99plsi}.
 Many Bayesian topic models, including LDA~\cite{blei03latent}, can be represented
 as special cases of ARTM with different regularizers~$R$,
-as shown in~\cite{voron14aist,voron15mlj}.
+as shown in~\cite{voron15mlj}.
 
-In \cite{voron14dan-eng} it is shown that the \mbox{local} maximum $(\Phi,\Theta)$
+In~\cite{voron14dan-eng} it is shown that the \mbox{local} maximum $(\Phi,\Theta)$
 of problem~\eqref{eq:ARTM} satisfies
 the following system of equations:
 \begin{align}
@@ -275,7 +274,7 @@ which are all based on the above formulas but differ in the way how operations a
 In addition to plain text, many collections have other metadata,
 such as authors, class or category labels, date-time stamps,
 or even associated images, audio or video clips, usage data, etc.
-In \cite{voron15nonbayesian} this data was represented as \emph{modalities},
+In~\cite{voron15nonbayesian} this data was represented as \emph{modalities},
 where the overall vocabulary $W$ is partitioned into $M$ subsets
 $W = W^1 \sqcup \dots \sqcup W^M$, one subset per modality,
 and in \eqref{eq:Mstep:phi} matrix $\Phi$ is normalized independently 
@@ -285,7 +284,7 @@ and makes it applicable for classification, cross-modal retrieval, or making rec
 In the sequel we list all algorithms for one modality,
 but our implementation in BigARTM supports the general case.
 
-\section{Offline algorithm}
+\section{Offline Algorithm}
 \label{sec:OfflineARTM}
 
 \SetAlgoSkip{}
@@ -353,12 +352,12 @@ but in the \kw{Offline} algorithm it is instead used as a building block in an i
 
 \kw{Offline} algorithm performs scans over the collection, calling \kw{ProcessDocument}
 for each document $d \in D$ from the collection,
-and then aggregating the resulting $(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
+and then aggregating the resulting~$(\hat n_{wt})$ matrices into the final $(n_{wt})$ matrix of size $|W| \times |T|$.
 After each scan it recalculates $\Phi$ matrix according to the equation $\eqref{eq:Mstep:phi}$.
 
 %To split collection into batches and process them concurrently is a common approach,
-%introduced in AD-LDA algorithm \cite{newman09distributed}, and
-%then further developed in PLDA \cite{wang09plda} and PLDA{+} \cite{liu11plda} algorithms.
+%introduced in AD-LDA algorithm~\cite{newman09distributed}, and
+%then further developed in PLDA~\cite{wang09plda} and PLDA{+}~\cite{liu11plda} algorithms.
 
 At step \ref{alg:OfflineARTM:FormBatches} we partition collection $D$ into batches $(D_b)$.
 This step is not strictly necessary for \kw{Offline} algorithm,
@@ -386,12 +385,12 @@ correspond to the time spent in the step \ref{alg:OfflineARTM:Normalize} in Alg.
 where $n_{wt}$ counters are normalized to produce a new $\Phi$ matrix.
 
 
-\section{Online algorithm}
+\section{Online Algorithm}
 \label{sec:OnlineARTM}
 
 \kw{Online ARTM} (Alg. \ref{alg:OnlineARTM}) generalizes
 the Online variational Bayes algorithm,
-suggested in \cite{hoffman10online} for the LDA model.
+suggested in~\cite{hoffman10online} for the LDA model.
 \kw{Online ARTM} improves the convergence rate of the \kw{Offline ARTM}
 by re-calculating matrix $\Phi$ each time after processing a certain number of batches.
 To simplify the notation
@@ -455,7 +454,7 @@ In the next two sections we present asynchronous modifications of the online alg
 The first of them (\kw{Async~ARTM}) has non-deterministic behavior and few performance bottlenecks.
 The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 
-\section{Async: asynchronous online algorithm}
+\section{Async: Asynchronous Online Algorithm}
 \label{sec:AsyncARTM}
 
 \begin{figure}[h]
@@ -476,7 +475,7 @@ The second algorithm (\kw{DetAsync~ARTM}) addresses these problems.
 	\caption{Gantt chart for \kw{Async ARTM} from \kw{BigARTM v0.6} --- performance issues} \label{fig:gantt:AsyncARTM:slow}
 \end{figure}
 
-\kw{Async} algorithm was implemented in \kw{BigARTM v0.6} as described in \cite{vfardi15aist}.
+\kw{Async} algorithm was implemented in \kw{BigARTM v0.6} as described in~\cite{vfardi15aist}.
 The idea is to trigger asynchronous execution of the \kw{Offline} algorithm
 and store the resulting $\hat n_{wt}$ matrices into a queue.
 Then, whenever the number of elements in the queue becomes equal to $\eta$,
@@ -509,7 +508,7 @@ by introducing a new \kw{DetAsync} algorithm,
 which has an entirely deterministic behavior
 and achieves high CPU utilization without requiring user to tweak the parameters.
 
-\section{DetAsync: deterministic asynchronous online algorithm}
+\section{DetAsync: Deterministic Async Online Algorithm}
 \label{sec:DetAsyncARTM}
 
 \SetAlgoSkip{}
@@ -602,7 +601,7 @@ no threads simultaneously update the same row in $\hat n_{wt}$ matrix,
 yet the data for distinct words can be written in parallel.
 This is enforced by spin locks $l_w$, one per each word in the vocabulary $W$.
 At the end of \kw{ProcessDocument} we loop through all $w \in d$, acquire the corresponding lock $l_w$, append $\hat n_{wt}$ to $n_{wt}$ and release the lock.
-This approach is similar to \cite{smola10architecture},
+This approach is similar to~\cite{smola10architecture},
 where the same pattern is used to update a shared stated in a distributed topic modeling architecture.
 
 In our new architecture we also removed \emph{DataLoader} thread, which previously was loading batches from disk.
@@ -649,9 +648,9 @@ Previously the users had to interact with low-level building blocks, such as \kw
 In this section we compare the effectiveness of
 \kw{Offline} (Alg. \ref{alg:OfflineARTM}),
 \kw{Online} (Alg. \ref{alg:OnlineARTM}),
-\kw{Async} \cite{vfardi15aist} and
+\kw{Async}~\cite{vfardi15aist} and
 \kw{DetAsync} (Alg. \ref{alg:DetAsyncARTM}) algorithms.
-According to \cite{vfardi15aist} \kw{Async} algorithm
+According to~\cite{vfardi15aist} \kw{Async} algorithm
 runs approx. $10$ times faster compared to Gensim~\cite{rehurek10software},
 and twice as fast compared to
 Vowpal Wabbit (VW)~\cite{langford07vw}
@@ -722,17 +721,17 @@ and detailed feedback to this paper.
 \bibitem{blei12ptm}
 D.~M. Blei.
 \newblock Probabilistic topic models.
-\newblock {\em ACM}, 55(4):77--84, 2012.
-
-\bibitem{blei03latent}
-D.~M. Blei, A.~Y. Ng, and M.~I. Jordan.
-\newblock Latent {Dirichlet} allocation.
-\newblock {\em J. Mach. Learn. Res.}, 3:993--1022, 2003.
+\newblock {\em Communications of the ACM}, 55(4):77--84, 2012.
 
 \bibitem{daud10knowledge}
 Daud, A., Li, J., Zhou, L., Muhammad, F.: Knowledge discovery through directed
 probabilistic topic models: a survey. Frontiers of Computer Science in China
 4(2),  280--301 (2010)
+
+\bibitem{blei03latent}
+D.~M. Blei, A.~Y. Ng, and M.~I. Jordan.
+\newblock Latent {Dirichlet} allocation.
+\newblock {\em J. Mach. Learn. Res.}, 3:993--1022, 2003.
 
 %\bibitem{li13parserver}
 %M.~Li, D.~G. Andersen, J.~W. Park, A.~J. Smola, A.~Ahmed, V.~Josifovski, J.~Long, E.~J. Shekita, and B.~Y. Su.
@@ -812,11 +811,6 @@ A.~Smola and S.~Narayanamurthy.
 K.~V. Vorontsov.
 \newblock Additive regularization for topic models of text collections.
 \newblock {\em Doklady Mathematics}, 89(3):301--304, 2014.
-
-\bibitem{voron14aist}
-K.~V. Vorontsov and A.~A. Potapenko.
-\newblock Tutorial on probabilistic topic modeling: Additive regularization for stochastic matrix factorization.
-\newblock In~{\em AIST'2014}, volume 436, pp. 29--46., 2014.
 
 \bibitem{voron15mlj}
 K.~V. Vorontsov and A.~A. Potapenko.
